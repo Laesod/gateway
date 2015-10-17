@@ -1,0 +1,14 @@
+<div style="margin-top: 2rem">You are currently logged in as:</div>
+<div style="font-weight: bold;">{{authValues.name}}</div>
+<div style="margin-top: 2rem">Your roles are:</div>
+<div ng-repeat="role in authValues.authorities" style="font-weight: bold;">{{($index + 1) + '. ' + role.authority}}</div>
+
+
+<button ng-click="onLogOut()" style="padding: 2px; margin-top: 1rem;">Logout</button>
+
+<div>This message added to test deployment process...</div>
+
+<div>This message added to test deployment process...</div>
+
+
+

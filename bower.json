@@ -1,0 +1,29 @@
+{
+    "name": "cimLoginApp",
+    "version": "0.0.0",
+    "appPath": "src/main/resources/public",
+    "dependencies": {
+        "jquery": "~2.0",
+        "bootstrap": "~3.3",
+        "angular": "^1.4.3",
+        "angular-cookies": "^1.4.2",
+        "angular-mocks": "~1.4.3",
+        "angular-ui-router": "^0.2.13",
+        "font-awesome": "~4.0",
+        "lodash": "^3.10.0"
+    },
+    "notUsed": {
+        "angular-bootstrap": "~0.13.1",
+        "angular-messages": "^1.4.2",
+        "angular-material": "~0.10.0",
+        "angular-animate": "~1.4.3",
+        "angular-aria": "~1.4.3",
+        "angular-resource": "^1.4.2",
+        "angular-ui-grid": "~3.0.1",
+        "ng-file-upload": "~5.0.9",
+        "json3": "3.3.2"
+    },
+    "resolutions": {
+        "angular": "~1.4.3"
+    }
+}
