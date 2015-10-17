@@ -1,4 +1,4 @@
-# conspector-gateway
+# gateway
 
 In order to start the project please follow the steps:
 
@@ -7,12 +7,12 @@ In order to start the project please follow the steps:
 'admin@gmail.com' and 'user@gmail.com' both with password 'admin'. admin@gmail.com will be assigned to roles ROLE_ADMIN and ROLE_USER, user@gmail.com will be assigned to the role ROLE_USER (check db_initializer.sql in resources for more details). Passwords will 
 be stored in DB in encoded mode.
 
-- In command line navigate to conspector-gateway folder and execute 
+- In command line navigate to gateway folder and execute 
 	- npm install
 	- bower install
 	- gulp dev	
 
-- Open another command line, navigate to conspector-gateway folder and execute (previous terminal should be open)
+- Open another command line, navigate to gateway folder and execute (previous terminal should be open)
 	- mvn clean install
 	- mvn spring-boot:run
 
@@ -22,7 +22,7 @@ For testing purposes use user/password created by db_initializer.sql script.
 
 Features:
 
-- Logged in user can change his password with PUT request http://localhost:8080/gateway/changePassword that
+- Logged in user can change his password with PUT request http://localhost:2000/gateway/changePassword that
 accept two attributes in the payload: currentPassword and newPassword.
 
 - Possibility to remember password (will be kept for two months);
@@ -49,5 +49,5 @@ track entity modifications at individual field level (for test purposes activate
 - multilanguage support(as many languages as needed) for db fields (as example check description field for ProjectEntity);
 	
 General notes:
-- for email account that will be used as a sender turn on acction should be done here:
+- for email account that will be used as a sender turn on action should be done here:
 https://www.google.com/settings/security/lesssecureapps
