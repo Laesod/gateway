@@ -1,46 +1,37 @@
-<div class="cimlogin row">
-    <div class="status bg-danger ng-binding auth-error" ng-show="!!authenticationError">
-        {{authenticationError}}<span class="close auth-error-close"
-                                     ng-click="authenticationError = null">&#10006;</span>
-    </div>
+<form class="form" role="form">
+    <div class="form-group" ng-class="{required: !!formValidation.username}">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" id="username" placeholder="Your username" ng-model="username"
+               ng-change="formValidation.username = null" autofocus>
 
-    <div class="col-md-4 col-md-offset-4">
-        <form class="form" role="form">
-            <div class="form-group" ng-class="{required: !!formValidation.username}">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" placeholder="Your username" ng-model="username"
-                       ng-change="formValidation.username = null" autofocus>
-
-                <div ng-messages="formValidation">
+        <div ng-messages="formValidation">
                     <span class="errormsg" ng-message="username">
                         {{formValidation.username}}
                     </span>
-                </div>
-            </div>
-
-            <div class="form-group" ng-class="{required: !!formValidation.password}">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" placeholder="Your password"
-                       ng-model="password" ng-change="formValidation.password = null">
-
-                <div ng-messages="formValidation">
-                    <span class="errormsg" ng-message="password">
-                        {{formValidation.password}} 
-                    </span>
-                </div>
-            </div>
-
-            <input id="remember_me" name="remember-me" type="checkbox" ng-model="remember_me"/>
-            <label for="remember_me">Remember me</label>
-
-            <select class="form-control" style="background-color: white; border: 1px solid silver;"
-                    ng-change="onLanguageChange()" ng-model="language"
-                    ng-options="language.description for language in languages">
-            </select>
-
-            <button type="submit" id="loginBtn" class="btn btn-primary" ng-click="login()"
-                    style="    display: block; width: 100%; margin-top: 1rem;">SUBMIT
-            </button>
-        </form>
+        </div>
     </div>
-</div>
+
+    <div class="form-group" ng-class="{required: !!formValidation.password}">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" placeholder="Your password"
+               ng-model="password" ng-change="formValidation.password = null">
+
+        <div ng-messages="formValidation">
+                    <span class="errormsg" ng-message="password">
+                        {{formValidation.password}}
+                    </span>
+        </div>
+    </div>
+
+    <input id="remember_me" name="remember-me" type="checkbox" ng-model="remember_me"/>
+    <label for="remember_me">Remember me</label>
+
+    <select class="form-control" style="background-color: white; border: 1px solid silver;"
+            ng-change="onLanguageChange()" ng-model="language"
+            ng-options="language.description for language in languages">
+    </select>
+
+    <button type="submit" id="loginBtn" class="btn btn-primary" ng-click="login()"
+            style="    display: block; width: 100%; margin-top: 1rem;">SUBMIT
+    </button>
+</form>

@@ -8,7 +8,6 @@ module.exports = {
 
     styles: {
         libSrc: [
-            'src/main/resources/public/lib/bootstrap/dist/css/bootstrap.css',
             'src/main/resources/public/lib/font-awesome/css/font-awesome.css'
         ],
         src: [
@@ -39,9 +38,7 @@ module.exports = {
             'src/main/resources/public/lib/angular/angular.min.js',
             'src/main/resources/public/lib/angular-ui-router/release/angular-ui-router.min.js',
             'src/main/resources/public/lib/angular-cookies/angular-cookies.min.js',
-            'src/main/resources/public/lib/angular-bootstrap/ui-bootstrap.min.js',
-            'src/main/resources/public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js'
-        ],
+            ],
         dest: 'src/main/resources/public/build/js'
     },
 

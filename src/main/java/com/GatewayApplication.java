@@ -136,7 +136,7 @@ public class GatewayApplication {
 	public LocaleResolver localeResolver() {
 		CookieLocaleResolver cookieLocaleResolver = new CookieLocaleResolver();
 		cookieLocaleResolver.setDefaultLocale(StringUtils.parseLocaleString("en"));
-		cookieLocaleResolver.setCookieName("conspectorLanguage");
+		cookieLocaleResolver.setCookieName("appLanguage");
 		cookieLocaleResolver.setCookieMaxAge(604800);//one month
 		return cookieLocaleResolver;
 	}
@@ -251,6 +251,6 @@ public class GatewayApplication {
 
 	@RequestMapping("/user")
 	public Principal user(Principal user) {
-		return user;
+				return user;
 	}
 }

@@ -3,7 +3,6 @@
 require('./global.service');
 require('../general-layout/_index');
 require('../login/_index');
-require('../deficiencies/_index');
 
 var app = require('./_index'),
     http;

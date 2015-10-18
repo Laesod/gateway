@@ -2,22 +2,18 @@
 
 module = require('./_index');
 
-function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS) {
+function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams) {
     removeErrors();
 
-    $scope.languages = [{
-        description: "English",
-        code: "en"
-    }, {
-        description: "French",
-        code: "fr"
-    }];
-
+    $scope.languages = APP_SETTINGS.supportedLanguages;
     $scope.language = $scope.languages[0];
 
     function onLoginSuccess(response) {
-        // $window.location = $stateParams.location;
-        $state.go("app.deficiencies");
+        if($stateParams.location){
+            $window.location = $stateParams.location;
+        }else{
+            $window.location = APP_SETTINGS.apiUrl.defaultRedirectUrl;
+        }
     }
 
     function onLoginFailure(response) {
@@ -37,20 +33,6 @@ function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS) {
             return;
         }
 
-        //************************************************************************************
-        //Example of basic authentication (authentication without login page but with request headers)
-        //Note: Remember me feature is not supported for basic authentication and default spring security settings
-        //************************************************************************************
-        // var headers = {
-        //     authorization: "Basic " + btoa($scope.username + ":" + $scope.password)
-        // };
-        // var req = {
-        //     url: "http://localhost:8080/user",
-        //     headers: headers,
-        //     method: "POST",
-        //     data: {}
-        // };
-        //************************************************************************************
         $http.post('login', "username=" + $scope.username + "&password=" + $scope.password + "&remember-me=" + $scope.remember_me, {
             headers: {
                 "content-type": "application/x-www-form-urlencoded"
@@ -76,8 +58,8 @@ function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS) {
     }
 
     $scope.onLanguageChange = function() {
-        $cookies.remove("conspectorLanguage");
-        $cookies.put("conspectorLanguage", $scope.language.code);
+        $cookies.remove("appLanguage");
+        $cookies.put("appLanguage", $scope.language.code);
     };
 
 }

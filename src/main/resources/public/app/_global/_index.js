@@ -5,7 +5,6 @@ var requires = [
     'templates',
     'globals',
     'generalLayout',
-    'deficiencies',
     'login',
     'ngCookies'
 ];

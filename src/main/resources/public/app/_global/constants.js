@@ -2,14 +2,22 @@
 
 var appSettings = {
     apiUrl: {
-        defaultRedirect: 'http://localhost:9000',
+        defaultRedirectUrl: 'http://localhost:63769',
     },
 
     errorMessages: {
         authenticationFailed: 'Invalid username and/or password.',
         emptyUsername: 'Username is mandatory',
         emptyPassword: 'Password is mandatory'
-    }
+    },
+
+    supportedLanguages: [{
+        description: "English",
+        code: "en"
+    }, {
+        description: "French",
+        code: "fr"
+    }]
 };
 
 module.exports = appSettings;
