@@ -207,7 +207,7 @@ public class GatewayApplication {
 				.and()
 					.rememberMe()
 					.tokenValiditySeconds(2419200)
-					.key("conspector")
+					.key("gateway")
 					.and()
 					.logout()
 				.and()

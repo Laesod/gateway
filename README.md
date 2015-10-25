@@ -30,7 +30,7 @@ accept two attributes in the payload: currentPassword and newPassword.
 - Request input data validation (validation result will be returned with details per attribute - can be used to
 display field validation in UI for each view of the form)
 
-- Backend Localization enabled (based on cookie conspectorLanguage - cookie will stay valid for one month). I.e. request input validation results will be returned with respect of the current language. As example - there is validation for proper email format and password length for create user end point.
+- Backend Localization enabled (based on cookie gatewayLanguage - cookie will stay valid for one month). I.e. request input validation results will be returned with respect of the current language. As example - there is validation for proper email format and password length for create user end point.
 
 - Rest end point unit test examples (groovy based)
 

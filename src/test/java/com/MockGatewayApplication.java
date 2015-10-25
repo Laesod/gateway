@@ -129,7 +129,7 @@ public class MockGatewayApplication {
     public LocaleResolver localeResolver() {
         CookieLocaleResolver cookieLocaleResolver = new CookieLocaleResolver();
         cookieLocaleResolver.setDefaultLocale(StringUtils.parseLocaleString("en"));
-        cookieLocaleResolver.setCookieName("conspectorLanguage");
+        cookieLocaleResolver.setCookieName("gatewayLanguage");
         cookieLocaleResolver.setCookieMaxAge(604800);//one month
         return cookieLocaleResolver;
     }

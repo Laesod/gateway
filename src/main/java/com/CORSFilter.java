@@ -6,10 +6,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Filter to add CORS header.
- * Created by autushka on 7/10/2015.
- */
 @Component
 public class CORSFilter implements Filter {
 
