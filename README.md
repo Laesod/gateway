@@ -12,7 +12,7 @@ be stored in DB in encoded mode.
 	- bower install
 	- gulp dev	
 
-- Open another command line, navigate to gateway folder and execute (previous terminal should be open)
+- Open another command line, navigate to gateway folder and execute (previous terminal should be open). Unit tests will be run (start local mail server for example https://github.com/jaben/papercut Papercut,  start DB)
 	- mvn clean install
 	- mvn spring-boot:run
 
