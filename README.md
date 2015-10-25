@@ -6,9 +6,11 @@ authentication flows (sign up, login, reset password, change password etc), secu
 Project is initially configured to be used along with mainUi-seed application (initial private portion of the "common" web application).
 
 Prerequisites:
+
 	- You have mainUi-seed application up and running on port 63769
 
 In order to start the project please follow the steps:
+
 	- Make sure that you have MySQL db running locally on default port (user: root, password: '');
 	- Create db with name gateway. This database will be initialized by the application on the run time. Two initial users will be added:'admin@gmail.com' and 'user@gmail.com' both with password 'admin'. admin@gmail.com will be assigned to roles ROLE_ADMIN and ROLE_USER, user@gmail.com will be assigned to the role ROLE_USER (check db_initializer.sql in resources for more details). Passwords will be stored in DB in encoded mode.
 
@@ -28,7 +30,8 @@ Now you can try to access localhost:2000
 For testing purposes use user/password created by db_initializer.sql script.
 
 Features:
-	- spring security used based on cookies
+
+	- Spring security used based on cookies
 
 	- Logged in user can change his password with PUT request http://localhost:2000/gateway/changePassword that accept two attributes in the payload: currentPassword and newPassword.
 
@@ -40,8 +43,7 @@ Features:
 
 	- Rest end point unit test examples 
 
-	- Profiling example (different db source settings based on
-	application.properties profile value (development/production/test));
+	- Profiling example (different db source settings based on application.properties profile value (development/production/test));
 
 	- Spring based audit mechanism (automatic population of the fields CreatedBy, ModifiedBy, CreatedAt, LastModifiedAt);
 
