@@ -198,7 +198,7 @@
                 <configuration>
                     <monitorKey>emailserver</monitorKey>
                     <monitorPort>10025</monitorPort>
-                    <daemon>true</daemon>
+                    <!--<daemon>true</daemon>-->
                     <type>greenmail</type>
                     <useSSL>false</useSSL>
                     <mailboxes>
