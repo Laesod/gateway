@@ -20,7 +20,7 @@ In command line navigate to gateway folder and execute:
 	- bower i; (will install js dependencies)
 	- gulp dev; (will produce build folder with final app that should be ready for production use)
 
-Open another command line, navigate to gateway folder and execute (previous terminal should be open). Unit tests will be run. Start DB, start local mail server (for example https://github.com/jaben/papercut Papercut or mvn emailserver:run in separate console)
+Open another command line, navigate to gateway folder and execute (previous terminal should be open). Unit tests will be run. Start DB, local mail server will be started during integration test and stoped after tests finished. During development optionally mail server can be run manually  (for example https://github.com/jaben/papercut Papercut or mvn emailserver:run in separate console).
 
 	- mvn clean install
 	- mvn spring-boot:run

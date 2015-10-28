@@ -188,8 +188,28 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.18.1</version>
 				<configuration>
-					<!--empty for now-->
+					<includes>
+						<include>**/*UnitTest.java</include>
+					</includes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19</version>
+				<configuration>
+					<includes>
+						<include>**/*IntTest.java</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
             <plugin>
                 <groupId>com.btmatthews.maven.plugins</groupId>
@@ -198,7 +218,7 @@
                 <configuration>
                     <monitorKey>emailserver</monitorKey>
                     <monitorPort>10025</monitorPort>
-                    <!--<daemon>true</daemon>-->
+                    <daemon>false</daemon>
                     <type>greenmail</type>
                     <useSSL>false</useSSL>
                     <mailboxes>
@@ -220,24 +240,10 @@
                     <goals>
                       <goal>run</goal>
                     </goals>
-<!--                    <phase>pre-integration-test</phase>-->
+                    <phase>pre-integration-test</phase>
                     <configuration>
                       <daemon>true</daemon>
-                      <type>greenmail</type>
 <!--                      <portOffset>13000</portOffset>-->
-                      <useSSL>false</useSSL>
-                      <mailboxes>
-                        <mailbox>
-                          <login>admin@gmail.com</login>
-                          <password>admin</password>
-                          <email>admin@gmail.com</email>
-                        </mailbox>
-                        <mailbox>
-                          <login>user@gmail.com</login>
-                          <password>admin</password>
-                          <email>user@gmail.com</email>
-                        </mailbox>
-                      </mailboxes>
                     </configuration>
                   </execution>
                   <execution>
@@ -245,7 +251,7 @@
                       <goals>
                           <goal>stop</goal>
                       </goals>
-                  <!--    <phase>post-integration-test</phase>-->
+                      <phase>post-integration-test</phase>
                   </execution>
                 </executions>
             </plugin>
