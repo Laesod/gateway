@@ -8,7 +8,8 @@ module.exports = {
 
     styles: {
         libSrc: [
-            'src/main/resources/public/lib/font-awesome/css/font-awesome.css'
+            'src/main/resources/public/lib/font-awesome/css/font-awesome.css',
+            'src/main/resources/public/lib/angular-material/angular-material.css',
         ],
         src: [
             'src/main/resources/public/app/_global/main.less',
@@ -36,9 +37,12 @@ module.exports = {
         src: [
             'src/main/resources/public/lib/jquery/jquery.min.js',
             'src/main/resources/public/lib/angular/angular.min.js',
+            'src/main/resources/public/lib/angular-aria/angular-aria.min.js',
+            'src/main/resources/public/lib/angular-animate/angular-animate.min.js',
+            'src/main/resources/public/lib/angular-material/angular-material.min.js',
             'src/main/resources/public/lib/angular-ui-router/release/angular-ui-router.min.js',
             'src/main/resources/public/lib/angular-cookies/angular-cookies.min.js',
-            ],
+        ],
         dest: 'src/main/resources/public/build/js'
     },
 

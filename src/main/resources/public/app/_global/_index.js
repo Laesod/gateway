@@ -5,8 +5,9 @@ var requires = [
     'templates',
     'globals',
     'generalLayout',
-    'login',
-    'ngCookies'
+    'publicApp',
+    'ngCookies',
+    'ngMaterial'
 ];
 
 module.exports = angular.module('app', requires);

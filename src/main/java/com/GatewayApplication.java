@@ -212,7 +212,7 @@ public class GatewayApplication {
 					.logout()
 				.and()
 					.authorizeRequests()
-						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/build/**", "/views/**", "/img/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser").permitAll()
+						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/build/**", "/views/**", "/img/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser", "/gateway/initiateResetPassword",  "/gateway/resetPassword").permitAll()
 						.anyRequest().authenticated()
 					.and()
 					.csrf().disable();

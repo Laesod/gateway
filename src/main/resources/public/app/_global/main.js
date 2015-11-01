@@ -2,7 +2,7 @@
 
 require('./global.service');
 require('../general-layout/_index');
-require('../login/_index');
+require('../public-app/_index');
 
 var app = require('./_index'),
     http;
@@ -17,7 +17,8 @@ function onDocumentReady() {
 }
 
 function createApp() {
-    var APP_SETTINGS = require('./constants');
+    var constants = require('./constants');
+    var APP_SETTINGS = constants();
 
     angular.module('app').constant('APP_SETTINGS', APP_SETTINGS);
     angular.module('app').config(require('./on_config'));

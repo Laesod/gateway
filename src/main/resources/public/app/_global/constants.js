@@ -1,23 +1,25 @@
 'use strict';
 
-var appSettings = {
-    apiUrl: {
-        defaultRedirectUrl: 'http://localhost:63769',
-    },
+var AppSettings = function() {
+    var mainAppBaseUrl = 'http://localhost:63769';
+    var apiGatewayBaseUrl = 'http://localhost:2000';
 
-    errorMessages: {
-        authenticationFailed: 'Invalid username and/or password.',
-        emptyUsername: 'Username is mandatory',
-        emptyPassword: 'Password is mandatory'
-    },
-
-    supportedLanguages: [{
-        description: "English",
-        code: "en"
-    }, {
-        description: "French",
-        code: "fr"
-    }]
+    return {
+        appTitle: 'application',
+        apiUrl: {
+            defaultRedirectAfterLoginUrl: mainAppBaseUrl,
+            loginUrl: apiGatewayBaseUrl + '/login',
+            createUserUrl: apiGatewayBaseUrl + '/gateway/createUser',
+            activateUser: apiGatewayBaseUrl + '/gateway/activateUser',
+            initiateResetPassword: apiGatewayBaseUrl + '/gateway/initiateResetPassword',
+            resetPassword: apiGatewayBaseUrl + '/gateway/resetPassword?resetPasswordToken='
+        },
+        errorMessages: {
+            authenticationFailed: 'Invalid username and/or password.',
+            emptyUsername: 'Username is mandatory',
+            emptyPassword: 'Password is mandatory'
+        },
+    };
 };
 
-module.exports = appSettings;
+module.exports = AppSettings;
