@@ -1,8 +1,10 @@
 'use strict';
 
-var AppSettings = function() {
-    var mainAppBaseUrl = 'http://localhost:63769';
-    var apiGatewayBaseUrl = 'http://localhost:2000';
+var AppSettings = function(config) {
+    var mainAppBaseUrl = 'http://' + config.mainAppHost + ":" + config.mainAppPort;
+    var apiGatewayBaseUrl = 'http://' + config.gatewayHost + ":" + config.gatewayPort;
+    // var mainAppBaseUrl = 'http://localhost:63769';
+    // var apiGatewayBaseUrl = 'http://localhost:2000';
 
     return {
         appTitle: 'application',

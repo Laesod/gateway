@@ -5,7 +5,9 @@ require('../general-layout/_index');
 require('../public-app/_index');
 
 var app = require('./_index'),
-    http;
+    http, APP_SETTINGS;
+
+var constants = require('./constants');
 
 angular.element(document).ready(onDocumentReady);
 
@@ -13,13 +15,14 @@ function onDocumentReady() {
     var injector = angular.injector(['app']);
     http = injector.get('$http');
 
-    createApp();
+    http.get('gateway/config?' + new Date().getTime()).
+    success(function(response) {
+        APP_SETTINGS = constants(response);
+        createApp();
+    });
 }
 
 function createApp() {
-    var constants = require('./constants');
-    var APP_SETTINGS = constants();
-
     angular.module('app').constant('APP_SETTINGS', APP_SETTINGS);
     angular.module('app').config(require('./on_config'));
     angular.module('app').run(require('./on_run'));
