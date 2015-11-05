@@ -53,14 +53,23 @@ import java.util.Properties;
 @EnableJpaAuditing//needed to activate auditing(automatically managed fields createdBy, createdDate, lastModifiedBy, lastModifiedDate)
 
 public class GatewayApplication {
-    @Value("${mysql.url}")
-    private String mySqlUrl;
+	@Value("${db.type}")
+	private String dbType;
 
-    @Value("${mysql.username}")
-    private String mySqlUsername;
+	@Value("${db.dialect}")
+	private String dbDialect;
 
-    @Value("${mysql.password}")
-    private String mySqlPassword;
+	@Value("${db.driver}")
+	private String dbDriver;
+
+	@Value("${db.url}")
+    private String dbUrl;
+
+    @Value("${db.username}")
+    private String dbUsername;
+
+    @Value("${db.password}")
+    private String dbPassword;
 
     @Value("${mailserver.host}")
     private String mailHost;
@@ -85,11 +94,10 @@ public class GatewayApplication {
     @Bean
     public DataSource dataSource(){
         DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("com.mysql.jdbc.Driver");
-        //ds.setUrl("jdbc:mysql://localhost/gateway");
-        ds.setUrl(mySqlUrl);
-        ds.setUsername(mySqlUsername);
-        ds.setPassword(mySqlPassword);
+        ds.setDriverClassName(dbDriver);
+        ds.setUrl(dbUrl);
+        ds.setUsername(dbUsername);
+        ds.setPassword(dbPassword);
 
         return ds;
     }
@@ -102,10 +110,10 @@ public class GatewayApplication {
 	@Bean
 	public JpaVendorAdapter jpaVendorAdapter() {
 		HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-		adapter.setDatabase(Database.MYSQL);
+		adapter.setDatabase(Database.valueOf(dbType));
 		adapter.setShowSql(true);
 		adapter.setGenerateDdl(true);
-		adapter.setDatabasePlatform("org.hibernate.dialect.MySQL5Dialect");
+		adapter.setDatabasePlatform(dbDialect);
 		return adapter;
 	}
 
@@ -113,10 +121,10 @@ public class GatewayApplication {
 	public EntityManagerFactory entityManagerFactory() {
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-		vendorAdapter.setDatabase(Database.MYSQL);
+		vendorAdapter.setDatabase(Database.valueOf(dbType));
 		vendorAdapter.setShowSql(true);
 		vendorAdapter.setGenerateDdl(false); //true value not for production !!! update db after entityManager instantiation based on entities
-		vendorAdapter.setDatabasePlatform("org.hibernate.dialect.MySQL5Dialect");
+		vendorAdapter.setDatabasePlatform(dbDialect);
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter(vendorAdapter);
@@ -218,22 +226,25 @@ public class GatewayApplication {
 					.csrf().disable();
 		}
 
-        @Value("${mysql.url}")
-        private String mySqlUrl;
+		@Value("${db.driver}}")
+		private String dbDriver;
 
-        @Value("${mysql.username}")
-        private String mySqlUsername;
+        @Value("${db.url}")
+        private String dbUrl;
 
-        @Value("${mysql.password}")
-        private String mySqlPassword;
+        @Value("${db.username}")
+        private String dbUsername;
+
+        @Value("${db.password}")
+        private String mySqldb;
 
         @Bean
         public DataSource dataSource(){
             DriverManagerDataSource ds = new DriverManagerDataSource();
-            ds.setDriverClassName("com.mysql.jdbc.Driver");
-            ds.setUrl(mySqlUrl);
-            ds.setUsername(mySqlUsername);
-            ds.setPassword(mySqlPassword);
+            ds.setDriverClassName(dbDriver);
+            ds.setUrl(dbUrl);
+            ds.setUsername(dbUsername);
+            ds.setPassword(mySqldb);
 
             return ds;
         }

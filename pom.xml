@@ -158,8 +158,12 @@
 			<artifactId>thymeleaf-spring3</artifactId>
 			<version>2.1.4.RELEASE</version>
 		</dependency>
-
-
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.2.9</version>
+			<scope>test</scope>
+		</dependency>
 </dependencies>
 
 
