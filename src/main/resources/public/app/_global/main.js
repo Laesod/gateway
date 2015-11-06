@@ -15,7 +15,7 @@ function onDocumentReady() {
     var injector = angular.injector(['app']);
     http = injector.get('$http');
 
-    http.get('gateway/config?' + new Date().getTime()).
+    http.get('gateway/gateway/config?' + new Date().getTime()).
     success(function(response) {
         APP_SETTINGS = constants(response);
         createApp();

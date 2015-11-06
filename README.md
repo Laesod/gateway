@@ -7,7 +7,7 @@ Project is initially configured to be used along with mainUi-seed application (i
 
 Prerequisites:
 
-	- You have mainUi-seed application up and running on port 63769
+	- You have mainUi-seed application up and running
 
 In order to start the project please follow the steps:
 
@@ -25,7 +25,7 @@ Open another command line, navigate to gateway folder and execute (previous term
 	- mvn clean install
 	- mvn spring-boot:run
 
-Now you can try to access localhost:2000
+Now you can try to access localhost:2000/gateway
 
 For testing purposes use user/password created by db_initializer.sql script.
 

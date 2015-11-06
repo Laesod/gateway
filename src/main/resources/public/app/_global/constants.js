@@ -9,12 +9,12 @@ var AppSettings = function(config) {
     return {
         appTitle: 'application',
         apiUrl: {
-            defaultRedirectAfterLoginUrl: mainAppBaseUrl,
-            loginUrl: apiGatewayBaseUrl + '/login',
-            createUserUrl: apiGatewayBaseUrl + '/gateway/createUser',
-            activateUser: apiGatewayBaseUrl + '/gateway/activateUser',
-            initiateResetPassword: apiGatewayBaseUrl + '/gateway/initiateResetPassword',
-            resetPassword: apiGatewayBaseUrl + '/gateway/resetPassword?resetPasswordToken='
+            defaultRedirectAfterLoginUrl: mainAppBaseUrl + "/mainUi",
+            loginUrl: apiGatewayBaseUrl + '/gateway/login',
+            createUserUrl: apiGatewayBaseUrl + '/gateway/gateway/createUser',
+            activateUser: apiGatewayBaseUrl + '/gateway/gateway/activateUser',
+            initiateResetPassword: apiGatewayBaseUrl + '/gateway/gateway/initiateResetPassword',
+            resetPassword: apiGatewayBaseUrl + '/gateway/gateway/resetPassword?resetPasswordToken='
         },
         errorMessages: {
             authenticationFailed: 'Invalid username and/or password.',
