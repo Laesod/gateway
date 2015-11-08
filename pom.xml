@@ -6,7 +6,7 @@
 	<groupId>poweredbysergey</groupId>
 	<artifactId>poweredbysergey-gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>Gateway</name>
 	<description>Gateway</description>
@@ -287,4 +287,18 @@
       </snapshots>
     </repository>
   </repositories>
+
+ <profiles>
+	 <profile>
+		<id>NoTomcat</id>
+			 <dependencies>
+				 <dependency>
+					 <groupId>org.springframework.boot</groupId>
+					 <artifactId>spring-boot-starter-tomcat</artifactId>
+					 <scope>provided</scope>
+				 </dependency>
+			 </dependencies>
+	 </profile>
+ </profiles>
 </project>
+

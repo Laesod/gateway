@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -52,7 +54,7 @@ import java.util.Properties;
 @EnableGlobalMethodSecurity(securedEnabled=true) // needed for method based security (@Secured("ROLE_ADMIN") annotation))
 @EnableJpaAuditing//needed to activate auditing(automatically managed fields createdBy, createdDate, lastModifiedBy, lastModifiedDate)
 
-public class GatewayApplication {
+public class GatewayApplication extends SpringBootServletInitializer{
 	@Value("${db.type}")
 	private String dbType;
 
@@ -198,6 +200,11 @@ public class GatewayApplication {
 	public SpringTemplateEngine templateEngine() {
 		SpringTemplateEngine engine = new SpringTemplateEngine();
 		return engine;
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(GatewayApplication.class);
 	}
 
 	public static void main(String[] args) {
