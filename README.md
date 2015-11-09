@@ -12,30 +12,31 @@ Prerequisites:
 In order to start the project please follow the steps:
 
 	- Make sure that you have MySQL db running locally on default port (user: root, password: '');
-	- Create db with name gateway. This database will be initialized by the application on the run time. Two initial users will be added:'admin@gmail.com' and 'user@gmail.com' both with password 'admin'. admin@gmail.com will be assigned to roles ROLE_ADMIN and ROLE_USER, user@gmail.com will be assigned to the role ROLE_USER (check db_initializer.sql in resources for more details). Passwords will be stored in DB in encoded mode.
+	- Create db with name gateway. This database will be initialized by the application on the run time. 
+	Two initial users will be added:'admin@gmail.com' and 'user@gmail.com' both with password 'admin'. admin@gmail.com will be assigned to roles ROLE_ADMIN and ROLE_USER, user@gmail.com will be assigned to the role ROLE_USER (check db_initializer.sql in resources for more details). Passwords will be stored in DB in encoded mode.
 
 In command line navigate to gateway folder and execute:
 
 	- npm i; (will install npm packages dependencies)
 	- bower i; (will install js dependencies)
-	- gulp dev; (will produce build folder with final app that should be ready for production use)
+	- gulp dev; (will produce build folder with final app that should be ready for development use)
 
-Open another command line, navigate to gateway folder and execute (previous terminal should be open). Unit tests will be run. Start DB, local mail server will be started during integration test and stoped after tests finished. During development optionally mail server can be run manually  (for example https://github.com/jaben/papercut Papercut or mvn emailserver:run in separate console).
+Open another command line, navigate to gateway folder and execute (previous terminal should be open): 
 
 	- mvn clean install
 	- mvn spring-boot:run
 
+Unit tests and integration tests will be executed. Embedded mail server will be started during integration test and stopped after tests finished. During development optionally mail server can be run manually. It can be embedded mvn mailserver plugin (that can be run by mvn emailserver:run in separate console) or a separate application (for example Papercut at https://github.com/jaben/papercut).
+In order to skip the tests during compilation use mvn clean install -DskipTests. 
 Now you can try to access localhost:2000/gateway
 
 For testing purposes use user/password created by db_initializer.sql script.
 
-Features:
+Features that can be found in the project:
 
 	- Spring security used based on cookies
 
-	- Logged in user can change his password with PUT request http://localhost:2000/gateway/changePassword that accept two attributes in the payload: currentPassword and newPassword.
-
-	- Possibility to remember password (will be kept for two months);
+	- Remember me feature (no login needed for two months);
 
 	- Request input data validation (validation result will be returned with details per attribute - can be used to display field validation in UI for each view of the form)
 
@@ -58,3 +59,10 @@ Features:
 General notes:
 
 	- for email account that will be used as a sender turn on action should be done here (in case of gmail account): https://www.google.com/settings/security/lesssecureapps
+	- example of shell script for jenkins to start the app on production server:
+	
+sudo bower install --allow-root 
+sudo gulp prod
+sudo mvn clean install -DskipTests 
+echo "sudo mvn spring-boot:run -Dspring.profiles.active=prod" | at now + 1 minutes	
+	
