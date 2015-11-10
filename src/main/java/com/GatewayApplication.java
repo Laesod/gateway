@@ -180,6 +180,7 @@ public class GatewayApplication extends SpringBootServletInitializer{
 		Properties properties = new Properties();
         properties.setProperty("mail.smtp.auth", "true");
 		properties.setProperty("mail.smtp.starttls.enable", "true");
+		properties.setProperty("mail.smtp.starttls.required", "true");
 		mailSender.setJavaMailProperties(properties);
 
 		return mailSender;
