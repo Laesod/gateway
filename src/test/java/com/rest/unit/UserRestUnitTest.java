@@ -51,13 +51,13 @@ public class UserRestUnitTest {
         userRequestDto.setPassword("password");
         when(mockUserRepository.findByUsername(any(String.class))).thenReturn(null);
 
-        Mockito.doNothing().when(mockEmailSender).sendVerificationTokenEmail(any(String.class));
+        Mockito.doNothing().when(mockEmailSender).sendVerificationTokenEmail(any(String.class), any(String.class));
 
         ResponseEntity responseEntity = userRest.createUser(userRequestDto);
 
         verify(mockUserRepository, times(1)).save(any(UserEntity.class));
         verify(mockAuthorityRepository, times(1)).save(any(AuthorityEntity.class));
-        verify(mockEmailSender, times(1)).sendVerificationTokenEmail(any(String.class));
+        verify(mockEmailSender, times(1)).sendVerificationTokenEmail(any(String.class), any(String.class));
     }
 
     //user story 3.
@@ -65,7 +65,7 @@ public class UserRestUnitTest {
     public void createUserWithExistingName(){
         when(mockUserRepository.findByUsername(any(String.class))).thenReturn(new UserEntity());
 
-        Mockito.doNothing().when(mockEmailSender).sendVerificationTokenEmail(any(String.class));
+        Mockito.doNothing().when(mockEmailSender).sendVerificationTokenEmail(any(String.class), any(String.class));
 
         ResponseEntity responseEntity = userRest.createUser(userRequestDto);
     }
@@ -121,11 +121,11 @@ public class UserRestUnitTest {
     @Test
     public void initiateResetPassword(){
         when(mockUserRepository.findByUsername(any(String.class))).thenReturn(user);
-        Mockito.doNothing().when(mockEmailSender).sendReserPasswordEmail(any(String.class));
+        Mockito.doNothing().when(mockEmailSender).sendReserPasswordEmail(any(String.class), any(String.class));
 
         userRest.initiateResetPassword("test@gmail.com");
         verify(mockUserRepository, times(1)).save(any(UserEntity.class));
-        verify(mockEmailSender, times(1)).sendReserPasswordEmail(any(String.class));
+        verify(mockEmailSender, times(1)).sendReserPasswordEmail(any(String.class), any(String.class));
     }
 
     //user story 5.

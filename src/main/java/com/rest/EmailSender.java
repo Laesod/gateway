@@ -41,7 +41,7 @@ public class EmailSender {
 
     }
 
-    public void sendVerificationTokenEmail(String emailVerificationToken){
+    public void sendVerificationTokenEmail(String emailVerificationToken, String requestBaseUrl){
         Locale locale = LocaleContextHolder.getLocale();
         String emailVerificationTemplate = "";
         switch (locale.toString()){
@@ -55,6 +55,7 @@ public class EmailSender {
 
         Context ctx = new Context();
         ctx.setVariable("emailVerificationToken", emailVerificationToken.toString());
+        ctx.setVariable("requestBaseUrl", requestBaseUrl.toString());
 
         String emailText = thymeleaf.process(emailVerificationTemplate, ctx);
 
@@ -65,7 +66,7 @@ public class EmailSender {
         }
     }
 
-    public void sendReserPasswordEmail(String resetPasswordToken){
+    public void sendReserPasswordEmail(String resetPasswordToken, String requestBaseUrl){
         Locale locale = LocaleContextHolder.getLocale();
         String resetPasswordTemplate = "";
         switch (locale.toString()){
@@ -79,6 +80,7 @@ public class EmailSender {
 
         Context ctx = new Context();
         ctx.setVariable("resetPasswordToken", resetPasswordToken.toString());
+        ctx.setVariable("requestBaseUrl", requestBaseUrl.toString());
 
         String emailText = thymeleaf.process(resetPasswordTemplate, ctx);
 

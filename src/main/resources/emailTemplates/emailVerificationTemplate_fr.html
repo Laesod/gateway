@@ -7,6 +7,6 @@
 <p>
     In order to activate your account please follow the link:
 </p>
-<p> <a th:href="${'localhost:2000/#/activate-account/' + emailVerificationToken}" th:text="'localhost:2000/#/activate-account/' + ${emailVerificationToken}">Link</a></p>
+<p> <a th:href="${requestBaseUrl + '/#/activate-account/' + emailVerificationToken}" th:text=" ${requestBaseUrl} + '/#/activate-account/' + ${emailVerificationToken}">Link</a></p>
 </body>
 </html>

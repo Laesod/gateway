@@ -10,11 +10,11 @@ gulp.task('dev', ['lib'], function(cb) {
         console.log('\n');
         console.log('-----------------------------------------------');
         console.log('gulp dev task finished and is in watch mode now');
-        console.log('use http://localhost:2000 to access the app');
+        console.log('use http://localhost:2000/gateway to access the app');
         console.log('-----------------------------------------------');
         console.log('\n');
     };
 
     // runSequence(['styles', 'views', 'index', 'browserify'], 'clean', 'watch', cb);
-    runSequence(['styles', 'views', 'browserify'], 'clean', 'watch', cb);
+    runSequence(['styles', 'views', 'prepareIndexHtml', 'browserify'], 'clean', 'watch', cb);
 });

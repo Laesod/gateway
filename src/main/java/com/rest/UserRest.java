@@ -65,6 +65,15 @@ public class UserRest {
     @Value("${mailserver.username}")
     public String mailUsername;
 
+    @Value("${gatewayHost}")
+    public String gatewayHost;
+
+    @Value("${gatewayPort}")
+    public String gatewayPort;
+
+    @Value("${server.contextPath}")
+    public String contextPath;
+
     public EmailSender emailSender;
 
     private ModelMapper modelMapper = new ModelMapper(); //read more at http://modelmapper.org/user-manual/
@@ -105,7 +114,8 @@ public class UserRest {
             emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailUsername);
         }
 
-        emailSender.sendVerificationTokenEmail(emailVerificationToken.toString());
+        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
+        emailSender.sendVerificationTokenEmail(emailVerificationToken.toString(), requestBaseUrl);
 
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -159,7 +169,8 @@ public class UserRest {
             emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailUsername);
         }
 
-        emailSender.sendReserPasswordEmail(resetPasswordToken.toString());
+        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
+        emailSender.sendReserPasswordEmail(resetPasswordToken.toString(), requestBaseUrl);
 
         return new ResponseEntity(HttpStatus.OK);
     }
