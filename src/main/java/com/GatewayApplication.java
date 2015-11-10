@@ -79,6 +79,9 @@ public class GatewayApplication extends SpringBootServletInitializer{
     @Value("${mailserver.port}")
     private int mailPort;
 
+	@Value("${mailserver.protocol}")
+	private String mailProtocol;
+
     @Value("${mailserver.username}")
     private String mailUsername;
 
@@ -174,13 +177,15 @@ public class GatewayApplication extends SpringBootServletInitializer{
 
 		mailSender.setHost(mailHost);
 		mailSender.setPort(mailPort);
+		mailSender.setProtocol(mailProtocol);
 		mailSender.setUsername(mailUsername);
 		mailSender.setPassword(mailPassword);
 
 		Properties properties = new Properties();
         properties.setProperty("mail.smtp.auth", "true");
-		properties.setProperty("mail.smtp.starttls.enable", "true");
-		properties.setProperty("mail.smtp.starttls.required", "true");
+		properties.setProperty("mail.smtp.ssl.enable", "true");
+		//properties.setProperty("mail.smtp.starttls.required", "true");
+		properties.setProperty("mail.transport.protocol", "smtps");
 		mailSender.setJavaMailProperties(properties);
 
 		return mailSender;
