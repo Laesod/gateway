@@ -62,8 +62,8 @@ public class UserRest {
     @Autowired
     public SpringTemplateEngine thymeleaf;
 
-    @Value("${mailserver.username}")
-    public String mailUsername;
+    @Value("${mailserver.sendFrom}")
+    public String mailSendFrom;
 
     @Value("${gatewayHost}")
     public String gatewayHost;
@@ -111,7 +111,7 @@ public class UserRest {
         authorityRepository.save(authorityEntity); // initial role is assigned to the new user (needed by spring security)
 
         if(emailSender == null){// this check needed for unit testing perposes
-            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailUsername);
+            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailSendFrom);
         }
 
         String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
@@ -166,7 +166,7 @@ public class UserRest {
         userRepository.save(user);
 
         if(emailSender == null){// this check needed for unit testing perposes
-            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailUsername);
+            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailSendFrom);
         }
 
         String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;

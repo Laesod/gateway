@@ -74,8 +74,8 @@ public class UserRestIntTest {
     @Autowired
     private SpringTemplateEngine thymeleaf;
 
-    @Value("${mailserver.username}")
-    private String mailUsername;
+    @Value("${mailserver.sendFrom}")
+    private String mailSendFrom;
 
     private TestData testData = new TestData();
 
@@ -96,7 +96,7 @@ public class UserRestIntTest {
         userRest.mailSender = mailSender;
         userRest.emailTemplateResolver = emailTemplateResolver;
         userRest.thymeleaf = thymeleaf;
-        userRest.mailUsername = mailUsername;
+        userRest.mailSendFrom = mailSendFrom;
 
         userRest.createUser(userRequestDto);
 
@@ -122,7 +122,7 @@ public class UserRestIntTest {
         userRest.mailSender = mailSender;
         userRest.emailTemplateResolver = emailTemplateResolver;
         userRest.thymeleaf = thymeleaf;
-        userRest.mailUsername = mailUsername;
+        userRest.mailSendFrom = mailSendFrom;
 
         userRest.createUser(userRequestDto);
 
@@ -178,7 +178,7 @@ public class UserRestIntTest {
         userRest.mailSender = mailSender;
         userRest.emailTemplateResolver = emailTemplateResolver;
         userRest.thymeleaf = thymeleaf;
-        userRest.mailUsername = mailUsername;
+        userRest.mailSendFrom = mailSendFrom;
 
         userRest.createUser(userRequestDto);
 
