@@ -148,7 +148,11 @@ public class GatewayApplication extends SpringBootServletInitializer{
 
 	@Bean
 	public javax.validation.Validator localValidatorFactoryBean() {
-		return new LocalValidatorFactoryBean();
+		LocalValidatorFactoryBean factory=new LocalValidatorFactoryBean();
+		ReloadableResourceBundleMessageSource messageSource=new ReloadableResourceBundleMessageSource();
+		messageSource.setBasename("classpath:validations");
+		factory.setValidationMessageSource(messageSource);
+		return factory;
 	}
 
 	@Bean
