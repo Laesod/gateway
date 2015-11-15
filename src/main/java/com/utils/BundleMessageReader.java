@@ -13,6 +13,9 @@ public class BundleMessageReader {
     public String getMessage(String key) {
         Locale locale = LocaleContextHolder.getLocale();
 
+        System.out.println("Current local is:");
+        System.out.println(locale.getLanguage());
+
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasenames("classpath:messages");
         messageSource.setUseCodeAsDefaultMessage(true);
