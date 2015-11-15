@@ -82,11 +82,17 @@ public class GatewayApplication extends SpringBootServletInitializer{
 	@Value("${mailserver.protocol}")
 	private String mailProtocol;
 
+	@Value("${mailserver.ssl.enable}")
+	private String mailEnableSSL;
+
     @Value("${mailserver.username}")
     private String mailUsername;
 
     @Value("${mailserver.password}")
-    private String mailPassword;
+	private String mailPassword;
+
+	@Value("${mailserver.debug}")
+	private String mailDebug;
 
     private class SpringSecurityAuditorAware implements AuditorAware<String> {
 		@Override
@@ -172,9 +178,6 @@ public class GatewayApplication extends SpringBootServletInitializer{
 	public JavaMailSender mailSender(){
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-//		mailSender.setHost("localhost");
-//		mailSender.setPort(25);
-
 		mailSender.setHost(mailHost);
 		mailSender.setPort(mailPort);
 		mailSender.setProtocol(mailProtocol);
@@ -183,10 +186,9 @@ public class GatewayApplication extends SpringBootServletInitializer{
 
 		Properties properties = new Properties();
         properties.setProperty("mail.smtps.auth", "true");
-		properties.setProperty("mail.smtp.ssl.enable", "true");
-		//properties.setProperty("mail.smtp.starttls.required", "true");
-		properties.setProperty("mail.transport.protocol", "smtps");
-		properties.setProperty("mail.debug", "true");
+		properties.setProperty("mail.smtp.ssl.enable", mailEnableSSL);
+		properties.setProperty("mail.transport.protocol", mailProtocol);
+		properties.setProperty("mail.debug", mailDebug);
 		mailSender.setJavaMailProperties(properties);
 
 		return mailSender;
