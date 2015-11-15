@@ -1,16 +1,16 @@
 {
-    "name": "cimLoginApp",
-    "version": "0.0.0",
+    "name": "gateway",
+    "version": "0.0.1",
     "appPath": "src/main/resources/public",
     "dependencies": {
-        "jquery": "latest",
-        "angular": "latest",
-        "angular-cookies": "latest",
-        "angular-mocks": "latest",
-        "angular-ui-router": "latest",
-        "font-awesome": "latest",
-        "angular-animate": "latest",
-        "angular-aria": "latest",
-        "angular-material": "latest"
+    "jquery": "latest",
+    "angular": "latest",
+    "angular-cookies": "latest",
+    "angular-mocks": "latest",
+    "angular-ui-router": "latest",
+    "font-awesome": "latest",
+    "angular-animate": "latest",
+    "angular-aria": "latest",
+    "angular-material": "latest"
     }
 }
