@@ -1,5 +1,7 @@
 'use strict';
 
+var contextPrefix = require('./context-prefix');
+
 var AppSettings = function(config) {
     var mainAppBaseUrl = 'http://' + config.mainAppHost + ":" + config.mainAppPort;
     var apiGatewayBaseUrl = 'http://' + config.gatewayHost + ":" + config.gatewayPort;
@@ -8,6 +10,7 @@ var AppSettings = function(config) {
 
     return {
         appTitle: 'application',
+        contextPrefix: contextPrefix(), //'/gateway',
         apiUrl: {
             defaultRedirectAfterLoginUrl: mainAppBaseUrl + "/mainUi",
             loginUrl: apiGatewayBaseUrl + '/gateway/login',

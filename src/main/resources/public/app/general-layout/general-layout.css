@@ -1,0 +1,9 @@
+.successToast {
+  background-color: #75ff75 !important;
+  color: black;
+}
+.errorToast {
+  background-color: #ff704d !important;
+  color: black;
+}
+/*# sourceMappingURL=general-layout.css.map */
