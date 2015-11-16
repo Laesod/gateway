@@ -15,8 +15,10 @@ function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stat
     }
 
     function onLoginFailure(response) {
-        $scope.username = '';
-        $scope.password = '';
+        globalService.displayToast({
+            messageText: "Wrong credentials",
+            messageType: "error"
+        });
     }
 
     $scope.onLogin = function() {
@@ -41,6 +43,12 @@ function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stat
 
     $scope.onForgotPassword = function() {
         $state.go("app.forgotPassword");
+    };
+
+    $scope.onKeyPress = function(event) {
+        if (event.keyCode === 13) {
+            $scope.onLogin();
+        }
     };
 
     // $scope.onLanguageChange = function() {

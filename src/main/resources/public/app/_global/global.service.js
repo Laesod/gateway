@@ -2,7 +2,7 @@
 
 module.exports = angular.module('globals', []);
 
-function globalService($http, $q, $cookies, $window, APP_SETTINGS) {
+function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $rootScope) {
     var service = {};
 
     service.request = function(params) {
@@ -68,6 +68,22 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS) {
             url: url,
             data: parameters.payload
         });
+    };
+
+    service.displayToast = function(parameters) {
+        var templateUrl = "/gateway/templates/toast-template.html";
+
+        $rootScope.toastMessageText = parameters.messageText;
+        $rootScope.toastMessageType = parameters.messageType;
+
+        var oToast = {
+            controller: "ToastCtrl",
+            templateUrl: templateUrl,
+            hideDelay: 3000,
+            position: "top right"
+        };
+
+        $mdToast.show(oToast);
     };
 
     return service;

@@ -11,11 +11,11 @@
 
             <md-input-container>
                 <label>Password</label>
-                <input type="password" id="password" ng-model="password">
+                <input type="password" id="password" ng-model="password" ng-keypress="onKeyPress($event)">
             </md-input-container>
 
             <md-input-container>
-                <md-checkbox id="remember_me" name="remember-me" ng-model="remember_me" class="md-primary">
+                <md-checkbox id="remember_me" name="remember-me" ng-model="remember_me" class="md-primary" ng-keypress="onKeyPress($event)">
                     Remember me
                 </md-checkbox>
             </md-input-container>

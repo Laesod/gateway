@@ -15,7 +15,8 @@ function onDocumentReady() {
     var injector = angular.injector(['app']);
     http = injector.get('$http');
 
-    http.get('gateway/gateway/config?' + new Date().getTime()).
+    //before commiting path should be changed to gateway/gateway/config?
+    http.get('http://localhost:2000/gateway/gateway/config?' + new Date().getTime()).
     success(function(response) {
         APP_SETTINGS = constants(response);
         createApp();

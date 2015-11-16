@@ -240,7 +240,7 @@ public class GatewayApplication extends SpringBootServletInitializer{
 					.logout()
 				.and()
 					.authorizeRequests()
-						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/build/**", "/views/**", "/img/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser", "/gateway/initiateResetPassword",  "/gateway/resetPassword", "/gateway/config").permitAll()
+						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/build/**", "/views/**", "/img/**",  "/templates/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser", "/gateway/initiateResetPassword",  "/gateway/resetPassword", "/gateway/config").permitAll()
 						.anyRequest().authenticated()
 					.and()
 					.csrf().disable();
