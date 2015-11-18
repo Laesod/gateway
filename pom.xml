@@ -10,13 +10,177 @@
 
 	<name>Gateway</name>
 	<description>Gateway</description>
+	<inceptionYear>2015</inceptionYear>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.2.3.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>Powered by Sergey</name>
+	</organization>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<wro4j.version>1.7.6</wro4j.version>
+		<java.version>1.7</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>${project.build.directory}/generated-resources</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<archive>
+						<manifest>
+							<mainClass>${start-class}</mainClass>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+					<includes>
+						<include>**/*UnitTest.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19</version>
+				<configuration>
+					<includes>
+						<include>**/*IntTest.java</include>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>
+                <groupId>com.btmatthews.maven.plugins</groupId>
+                <artifactId>emailserver-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <monitorKey>emailserver</monitorKey>
+                    <monitorPort>10025</monitorPort>
+                    <daemon>false</daemon>
+                    <!--<type>greenmail</type>-->
+                    <useSSL>false</useSSL>
+                    <mailboxes>
+                        <mailbox>
+                            <login>admin@gmail.com</login>
+                            <password>admin</password>
+                            <email>admin@gmail.com</email>
+                        </mailbox>
+                        <mailbox>
+                            <login>user@gmail.com</login>
+                            <password>admin</password>
+                            <email>user@gmail.com</email>
+                        </mailbox>
+                    </mailboxes>
+                </configuration>
+                <executions>
+                  <execution>
+                    <id>run-mail</id>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                    <phase>pre-integration-test</phase>
+                    <configuration>
+                      <daemon>true</daemon>
+<!--                      <portOffset>13000</portOffset>-->
+                    </configuration>
+                  </execution>
+                  <execution>
+                      <id>stop-mail</id>
+                      <goals>
+                          <goal>stop</goal>
+                      </goals>
+                      <phase>post-integration-test</phase>
+                  </execution>
+                </executions>
+            </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.7</version>
+				<configuration>
+					<licenseName>apache_v2</licenseName>
+					<roots>
+						<root>src</root>
+					</roots>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+  <repositories>
+    <repository>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>http://repo.spring.io/libs-snapshot-local</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>http://repo.spring.io/libs-milestone-local</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>spring-releases</id>
+      <name>Spring Releases</name>
+      <url>http://repo.spring.io/libs-release-local</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+        <repository>
+            <id>spring-milestones2</id>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones2</id>
+            <url>https://repo.spring.io/milestone</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 	<dependencyManagement>
 		<dependencies>
@@ -40,8 +204,8 @@
 			<artifactId>spring-cloud-starter-security</artifactId>
 		</dependency>
 		<!--<dependency>-->
-			<!--<groupId>org.springframework.boot</groupId>-->
-			<!--<artifactId>spring-boot-starter-security</artifactId>-->
+		<!--<groupId>org.springframework.boot</groupId>-->
+		<!--<artifactId>spring-boot-starter-security</artifactId>-->
 		<!--</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -165,135 +329,13 @@
 			<scope>test</scope>
 		</dependency>
 		<!--<dependency>-->
-			<!--<groupId>org.springframework.security</groupId>-->
-			<!--<artifactId>spring-security-web</artifactId>-->
-			<!--<version>4.0.3.RELEASE</version>-->
+		<!--<groupId>org.springframework.security</groupId>-->
+		<!--<artifactId>spring-security-web</artifactId>-->
+		<!--<version>4.0.3.RELEASE</version>-->
 		<!--</dependency>-->
 	</dependencies>
 
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<wro4j.version>1.7.6</wro4j.version>
-		<java.version>1.7</java.version>
-	</properties>
-
-	<build>
-		<resources>
-			<resource>
-				<directory>${project.basedir}/src/main/resources</directory>
-			</resource>
-			<resource>
-				<directory>${project.build.directory}/generated-resources</directory>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18.1</version>
-				<configuration>
-					<includes>
-						<include>**/*UnitTest.java</include>
-					</includes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.19</version>
-				<configuration>
-					<includes>
-						<include>**/*IntTest.java</include>
-					</includes>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-            <plugin>
-                <groupId>com.btmatthews.maven.plugins</groupId>
-                <artifactId>emailserver-maven-plugin</artifactId>
-                <version>1.1.0</version>
-                <configuration>
-                    <monitorKey>emailserver</monitorKey>
-                    <monitorPort>10025</monitorPort>
-                    <daemon>false</daemon>
-                    <!--<type>greenmail</type>-->
-                    <useSSL>false</useSSL>
-                    <mailboxes>
-                        <mailbox>
-                            <login>admin@gmail.com</login>
-                            <password>admin</password>
-                            <email>admin@gmail.com</email>
-                        </mailbox>
-                        <mailbox>
-                            <login>user@gmail.com</login>
-                            <password>admin</password>
-                            <email>user@gmail.com</email>
-                        </mailbox>
-                    </mailboxes>
-                </configuration>
-                <executions>
-                  <execution>
-                    <id>run-mail</id>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                    <phase>pre-integration-test</phase>
-                    <configuration>
-                      <daemon>true</daemon>
-<!--                      <portOffset>13000</portOffset>-->
-                    </configuration>
-                  </execution>
-                  <execution>
-                      <id>stop-mail</id>
-                      <goals>
-                          <goal>stop</goal>
-                      </goals>
-                      <phase>post-integration-test</phase>
-                  </execution>
-                </executions>
-            </plugin>
-		</plugins>
-	</build>
-  <repositories>
-    <repository>
-      <id>spring-snapshots</id>
-      <name>Spring Snapshots</name>
-      <url>http://repo.spring.io/libs-snapshot-local</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>spring-milestones</id>
-      <name>Spring Milestones</name>
-      <url>http://repo.spring.io/libs-milestone-local</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>spring-releases</id>
-      <name>Spring Releases</name>
-      <url>http://repo.spring.io/libs-release-local</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
- <profiles>
+	<profiles>
 	 <profile>
 		<id>NoTomcat</id>
 			 <dependencies>
