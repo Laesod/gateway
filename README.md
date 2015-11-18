@@ -26,6 +26,10 @@ Open another command line, navigate to gateway folder and execute (previous term
 	- mvn clean install
 	- mvn spring-boot:run
 
+To generate site reports run ( result will be available in target/site/index.html ):
+
+    - mvn clean install site
+
 Unit tests and integration tests will be executed. Embedded mail server will be started during integration test and stopped after tests finished. During development optionally mail server can be run manually. It can be embedded mvn mailserver plugin (that can be run by mvn emailserver:run in separate console) or a separate application (for example Papercut at https://github.com/jaben/papercut).
 In order to skip the tests during compilation use mvn clean install -DskipTests. 
 Now you can try to access localhost:2000/gateway
