@@ -1,5 +1,7 @@
 # gateway
 
+[![Build Status](https://travis-ci.org/Laesod/gateway.svg?branch=master)](https://travis-ci.org/Laesod/gateway)
+
 The goal of this project is to have a "common" seed for spring based application that enables
 authentication flows (sign up, login, reset password, change password etc), security (role based, project based, user group based), commont features (like localization, entity version tracking etc). It contains angular 1.x UI portion that is css framework agnostic (no css frameworked is used and any can be applied) and contains typical public views like sign up, login, reset password etc. UI application is based on gulp-browserify boilerplate for angularjs (read here for more details: https://github.com/jakemmarsh/angularjs-gulp-browserify-boilerplate).
 
