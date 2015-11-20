@@ -75,4 +75,4 @@ echo "sudo mvn spring-boot:run -Dspring.profiles.active=prod" | at now + 1 minut
 	
 ## License
 
-Licensed under the [APACHE 2.0 license](https://github.com/Laesod/gateway/blob/master/LICENSE).
+Licensed under the [Apache 2.0 license](https://github.com/Laesod/gateway/blob/master/LICENSE).
