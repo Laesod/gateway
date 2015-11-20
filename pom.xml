@@ -9,7 +9,8 @@
 	<packaging>war</packaging>
 
 	<name>Gateway</name>
-	<description>Gateway</description>
+    <url>https://github.com/Laesod/gateway/</url>
+    <description>Gateway</description>
 	<inceptionYear>2015</inceptionYear>
 
 	<licenses>
@@ -22,7 +23,62 @@
 
 	<organization>
 		<name>Powered by Sergey</name>
+        <url>http://powered-by-sergey.wikidot.com</url>
 	</organization>
+
+    <issueManagement>
+        <url>https://github.com/Laesod/gateway/issues</url>
+        <system>GitHub</system>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/Laesod/gateway/</url>
+    </ciManagement>
+
+    <scm>
+        <developerConnection>scm:git:https://github.com/Laesod/gateway.git</developerConnection>
+        <url>https://github.com/Laesod/gateway</url>
+        <connection>scm:git:https://github.com/Laesod/gateway.git</connection>
+    </scm>
+
+    <mailingLists>
+        <mailingList>
+            <name>User List</name>
+            <subscribe>gatewaypbs+subscribe@googlegroups.com</subscribe>
+            <unsubscribe>gatewaypbs+unsubscribe@googlegroups.com</unsubscribe>
+            <post>gatewaypbs@googlegroups.com</post>
+            <archive>https://groups.google.com/forum/#!forum/gatewaypbs</archive>
+        </mailingList>
+    </mailingLists>
+
+    <developers>
+        <developer>
+            <id>Laesod</id>
+            <name>Laesod</name>
+            <email>powered.by.sergey@gmail.com</email>
+            <url>http://powered-by-sergey.wikidot.com</url>
+            <organization>Powered by Sergey</organization>
+            <organizationUrl>http://powered-by-sergey.wikidot.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>Laesod</name>
+            <email>powered.by.sergey@gmail.com</email>
+            <url>http://powered-by-sergey.wikidot.com</url>
+            <organization>Powered by Sergey</organization>
+            <organizationUrl>http://powered-by-sergey.wikidot.com</organizationUrl>
+            <roles>
+                <role>tester</role>
+            </roles>
+        </contributor>
+    </contributors>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
