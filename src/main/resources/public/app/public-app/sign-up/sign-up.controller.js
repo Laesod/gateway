@@ -25,14 +25,39 @@
 
 module = require('../_index');
 
-function SignUpCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService) {
+function SignUpCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
     $scope.signUpPayload = {};
 
+    var isFormDataValid = function() {
+        var result = true;
+
+        if ($scope.signUpPayload.password !== confirmPassword) {
+            result = false;
+        }
+        return result;
+    };
+
     $scope.onSubmit = function() {
+        if (!isFormDataValid()) {
+            $translate("passwordsDontMatch").then(function(value) {
+                globalService.displayToast({
+                    messageText: value,
+                    messageType: "error"
+                });
+            });
+
+            return;
+        }
+
         globalService.signUp({
             payload: $scope.signUpPayload
         }).then(function() {
-            alert("userCreated");
+            $translate("userCreated").then(function(value) {
+                globalService.displayToast({
+                    messageText: value,
+                    messageType: "success"
+                });
+            });
         }, function() {
 
         });

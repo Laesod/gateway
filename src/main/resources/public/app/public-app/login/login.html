@@ -24,24 +24,24 @@
 
         <div flex=40 flex-md=60 flex-sm=80 layout="column">
             <md-input-container>
-                <label>Email</label>
+                <label>{{'email' | translate}}</label>
                 <input type="text" id="username" ng-model="username">
             </md-input-container>
 
             <md-input-container>
-                <label>Password</label>
+                <label>{{'password' | translate}}</label>
                 <input type="password" id="password" ng-model="password" ng-keypress="onKeyPress($event)">
             </md-input-container>
 
             <md-input-container>
                 <md-checkbox id="remember_me" name="remember-me" ng-model="remember_me" class="md-primary" ng-keypress="onKeyPress($event)">
-                    Remember me
+                    {{'rememberMe' | translate}}
                 </md-checkbox>
             </md-input-container>
 
-            <md-button type="submit" id="loginBtn" ng-click="onLogin()" class="md-raised md-primary">LOGIN</md-button>
-            <md-button type="submit" id="signUpBtn" ng-click="onSignUp()" class="md-raised md-primary">SIGN UP</md-button>
-            <md-button type="submit" id="forgotBtn" ng-click="onForgotPassword()" class="md-raised md-primary">FORGOT PASSWORD</md-button>
+            <md-button type="submit" id="loginBtn" ng-click="onLogin()" class="md-raised md-primary">{{'login' | translate}}</md-button>
+            <md-button type="submit" id="signUpBtn" ng-click="onSignUp()" class="md-raised md-primary">{{'signUp' | translate}}</md-button>
+            <md-button type="submit" id="forgotBtn" ng-click="onForgotPassword()" class="md-raised md-primary">{{'forgotPassword' | translate}}</md-button>
         </div>
 
         <div flex=30 flex-md=20 flex-sm=10></div>

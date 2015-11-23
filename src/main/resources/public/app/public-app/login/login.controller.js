@@ -21,7 +21,7 @@
 
 module = require('../_index');
 
-function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService) {
+function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
     // $scope.languages = APP_SETTINGS.supportedLanguages;
     // $scope.language = $scope.languages[0];
 
@@ -34,10 +34,13 @@ function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stat
     }
 
     function onLoginFailure(response) {
-        globalService.displayToast({
-            messageText: "Wrong credentials",
-            messageType: "error"
+        $translate("wrongCredentials").then(function(value) {
+            globalService.displayToast({
+                messageText: value,
+                messageType: "error"
+            });
         });
+
     }
 
     $scope.onLogin = function() {

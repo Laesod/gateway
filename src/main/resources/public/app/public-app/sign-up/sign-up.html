@@ -24,31 +24,31 @@
 
         <div flex=40 flex-md=60 flex-sm=80 layout="column">
             <md-input-container>
-                <label>First Name</label>
+                <label>{{'firstName' | translate}}</label>
                 <input type="text" id="firstName" ng-model="signUpPayload.firstName">
             </md-input-container>
 
             <md-input-container>
-                <label>Last Name</label>
+                <label>{{'lastName' | translate}}</label>
                 <input type="text" id="lastName" ng-model="signUpPayload.lastName">
             </md-input-container>
 
             <md-input-container>
-                <label>Email</label>
+                <label>{{'email' | translate}}</label>
                 <input type="email" id="username" ng-model="signUpPayload.username">
             </md-input-container>
 
             <md-input-container>
-                <label>Password</label>
+                <label>{{'password' | translate}}</label>
                 <input type="password" id="password" ng-model="signUpPayload.password">
             </md-input-container>
 
             <md-input-container>
-                <label>Confirm password</label>
+                <label>{{'confirmPassword' | translate}}</label>
                 <input type="password" id="confirmPassword" ng-model="confirmPassword">
             </md-input-container>            
 
-            <md-button type="submit" id="submitBtn" ng-click="onSubmit()" class="md-raised md-primary">SUBMIT</md-button>
+            <md-button type="submit" id="submitBtn" ng-click="onSubmit()" class="md-raised md-primary">{{'submit' | translate}}</md-button>
 
         </div>
 

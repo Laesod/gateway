@@ -21,9 +21,7 @@ package com.rest.it;
  */
 
 
-import com.GatewayApplication;
 import com.MockGatewayApplication;
-import com.dto.InvitationRequestDto;
 import com.dto.ResetPasswordRequestDto;
 import com.dto.UserPasswordRequestDto;
 import com.dto.UserRequestDto;
@@ -49,7 +47,6 @@ import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.mail.MessagingException;
-import javax.validation.Validator;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;

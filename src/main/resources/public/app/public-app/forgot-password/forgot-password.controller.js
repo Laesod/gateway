@@ -21,12 +21,17 @@
 
 module = require('../_index');
 
-function ForgotPasswordCtrl($scope, globalService) {
+function ForgotPasswordCtrl($scope, globalService, $translate) {
     $scope.onSubmit = function() {
         globalService.initiateResetPassword({
             email: $scope.email
         }).then(function() {
-
+            $translate("resetPasswordEmailSent").then(function(value) {
+                globalService.displayToast({
+                    messageText: value,
+                    messageType: "success"
+                });
+            });
         });
     };
 }

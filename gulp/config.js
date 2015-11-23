@@ -42,6 +42,7 @@ module.exports = {
             'src/main/resources/public/lib/angular-material/angular-material.min.js',
             'src/main/resources/public/lib/angular-ui-router/release/angular-ui-router.min.js',
             'src/main/resources/public/lib/angular-cookies/angular-cookies.min.js',
+            'src/main/resources/public/lib/angular-translate/angular-translate.js'
         ],
         dest: 'src/main/resources/public/build/js'
     },

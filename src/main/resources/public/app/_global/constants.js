@@ -29,6 +29,7 @@ var AppSettings = function(config) {
 
     return {
         appTitle: 'application',
+        appLanguage: 'en',
         contextPrefix: contextParams.contextPrefix(), //'/gateway',
         apiUrl: {
             defaultRedirectAfterLoginUrl: mainAppBaseUrl + "/mainUi",

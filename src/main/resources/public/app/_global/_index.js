@@ -26,7 +26,8 @@ var requires = [
     'generalLayout',
     'publicApp',
     'ngCookies',
-    'ngMaterial'
+    'ngMaterial',
+    'pascalprecht.translate'
 ];
 
 module.exports = angular.module('app', requires);

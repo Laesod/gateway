@@ -21,7 +21,7 @@
 
 module = require('../_index');
 
-function ResetPasswordCtrl($scope, globalService, $stateParams, $state) {
+function ResetPasswordCtrl($scope, globalService, $stateParams, $state, $translate) {
     var resetPasswordToken = $stateParams.resetPasswordToken;
 
     $scope.onSubmit = function() {
@@ -31,7 +31,12 @@ function ResetPasswordCtrl($scope, globalService, $stateParams, $state) {
                 newPassword: $scope.newPassword
             }
         }).then(function() {
-            alert("password was reset...");
+            $translate("resetPasswordFinished").then(function(value) {
+                globalService.displayToast({
+                    messageText: value,
+                    messageType: "success"
+                });
+            });
             $state.go("app.login");
         });
     };

@@ -18,9 +18,8 @@
   #L%
   -->
 <div style="height:100%;">
-    <div ui-view style="height:100%;"></div>
+    <md-toolbar layout="row" layout-align="end center">
+		<a ng-click="changeLanguage()" style="cursor:pointer; margin-right:2rem;">{{currentLanguageCode}}</a>
+    </md-toolbar>	
+	<div ui-view style="height:90%;"></div>
 </div>
-
-
-
-

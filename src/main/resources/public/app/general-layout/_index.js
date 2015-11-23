@@ -28,15 +28,16 @@ angular.module("generalLayout").config(function($stateProvider) {
         .state('app', {
             url: '',
             abstract: true,
+            controller: 'GeneralLayoutCtrl',
             templateUrl: "views/general-layout.html",
             title: ''
         });
 });
 
 angular.module("generalLayout").controller("ToastCtrl", function($scope, $rootScope, $mdToast) {
-    if (angular.isArray($rootScope.toastMessageText)) {
-        $scope.isArrayOfMessages = true;
-    }
+    // if (angular.isArray($rootScope.toastMessageText)) {
+    //     $scope.isArrayOfMessages = true;
+    // }
 
     $scope.messageText = $rootScope.toastMessageText;
 

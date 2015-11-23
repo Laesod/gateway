@@ -24,7 +24,7 @@
     require('../public-app/_index');
 
     var app = require('./_index'),
-        http, APP_SETTINGS;
+        http, APP_SETTINGS, cookies;
 
     var constants = require('./constants');
     var contextParams = require('./context-params');
@@ -34,10 +34,18 @@
     function onDocumentReady() {
         var injector = angular.injector(['app']);
         http = injector.get('$http');
+        cookies = injector.get('$cookies');
 
-    http.get(contextParams.configServicePrefix() + 'gateway/gateway/config?' + new Date().getTime()).
+        var appLanguage = cookies.get('appLanguage');
+
+        http.get(contextParams.configServicePrefix() + 'gateway/gateway/config?' + new Date().getTime()).
         success(function(response) {
             APP_SETTINGS = constants(response);
+
+            if (appLanguage) {
+                APP_SETTINGS.appLanguage = appLanguage;
+            }
+
             createApp();
         });
     }

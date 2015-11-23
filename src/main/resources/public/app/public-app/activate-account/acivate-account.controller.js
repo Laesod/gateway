@@ -21,15 +21,19 @@
 
 module = require('../_index');
 
-function ActivateAccountCtrl($scope, $state, globalService, $stateParams) {
+function ActivateAccountCtrl($scope, $state, globalService, $stateParams, $translate) {
     var emailVerificationToken = $stateParams.emailVerificationToken;
 
     if (emailVerificationToken) {
         globalService.activateUser({
             emailVerificationToken: emailVerificationToken
         }).then(function() {
-            alert("user was activated...");
-            $scope.activationFinished = true;
+            $translate("accountActivated").then(function(value) {
+                globalService.displayToast({
+                    messageText: value,
+                    messageType: "success"
+                });
+            });
         });
     }
 
