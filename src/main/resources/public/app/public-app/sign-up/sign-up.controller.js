@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,19 +25,21 @@
 
 module = require('../_index');
 
-function SignUpCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
+function SignUpCtrl($scope, $rootScope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
     $scope.signUpPayload = {};
 
     var isFormDataValid = function() {
         var result = true;
 
-        if ($scope.signUpPayload.password !== confirmPassword) {
+        if ($scope.signUpPayload.password !== $scope.confirmPassword) {
             result = false;
         }
         return result;
     };
 
     $scope.onSubmit = function() {
+        //$rootScope.formElementsErrors.userRequestDto_password.errorMessage = "Input required";
+        //$rootScope.formElementsErrors.userRequestDto_password = "sdfsdf";
         if (!isFormDataValid()) {
             $translate("passwordsDontMatch").then(function(value) {
                 globalService.displayToast({
@@ -58,9 +60,11 @@ function SignUpCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $sta
                     messageType: "success"
                 });
             });
-        }, function() {
+        }, function(error) {});
+    };
 
-        });
+    $scope.onFormElementChange = function(fieldId) {
+        $rootScope.formElementsErrors[fieldId] = "";
     };
 }
 

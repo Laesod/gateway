@@ -25,23 +25,27 @@
         <div flex=40 flex-md=60 flex-sm=80 layout="column">
             <md-input-container>
                 <label>{{'firstName' | translate}}</label>
-                <input type="text" id="firstName" ng-model="signUpPayload.firstName">
+                <input type="text" id="firstName" ng-model="signUpPayload.firstName" ng-change="onFormElementChange('userRequestDto_firstName')">
             </md-input-container>
+            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_firstName}}</span>
 
             <md-input-container>
                 <label>{{'lastName' | translate}}</label>
-                <input type="text" id="lastName" ng-model="signUpPayload.lastName">
+                <input type="text" id="lastName" ng-model="signUpPayload.lastName" ng-change="onFormElementChange('userRequestDto_lastName')">
             </md-input-container>
+            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_lastName}}</span>
 
             <md-input-container>
                 <label>{{'email' | translate}}</label>
-                <input type="email" id="username" ng-model="signUpPayload.username">
+                <input type="text" id="username" ng-model="signUpPayload.username" ng-change="onFormElementChange('userRequestDto_username')">
             </md-input-container>
+            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_username}}</span>
 
             <md-input-container>
                 <label>{{'password' | translate}}</label>
-                <input type="password" id="password" ng-model="signUpPayload.password">
+                <input type="password" id="password" ng-model="signUpPayload.password" ng-change="onFormElementChange('userRequestDto_password')">
             </md-input-container>
+            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_password}}</span>
 
             <md-input-container>
                 <label>{{'confirmPassword' | translate}}</label>

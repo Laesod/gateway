@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,9 +22,6 @@
 module = require('../_index');
 
 function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
-    // $scope.languages = APP_SETTINGS.supportedLanguages;
-    // $scope.language = $scope.languages[0];
-
     function onLoginSuccess(response) {
         if ($stateParams.location) {
             $window.location = $stateParams.location;
@@ -40,7 +37,6 @@ function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stat
                 messageType: "error"
             });
         });
-
     }
 
     $scope.onLogin = function() {
@@ -72,12 +68,6 @@ function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stat
             $scope.onLogin();
         }
     };
-
-    // $scope.onLanguageChange = function() {
-    //     $cookies.remove("appLanguage");
-    //     $cookies.put("appLanguage", $scope.language.code);
-    // };
-
 }
 
 module.controller('LoginCtrl', LoginCtrl);

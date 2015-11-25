@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,13 +25,26 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
     var service = {};
 
     service.request = function(params) {
+        var that = this;
         var deferred = $q.defer();
+        params.withCredentials = true;
 
         $http(params).
         success(function(data) {
             deferred.resolve(data);
         }).
         error(function(err, status) {
+            switch (err.status) {
+                case 500:
+                    that.displayToast({
+                        messageText: err.message,
+                        messageType: "error"
+                    });
+                    break;
+                case 400:
+                    that.parseSpringValidationError(err);
+                    break;
+            }
             deferred.reject(err);
         });
 
@@ -71,11 +84,12 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
     };
 
     service.initiateResetPassword = function(parameters) {
-        var url = APP_SETTINGS.apiUrl.initiateResetPassword + '?email=' + parameters.email;
+        var url = APP_SETTINGS.apiUrl.initiateResetPassword;
 
         return this.request({
             method: 'PUT',
-            url: url
+            url: url,
+            data: parameters.payload
         });
     };
 
@@ -103,6 +117,38 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
         };
 
         $mdToast.show(oToast);
+    };
+
+    service.parseSpringValidationError = function(parameters) {
+        var errorMessages = [];
+        var errorMessage = "";
+        var fieldName = "";
+        var objectName = "";
+
+        if (parameters.message) {
+            while (parameters.message.indexOf("default message") >= 0) {
+
+                parameters.message = parameters.message.substring(parameters.message.indexOf("'") + 1);
+                objectName = parameters.message.substring(0, parameters.message.indexOf("'"));
+                parameters.message = parameters.message.substring(parameters.message.indexOf("default message") + 17);
+
+                fieldName = parameters.message.substring(0, parameters.message.indexOf("]"));
+                parameters.message = parameters.message.substring(parameters.message.indexOf("default message") + 17);
+                errorMessage = parameters.message.substring(0, parameters.message.indexOf("]"));
+                errorMessages.push({
+                    object: objectName,
+                    field: fieldName,
+                    message: errorMessage
+                });
+
+                // if ($rootScope.formElementsErrors[objectName + '_' + fieldName]) {
+                // debugger;
+                $rootScope.formElementsErrors[objectName + '_' + fieldName] = errorMessage;
+                // }
+            }
+        }
+
+        return errorMessages;
     };
 
     return service;

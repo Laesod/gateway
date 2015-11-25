@@ -30,13 +30,13 @@ import javax.validation.constraints.Size;
  * Created by aautushk on 9/5/2015.
  */
 public class UserPasswordRequestDto {
-    @NotNull(message = "Field is mandatory")
-    @NotEmpty(message = "Field can not be empty")
+    @NotNull(message = "{FieldCanNotBeEmpty}")
+    @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String currentPassword;
 
-    @NotNull(message = "Field is mandatory")
-    @NotEmpty(message = "Field can not be empty")
-    @Size(min = 6, message = "Password length should be at least 6 characters...")
+    @NotNull(message = "{FieldCanNotBeEmpty}")
+    @NotEmpty(message = "{FieldCanNotBeEmpty}")
+    @Size(min = 6, message = "{WrongPasswordLength}")
     private String newPassword;
 
     public String getCurrentPassword(){

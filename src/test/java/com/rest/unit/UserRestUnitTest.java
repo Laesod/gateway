@@ -21,6 +21,7 @@ package com.rest.unit;
  */
 
 
+import com.dto.InitiateResetPasswordRequestDto;
 import com.dto.ResetPasswordRequestDto;
 import com.dto.UserPasswordRequestDto;
 import com.dto.UserRequestDto;
@@ -55,6 +56,7 @@ public class UserRestUnitTest {
     UserEntity user = new UserEntity();
     UserPasswordRequestDto userPasswordRequestDto = new UserPasswordRequestDto();
     ResetPasswordRequestDto resetPasswordRequestDto = new ResetPasswordRequestDto();
+    InitiateResetPasswordRequestDto initiateResetPasswordRequestDto = new InitiateResetPasswordRequestDto();
 
     public UserRestUnitTest(){
         userRest.userRepository = mockUserRepository;
@@ -144,7 +146,8 @@ public class UserRestUnitTest {
         when(mockUserRepository.findByUsername(any(String.class))).thenReturn(user);
         Mockito.doNothing().when(mockEmailSender).sendReserPasswordEmail(any(String.class), any(String.class));
 
-        userRest.initiateResetPassword("test@gmail.com");
+        initiateResetPasswordRequestDto.setEmail("test@gmail.com");
+        userRest.initiateResetPassword(initiateResetPasswordRequestDto);
         verify(mockUserRepository, times(1)).save(any(UserEntity.class));
         verify(mockEmailSender, times(1)).sendReserPasswordEmail(any(String.class), any(String.class));
     }
@@ -154,7 +157,8 @@ public class UserRestUnitTest {
     public void initiateResetPasswordNotValidEmail(){
         when(mockUserRepository.findByUsername(any(String.class))).thenReturn(null);
 
-        userRest.initiateResetPassword("test@gmail.com");
+        initiateResetPasswordRequestDto.setEmail("test@gmail.com");
+        userRest.initiateResetPassword(initiateResetPasswordRequestDto);
     }
 
     //user story 5.

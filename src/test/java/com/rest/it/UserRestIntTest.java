@@ -22,6 +22,7 @@ package com.rest.it;
 
 
 import com.MockGatewayApplication;
+import com.dto.InitiateResetPasswordRequestDto;
 import com.dto.ResetPasswordRequestDto;
 import com.dto.UserPasswordRequestDto;
 import com.dto.UserRequestDto;
@@ -200,7 +201,9 @@ public class UserRestIntTest {
 
         userRest.createUser(userRequestDto);
 
-        userRest.initiateResetPassword(userRequestDto.getUsername());
+        InitiateResetPasswordRequestDto initiateResetPasswordRequestDto = new InitiateResetPasswordRequestDto();
+        initiateResetPasswordRequestDto.setEmail(userRequestDto.getUsername());
+        userRest.initiateResetPassword(initiateResetPasswordRequestDto);
 
         userEntity = userRepository.findByUsername("test@gmail.com");
 

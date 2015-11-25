@@ -32,20 +32,20 @@ import javax.validation.constraints.Size;
  */
 public class UserRequestDto {
 
-    @NotNull(message = "{FieldIsMandatory}")
+    @NotNull(message = "{FieldCanNotBeEmpty}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     @Pattern(regexp=".+@.+\\.[a-z]+", message = "{NotValidEmailValue}")
     private String username;
 
-    @NotNull(message ="{FieldIsMandatory}")
+    @NotNull(message ="{FieldCanNotBeEmpty}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String firstName;
 
-    @NotNull(message = "{FieldIsMandatory}")
+    @NotNull(message = "{FieldCanNotBeEmpty}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String lastName;
 
-    @NotNull(message = "{FieldIsMandatory}")
+    @NotNull(message = "{FieldCanNotBeEmpty}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     @Size(min = 6, message =  "{WrongPasswordLength}")
     private String password;

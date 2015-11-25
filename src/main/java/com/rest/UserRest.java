@@ -21,10 +21,7 @@ package com.rest;
  */
 
 
-import com.dto.ResetPasswordRequestDto;
-import com.dto.UserPasswordRequestDto;
-import com.dto.UserRequestDto;
-import com.dto.UserResponseDto;
+import com.dto.*;
 import com.entity.AuthorityEntity;
 import com.entity.UserEntity;
 import com.repository.IAuthorityRepository;
@@ -170,8 +167,8 @@ public class UserRest {
 
     @RequestMapping(value = "/initiateResetPassword", method = RequestMethod.PUT)
     @Transactional
-    public ResponseEntity initiateResetPassword(@RequestParam String email) {
-        UserEntity user = userRepository.findByUsername(email);
+    public ResponseEntity initiateResetPassword(@Valid @RequestBody InitiateResetPasswordRequestDto initiateResetPasswordRequestDto) {
+        UserEntity user = userRepository.findByUsername(initiateResetPasswordRequestDto.getEmail());
 
         if(user == null){
             throw new RuntimeException(bundleMessageReader.getMessage("NoUserFound"));
