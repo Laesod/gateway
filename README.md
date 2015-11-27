@@ -1,6 +1,6 @@
 # gateway
 
-[![Build Status](https://travis-ci.org/Laesod/gateway.svg?branch=master)](https://travis-ci.org/Laesod/gateway)
+[![Build Status](https://travis-ci.org/Laesod/gateway.svg?branch=develop)](https://travis-ci.org/Laesod/gateway)
 [![License](http://img.shields.io/:license-apache 2.0-blue.svg)](https://github.com/Laesod/gateway/blob/master/LICENSE)
 
 Docs: http://laesod.github.io/gateway/
