@@ -48,9 +48,12 @@ import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -85,9 +88,6 @@ public class UserRestIntTest {
     private IAuthorityRepository authorityRepository;
 
     @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
     private ClassLoaderTemplateResolver emailTemplateResolver;
 
     @Autowired
@@ -107,6 +107,9 @@ public class UserRestIntTest {
     //user story 3.
     @Test
     public void createUser() throws MessagingException {
+        JavaMailSender mailSender = Mockito.mock(JavaMailSender.class);
+        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getDefaultInstance(new Properties())));
+
         UserRequestDto userRequestDto = testData.prepareUserRequestDto();
 
         userRest.userRepository = userRepository;
@@ -133,6 +136,9 @@ public class UserRestIntTest {
     //user story 3.
     @Test
     public void activateUser(){
+        JavaMailSender mailSender = Mockito.mock(JavaMailSender.class);
+        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getDefaultInstance(new Properties())));
+
         UserRequestDto userRequestDto = testData.prepareUserRequestDto();
 
         userRest.userRepository = userRepository;
@@ -189,6 +195,9 @@ public class UserRestIntTest {
     //user story 5.
     @Test
     public void resetPassword() {
+        JavaMailSender mailSender = Mockito.mock(JavaMailSender.class);
+        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getDefaultInstance(new Properties())));
+
         UserRequestDto userRequestDto = testData.prepareUserRequestDto();
 
         userRest.userRepository = userRepository;

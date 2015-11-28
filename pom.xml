@@ -167,6 +167,7 @@
                         </mailbox>
                     </mailboxes>
                 </configuration>
+<!--
                 <executions>
                   <execution>
                     <id>run-mail</id>
@@ -176,7 +177,7 @@
                     <phase>pre-integration-test</phase>
                     <configuration>
                       <daemon>true</daemon>
-<!--                      <portOffset>13000</portOffset>-->
+                      <portOffset>13000</portOffset>
                     </configuration>
                   </execution>
                   <execution>
@@ -187,6 +188,7 @@
                       <phase>post-integration-test</phase>
                   </execution>
                 </executions>
+-->
             </plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
