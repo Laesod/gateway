@@ -27,11 +27,16 @@ import com.dto.InvitationRequestDto;
 import com.dto.ProjectRequestDto;
 import com.entity.*;
 import com.repository.*;
+import com.rest.InvitationRest;
 import com.rest.ProjectRest;
 import com.utils.SecurityContextReader;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
@@ -47,9 +52,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by aautushk on 9/26/2015.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = MockGatewayApplication.class)
 @WebAppConfiguration
@@ -83,6 +85,17 @@ public class ProjectRestIntTest {
 
     @Autowired
     public IInvitationGroupRepository invitationGroupRepository;
+
+    @Mock
+    private SecurityContextReader securityContextReaderMock;
+
+    @InjectMocks
+    private ProjectRest projectRest;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     //user story 1.
     @Test
@@ -118,10 +131,7 @@ public class ProjectRestIntTest {
         invitations.add(invitation);
         projectRequestDto.setInvitations(invitations);
 
-        SecurityContextReader securityContextReaderMock = mock(SecurityContextReader.class);
         when(securityContextReaderMock.getUsername()).thenReturn("test@gmail.com");
-
-        ProjectRest projectRest = new ProjectRest();
 
         projectRest.projectRepository = projectRepository;
         projectRest.translationRepository = translationRepository;
@@ -131,7 +141,6 @@ public class ProjectRestIntTest {
         projectRest.projectGroupRepository = projectGroupRepository;
         projectRest.invitationRepository = invitationRepository;
         projectRest.invitationGroupRepository = invitationGroupRepository;
-        projectRest.securityContextReader = securityContextReaderMock;
 
         projectRest.createProject(projectRequestDto);
 

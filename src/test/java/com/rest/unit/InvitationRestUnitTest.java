@@ -25,31 +25,37 @@ import com.dto.InvitationResponseDto;
 import com.repository.IInvitationRepository;
 import com.rest.InvitationRest;
 import com.utils.SecurityContextReader;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-/**
- * Created by aautushk on 10/9/2015.
- */
+@RunWith(MockitoJUnitRunner.class)
 public class InvitationRestUnitTest {
-    InvitationRest invitationRest = new InvitationRest();
-    SecurityContextReader mockSecurityContextReader = Mockito.mock(SecurityContextReader.class);
-    IInvitationRepository mockInvitationRepository = Mockito.mock(IInvitationRepository.class);
 
-    public InvitationRestUnitTest(){
-        invitationRest.securityContextReader = mockSecurityContextReader;
-        invitationRest.invitationRepository = mockInvitationRepository;
-    }
+    @Mock
+    private SecurityContextReader mockSecurityContextReader;
+
+    @Mock
+    private IInvitationRepository mockInvitationRepository;
+
+    @InjectMocks
+    private InvitationRest invitationRest;
 
     //user story 2.
     @Test
     public void getReceivedInvitations(){
         when(mockSecurityContextReader.getUsername()).thenReturn("admin@gmail.com");
-        when(mockInvitationRepository.findByRecipientEmailAndIsInvitationAccepted(any(String.class), any(boolean.class))).thenReturn(null);
+        when(mockInvitationRepository.findByRecipientEmailAndIsInvitationAccepted(any(String.class), any(boolean.class)))
+                .thenReturn(null);
 
         List<InvitationResponseDto> invitationResponseDtos = invitationRest.getReceivedInvitations();
 

@@ -28,8 +28,12 @@ import com.repository.IInvitationRepository;
 import com.repository.ITranslationRepository;
 import com.rest.InvitationRest;
 import com.utils.SecurityContextReader;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,9 +49,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by aautushk on 9/26/2015.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = MockGatewayApplication.class)
 @WebAppConfiguration
@@ -55,16 +56,27 @@ import static org.mockito.Mockito.when;
 @TransactionConfiguration(defaultRollback=true)
 @ActiveProfiles("test")
 public class InvitationRestIntTest {
-    @Autowired
-    IInvitationRepository invitationRepository;
 
     @Autowired
-    ITranslationRepository translationRepository;
+    private IInvitationRepository invitationRepository;
+
+    @Autowired
+    private ITranslationRepository translationRepository;
+
+    @Mock
+    private SecurityContextReader securityContextReaderMock;
+
+    @InjectMocks
+    private InvitationRest invitationRest;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     //user story 2.
     @Test
     public void getReceivedInvitations() {
-        SecurityContextReader securityContextReaderMock = mock(SecurityContextReader.class);
         when(securityContextReaderMock.getUsername()).thenReturn("test@gmail.com");
 
         InvitationEntity invitationEntity = new InvitationEntity();
@@ -75,10 +87,8 @@ public class InvitationRestIntTest {
 
         invitationRepository.save(invitationEntity);
 
-        InvitationRest invitationRest = new InvitationRest();
         List<InvitationResponseDto> invitations = new ArrayList<InvitationResponseDto>();
 
-        invitationRest.securityContextReader = securityContextReaderMock;
         invitationRest.invitationRepository = invitationRepository;
         invitationRest.translationRepository = translationRepository;
 

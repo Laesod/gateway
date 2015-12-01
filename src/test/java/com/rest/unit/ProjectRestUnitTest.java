@@ -30,8 +30,13 @@ import com.repository.*;
 import com.rest.InvitationRest;
 import com.rest.ProjectRest;
 import com.utils.SecurityContextReader;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -44,36 +49,43 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by aautushk on 10/9/2015.
- */
+@RunWith(MockitoJUnitRunner.class)
 public class ProjectRestUnitTest {
-    ProjectRest projectRest = new ProjectRest();
-    IProjectRepository mockProjectRepository = Mockito.mock(IProjectRepository.class);
-    IProjectUserRepository mockProjectUserRepository = Mockito.mock(IProjectUserRepository.class);
-    IAuthorityRepository mockAuthorityRepository = Mockito.mock(IAuthorityRepository.class);
-    ITranslationRepository mockTranslationRepository = Mockito.mock(ITranslationRepository.class);
-    IGroupRepository mockGroupRepository = Mockito.mock(IGroupRepository.class);
-    IProjectGroupRepository mockProjectGroupRepository = Mockito.mock(IProjectGroupRepository.class);
-    IInvitationRepository mockInvitationRepository = Mockito.mock(IInvitationRepository.class);
-    IInvitationGroupRepository mockInvitationGroupRepository = Mockito.mock(IInvitationGroupRepository.class);
 
-    SecurityContextReader mockSecurityContextReader = Mockito.mock(SecurityContextReader.class);
+    @Mock
+    private IProjectRepository mockProjectRepository;
 
-    ProjectRequestDto projectRequestDto = new ProjectRequestDto();
+    @Mock
+    private IProjectUserRepository mockProjectUserRepository;
 
-    public ProjectRestUnitTest(){
-        projectRest.projectRepository = mockProjectRepository;
-        projectRest.projectUserRepository = mockProjectUserRepository;
-        projectRest.authorityRepository = mockAuthorityRepository;
-        projectRest.translationRepository = mockTranslationRepository;
-        projectRest.groupRepository = mockGroupRepository;
-        projectRest.projectGroupRepository = mockProjectGroupRepository;
-        projectRest.invitationRepository = mockInvitationRepository;
-        projectRest.invitationGroupRepository = mockInvitationGroupRepository;
+    @Mock
+    private IAuthorityRepository mockAuthorityRepository;
 
-        projectRest.securityContextReader = mockSecurityContextReader;
+    @Mock
+    private ITranslationRepository mockTranslationRepository;
 
+    @Mock
+    private IGroupRepository mockGroupRepository;
+
+    @Mock
+    private IProjectGroupRepository mockProjectGroupRepository;
+
+    @Mock
+    private IInvitationRepository mockInvitationRepository;
+
+    @Mock
+    private IInvitationGroupRepository mockInvitationGroupRepository;
+
+    @Mock
+    private SecurityContextReader mockSecurityContextReader;
+
+    @InjectMocks
+    private ProjectRest projectRest;
+
+    private ProjectRequestDto projectRequestDto = new ProjectRequestDto();
+
+    @Before
+    public void setup() {
         projectRequestDto.setDescription("My project");
 
         ArrayList<GroupRequestDto> groups = new ArrayList<GroupRequestDto>();
