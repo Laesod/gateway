@@ -36,6 +36,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -259,6 +260,7 @@ public class GatewayApplication{
 					.logout()
 				.and()
 					.authorizeRequests()
+						.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
 						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/build/**", "/views/**", "/img/**",  "/templates/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser", "/gateway/initiateResetPassword",  "/gateway/resetPassword", "/gateway/config").permitAll()
 						.anyRequest().authenticated()
 					.and()
