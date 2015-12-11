@@ -6,7 +6,7 @@
 	<groupId>poweredbysergey</groupId>
 	<artifactId>poweredbysergey-gateway</artifactId>
 	<version>v.0.0.3-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>Gateway</name>
     <url>https://github.com/Laesod/gateway/</url>
