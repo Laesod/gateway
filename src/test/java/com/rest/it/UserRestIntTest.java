@@ -31,9 +31,12 @@ import com.entity.UserEntity;
 import com.repository.IAuthorityRepository;
 import com.repository.IUserRepository;
 import com.rest.UserRest;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -48,16 +51,15 @@ import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-
-/**
- * Created by aautushk on 9/26/2015.
- */
 
 class TestData{
     public UserRequestDto prepareUserRequestDto(){
@@ -85,9 +87,6 @@ public class UserRestIntTest {
     private IAuthorityRepository authorityRepository;
 
     @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
     private ClassLoaderTemplateResolver emailTemplateResolver;
 
     @Autowired
@@ -103,6 +102,16 @@ public class UserRestIntTest {
     private StandardPasswordEncoder standardPasswordEncoder = new StandardPasswordEncoder("53cr3t");
 
     private UserEntity userEntity = new UserEntity();
+
+    @Mock
+    private JavaMailSender mailSender;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        when(mailSender.createMimeMessage())
+                .thenReturn(new MimeMessage(Session.getDefaultInstance(new Properties())));
+    }
 
     //user story 3.
     @Test

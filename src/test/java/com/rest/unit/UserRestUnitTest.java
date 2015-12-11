@@ -31,8 +31,13 @@ import com.repository.IAuthorityRepository;
 import com.repository.IUserRepository;
 import com.rest.EmailSender;
 import com.rest.UserRest;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
@@ -42,27 +47,33 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * Created by aautushk on 10/9/2015.
- */
+@RunWith(MockitoJUnitRunner.class)
 public class UserRestUnitTest {
-    UserRest userRest = new UserRest();
-    UserRequestDto userRequestDto = new UserRequestDto();
-    IUserRepository mockUserRepository = Mockito.mock(IUserRepository.class);
-    IAuthorityRepository mockAuthorityRepository = Mockito.mock(IAuthorityRepository.class);
-    StandardPasswordEncoder standardPasswordEncoder = new StandardPasswordEncoder("53cr3t");
-    EmailSender mockEmailSender = Mockito.mock(EmailSender.class);
-    Principal mockPrincipalUser = Mockito.mock(Principal.class);
-    UserEntity user = new UserEntity();
-    UserPasswordRequestDto userPasswordRequestDto = new UserPasswordRequestDto();
-    ResetPasswordRequestDto resetPasswordRequestDto = new ResetPasswordRequestDto();
-    InitiateResetPasswordRequestDto initiateResetPasswordRequestDto = new InitiateResetPasswordRequestDto();
 
-    public UserRestUnitTest(){
-        userRest.userRepository = mockUserRepository;
-        userRest.authorityRepository = mockAuthorityRepository;
-        userRest.emailSender = mockEmailSender;
+    @Mock
+    private IUserRepository mockUserRepository;
 
+    @Mock
+    private IAuthorityRepository mockAuthorityRepository;
+
+    @Mock
+    private EmailSender mockEmailSender;
+
+    @Mock
+    private Principal mockPrincipalUser;
+
+    @InjectMocks
+    private UserRest userRest;
+
+    private UserRequestDto userRequestDto = new UserRequestDto();
+    private StandardPasswordEncoder standardPasswordEncoder = new StandardPasswordEncoder("53cr3t");
+    private UserEntity user = new UserEntity();
+    private UserPasswordRequestDto userPasswordRequestDto = new UserPasswordRequestDto();
+    private ResetPasswordRequestDto resetPasswordRequestDto = new ResetPasswordRequestDto();
+    private InitiateResetPasswordRequestDto initiateResetPasswordRequestDto = new InitiateResetPasswordRequestDto();
+
+    @Before
+    public void setup(){
         userPasswordRequestDto.setCurrentPassword("password");
         userPasswordRequestDto.setNewPassword("newPassword");
         resetPasswordRequestDto.setNewPassword("password");
@@ -105,7 +116,6 @@ public class UserRestUnitTest {
         assertTrue(user.isEnabled());
         verify(mockUserRepository, times(1)).save(any(UserEntity.class));
     }
-
 
     //user story 3.
     @Test(expected = RuntimeException.class)
