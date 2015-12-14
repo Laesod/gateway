@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -49,7 +51,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -61,7 +65,10 @@ import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.persistence.EntityManagerFactory;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Properties;
 
@@ -74,7 +81,7 @@ import java.util.Properties;
 @EnableGlobalMethodSecurity(securedEnabled=true) // needed for method based security (@Secured("ROLE_ADMIN") annotation))
 @EnableJpaAuditing//needed to activate auditing(automatically managed fields createdBy, createdDate, lastModifiedBy, lastModifiedDate)
 
-public class GatewayApplication{
+public class GatewayApplication extends SpringBootServletInitializer {
 	@Value("${db.type}")
 	private String dbType;
 
@@ -235,10 +242,10 @@ public class GatewayApplication{
 		return engine;
 	}
 
-//	@Override
-//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-//		return application.sources(GatewayApplication.class);
-//	}
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(GatewayApplication.class);
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(GatewayApplication.class, args);
@@ -249,6 +256,7 @@ public class GatewayApplication{
 	protected static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			AlwaysSendUnauthorized401AuthenticationEntryPoint alwaysSendUnauthorized401AuthenticationEntryPoint = new AlwaysSendUnauthorized401AuthenticationEntryPoint();
 			//2419200 means 4 weeks
 			http
 					.formLogin()
@@ -264,7 +272,8 @@ public class GatewayApplication{
 						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/build/**", "/views/**", "/img/**",  "/templates/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser", "/gateway/initiateResetPassword",  "/gateway/resetPassword", "/gateway/config").permitAll()
 						.anyRequest().authenticated()
 					.and()
-					.csrf().disable();
+					.csrf().disable()
+					.exceptionHandling().authenticationEntryPoint(alwaysSendUnauthorized401AuthenticationEntryPoint);
 		}
 
 		@Value("${db.driver}}")
@@ -304,5 +313,13 @@ public class GatewayApplication{
 	@RequestMapping("/user")
 	public Principal user(Principal user) {
 				return user;
+	}
+}
+
+class AlwaysSendUnauthorized401AuthenticationEntryPoint implements AuthenticationEntryPoint {
+	@Override
+	public final void commence(HttpServletRequest request, HttpServletResponse response,
+							   AuthenticationException authException) throws IOException {
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
 	}
 }

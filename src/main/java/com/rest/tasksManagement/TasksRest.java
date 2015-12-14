@@ -2,6 +2,7 @@ package com.rest.tasksManagement;
 
 import com.dto.tasksManagement.TaskRequestDto;
 import com.dto.tasksManagement.TaskRequestForRestDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -9,9 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -127,24 +126,34 @@ public class TasksRest {
     }
 
     @RequestMapping(value = "/changeTask/{taskGuid}", method = RequestMethod.PUT)
-    public ResponseEntity changeTask(@PathVariable String taskGuid, @Valid @RequestBody TaskRequestDto taskRequestDto, Principal user) {
+    public ResponseEntity changeTask(@PathVariable String taskGuid, @Valid @RequestBody TaskRequestDto taskRequestDto, Principal user) throws JsonProcessingException {
         TaskRequestForRestDto taskRequestForRestDto = new TaskRequestForRestDto();
         taskRequestForRestDto = modelMapper.map(taskRequestDto, TaskRequestForRestDto.class);
         taskRequestForRestDto.setUserName(user.getName());
 
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://" + tasksManagerRestHost + ":" + tasksManagerRestPort + tasksManagerRestChangeTaskUrl + "/" + taskGuid;
-        restTemplate.put(url, taskRequestForRestDto);
 
-        return new ResponseEntity(HttpStatus.OK);
+        ObjectMapper mapper = new ObjectMapper();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+        headers.add("Accept", "*/*");
+
+        String jsonStr = mapper.writeValueAsString(taskRequestForRestDto);
+        HttpEntity requestEntity = new HttpEntity(jsonStr, headers);
+
+
+        return restTemplate.exchange(url, HttpMethod.PUT, requestEntity, ResponseEntity.class);
     }
 
     @RequestMapping(value = "/deleteTask/{taskGuid}", method = RequestMethod.DELETE)
-    public ResponseEntity deleteTask(@PathVariable String taskGuid) {
+    public ResponseEntity deleteTask(@PathVariable String taskGuid, Principal user) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://" + tasksManagerRestHost + ":" + tasksManagerRestPort + tasksManagerRestDeleteTaskUrl + "/" + taskGuid;
-        restTemplate.delete(url);
+        String urlParameters = "?createdByUser=" + user.getName();
+        url += urlParameters;
 
-        return new ResponseEntity(HttpStatus.OK);
+        return restTemplate.exchange(url, HttpMethod.DELETE, null, ResponseEntity.class);
     }
 }
