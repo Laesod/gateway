@@ -57,7 +57,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
@@ -69,7 +68,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Properties;
 
 @Configuration // needed to specify that the class contains global spring configurations
@@ -308,11 +306,6 @@ public class GatewayApplication extends SpringBootServletInitializer {
 			populator.addScript(new ClassPathResource("/sql/db_initializer.sql"));
 			populator.populate(dataSource().getConnection());
 		}
-	}
-
-	@RequestMapping("/user")
-	public Principal user(Principal user) {
-				return user;
 	}
 }
 

@@ -29,7 +29,8 @@ create table users(
 		created_at timestamp not null,
 		modified_by_user varchar(100) not null,
 		modified_at timestamp not null,
-		version bigint);
+		version bigint,
+		avatar_s3_object_key varchar(100));
 
 create table authorities (
 		authority_guid varchar(255) not null primary key,

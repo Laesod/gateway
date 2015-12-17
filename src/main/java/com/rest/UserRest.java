@@ -42,6 +42,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.validation.Valid;
 import javax.validation.Validator;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.UUID;
 
@@ -202,6 +203,28 @@ public class UserRest {
         user.setPassword(encodedNewPassword);
 
         userRepository.save(user);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getUserProfile", method = RequestMethod.GET)
+    public UserProfileDto getUserProfile(Principal user) {
+        UserEntity userEntity = userRepository.findByUsername(user.getName());
+
+        UserProfileDto userProfileDto = new UserProfileDto();
+        userProfileDto.setUser(user);
+
+        userProfileDto.setAvatarS3ObjectKey(userEntity.getAvatarS3ObjectKey());
+        return userProfileDto;
+    }
+
+    @RequestMapping(value = "/changeAvatar", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity changeAvatar(@RequestParam String s3ObjectKey, Principal user) throws IOException {
+        UserEntity userEntity = userRepository.findByUsername(user.getName());
+
+        userEntity.setAvatarS3ObjectKey(s3ObjectKey);
+        userRepository.save(userEntity);
 
         return new ResponseEntity(HttpStatus.OK);
     }

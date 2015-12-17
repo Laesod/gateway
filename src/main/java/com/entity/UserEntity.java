@@ -56,6 +56,9 @@ public class UserEntity extends BaseEntity {
     @Column(name = "reset_password_token")
     private String resetPasswordToken;
 
+    @Column(name = "avatar_s3_object_key")
+    private String avatarS3ObjectKey;
+
     public String getUsername() {
         return username;
     }
@@ -104,5 +107,13 @@ public class UserEntity extends BaseEntity {
 
     public void setResetPasswordToken(String resetPasswordToken) {
         this.resetPasswordToken = resetPasswordToken;
+    }
+
+    public String getAvatarS3ObjectKey() {
+        return avatarS3ObjectKey;
+    }
+
+    public void setAvatarS3ObjectKey(String avatarS3ObjectKey) {
+        this.avatarS3ObjectKey = avatarS3ObjectKey;
     }
 }
