@@ -26,6 +26,7 @@
 module = require('../_index');
 
 function SignUpCtrl($scope, $rootScope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
+    $rootScope.displayBackNavigation = true;    
     $scope.signUpPayload = {};
 
     var isFormDataValid = function() {

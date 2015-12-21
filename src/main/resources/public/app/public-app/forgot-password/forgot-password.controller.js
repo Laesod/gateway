@@ -22,6 +22,7 @@
 module = require('../_index');
 
 function ForgotPasswordCtrl($scope, $rootScope, globalService, $translate) {
+    $rootScope.displayBackNavigation = true;    
     $scope.onSubmit = function() {
         globalService.initiateResetPassword({
             payload: {

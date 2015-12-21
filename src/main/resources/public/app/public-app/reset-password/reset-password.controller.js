@@ -22,6 +22,7 @@
 module = require('../_index');
 
 function ResetPasswordCtrl($scope, $rootScope, globalService, $stateParams, $state, $translate) {
+    $rootScope.displayBackNavigation = true;    
     var resetPasswordToken = $stateParams.resetPasswordToken;
 
     var isFormDataValid = function() {

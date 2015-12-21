@@ -2,8 +2,9 @@
 
 var generalLayoutModule = require('./_index');
 
-function GeneralLayoutCtrl($scope, $window, APP_SETTINGS, globalService, $cookies) {
+function GeneralLayoutCtrl($scope, $rootScope, $window, APP_SETTINGS, globalService, $cookies, $state) {
     $scope.currentLanguageCode = APP_SETTINGS.appLanguage.toUpperCase();
+	$rootScope.displayBackNavigation = false;
 
     $scope.changeLanguage = function() {
         if ($scope.currentLanguageCode == "EN") {
@@ -13,6 +14,10 @@ function GeneralLayoutCtrl($scope, $window, APP_SETTINGS, globalService, $cookie
         }
 
         $window.location.reload();
+    };
+
+    $scope.backToLogin = function(){
+    	$state.go("app.login");
     };
 }
 

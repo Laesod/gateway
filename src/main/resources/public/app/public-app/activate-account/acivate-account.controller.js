@@ -21,7 +21,8 @@
 
 module = require('../_index');
 
-function ActivateAccountCtrl($scope, $state, globalService, $stateParams, $translate) {
+function ActivateAccountCtrl($scope, $rootScope, $state, globalService, $stateParams, $translate) {
+    $rootScope.displayBackNavigation = true;    
     var emailVerificationToken = $stateParams.emailVerificationToken;
 
     if (emailVerificationToken) {

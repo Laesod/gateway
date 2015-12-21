@@ -21,7 +21,9 @@
 
 module = require('../_index');
 
-function LoginCtrl($scope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
+function LoginCtrl($scope, $rootScope, $state, $http, $cookies, APP_SETTINGS, $window, $stateParams, globalService, $translate) {
+    $rootScope.displayBackNavigation = false;
+
     function onLoginSuccess(response) {
         if ($stateParams.location) {
             $window.location = $stateParams.location;

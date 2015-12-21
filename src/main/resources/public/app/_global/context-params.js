@@ -21,10 +21,10 @@
 
 var contextParams = {
     contextPrefix: function() {
-        return "/gateway";
+        return "";
     },
     configServicePrefix: function() {
-        return "";
+        return "http://localhost:2000/";
     }
 
 };
