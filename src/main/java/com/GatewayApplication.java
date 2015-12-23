@@ -24,6 +24,7 @@ package com;
 import com.utils.SecurityContextReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -67,6 +68,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -246,7 +248,14 @@ public class GatewayApplication extends SpringBootServletInitializer {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(GatewayApplication.class, args);
+		File pid = new File("app.pid");
+		pid.deleteOnExit();
+
+		SpringApplication app = new SpringApplication(GatewayApplication.class);
+		app.setShowBanner(false);
+		app.addListeners(new ApplicationPidFileWriter(pid));
+
+		app.run(args);
 	}
 
 	@Configuration
