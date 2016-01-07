@@ -276,7 +276,7 @@ public class GatewayApplication extends SpringBootServletInitializer {
 				.and()
 					.authorizeRequests()
 						.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/build/**", "/views/**", "/img/**",  "/templates/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser", "/gateway/initiateResetPassword",  "/gateway/resetPassword", "/gateway/config").permitAll()
+						.antMatchers("/#/login", "/user", "/login?logout", "/", "/index.html", "/favicon.ico", "favicon.ico", "/build/**", "/views/**", "/img/**",  "/templates/**", "/fonts/**", "/gateway/createUser", "/gateway/activateUser", "/gateway/initiateResetPassword",  "/gateway/resetPassword", "/gateway/config").permitAll()
 						.anyRequest().authenticated()
 					.and()
 					.csrf().disable()

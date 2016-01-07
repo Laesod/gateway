@@ -8,6 +8,10 @@ var config = require('../config'),
 gulp.task('prepareIndexHtml', function() {
     gulp.src(config.views.index)
         .pipe(g.htmlReplace({
+            favicon: {
+                tpl: '<link rel="icon" type="image/x-icon" href="%s" />',
+                src: '/gateway/favicon.ico'                
+            },            
             css: {
                 tpl: '<link type="text/css" rel="stylesheet" href="%s">',
                 src: 'gateway/build/css/app.css?' + version
