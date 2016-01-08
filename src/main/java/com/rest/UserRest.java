@@ -209,7 +209,10 @@ public class UserRest {
 
     @RequestMapping(value = "/getUserProfile", method = RequestMethod.GET)
     public UserProfileDto getUserProfile(Principal user) {
-        UserEntity userEntity = userRepository.findByUsername(user.getName());
+        UserEntity userEntity = new UserEntity();
+        if(user != null){
+            userEntity = userRepository.findByUsername(user.getName());
+        }
 
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setUser(user);
