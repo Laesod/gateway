@@ -37,7 +37,7 @@
 
             <md-input-container>
                 <label>{{'email' | translate}}</label>
-                <input type="text" id="username" ng-model="signUpPayload.username" ng-change="onFormElementChange('userRequestDto_username')">
+                <input type="email" id="username" ng-model="signUpPayload.username" ng-change="onFormElementChange('userRequestDto_username')">
             </md-input-container>
             <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_username}}</span>
 
