@@ -2,6 +2,7 @@ package com.rest.tasksManagement;
 
 import com.dto.tasksManagement.TaskRequestDto;
 import com.dto.tasksManagement.TaskRequestForRestDto;
+import com.dto.tasksManagement.TaskResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,6 +43,9 @@ public class TasksRest {
     @Value("${tasksManagerRest.getTasksUrl}")
     private String tasksManagerRestGetTasksUrl;
 
+    @Value("${tasksManagerRest.tasksManagerRestExportTasksToCsvUrl}")
+    private String tasksManagerRestExportTasksToCsvUrl;
+
     @Value("${tasksManagerRest.createTaskUrl}")
     private String tasksManagerRestCreateTaskUrl;
 
@@ -52,7 +57,7 @@ public class TasksRest {
 
     private ModelMapper modelMapper = new ModelMapper(); //read more at http://modelmapper.org/user-manual/
 
-    private String prepareGetTasksParams(Pageable pageable,Principal user, List<String>  project, List<String>  type, List<String> status, String description){
+    private String prepareGetTasksUrl(Pageable pageable, Principal user, List<String> project, List<String> type, List<String> status, String description){
         String urlParameters = "?size=" + pageable.getPageSize() + "&page=" + pageable.getPageNumber();
 
         if (pageable.getSort() != null) {
@@ -99,7 +104,7 @@ public class TasksRest {
         urlParameters += "&createdByUser=" + user.getName();
 
         return urlParameters;
-    };
+    }
 
     @RequestMapping(value = "/getTasks", method = RequestMethod.GET)
     public JsonNode getTasks(@PageableDefault Pageable pageable, Principal user,
@@ -110,12 +115,7 @@ public class TasksRest {
 
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://" + tasksManagerRestHost + ":" + tasksManagerRestPort + tasksManagerRestGetTasksUrl;
-
-
-
-        String urlParameters = this.prepareGetTasksParams(pageable, user, project, type, status, description);
-
-        url += urlParameters;
+        url += this.prepareGetTasksUrl(pageable, user, project, type, status, description);
 
         // Note: Page page = restTemplate.getForObject(url, Page.class) doesn't work due to serialization issue
         // raw jsonString is used instead
@@ -124,6 +124,41 @@ public class TasksRest {
         JsonNode jsonNode = mapper.readTree(jsonStr);
 
         return jsonNode;
+    }
+
+    @RequestMapping(value = "/exportTasksToCsv", method = RequestMethod.GET)
+    public void exportTasksToCsv(@PageableDefault Pageable pageable, Principal user,
+                                          @RequestParam(value = "project", required = false) List<String> project,
+                                          @RequestParam(value = "type", required = false) List<String> type,
+                                          @RequestParam(value = "status", required = false) List<String> status,
+                                          @RequestParam(value = "description", required = false) String description,
+                                          HttpServletResponse response) throws IOException {
+
+        String csvFileName = "TasksList.csv";
+        response.setContentType("text/csv");
+
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", csvFileName);
+        response.setHeader(headerKey, headerValue);
+
+        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+        String[] header = { "Project", "Type", "Status", "Description", "CreatedAt"};
+        csvWriter.writeHeader(header);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String url = "http://" + tasksManagerRestHost + ":" + tasksManagerRestPort + tasksManagerRestExportTasksToCsvUrl;
+        url += this.prepareGetTasksUrl(pageable, user, project, type, status, description);;
+
+        TaskResponseDto[] tasks = restTemplate.getForObject(url, TaskResponseDto[].class);
+
+        List<TaskResponseDto> taskResponseDtos = new ArrayList<TaskResponseDto>();
+        for (TaskResponseDto task : tasks) {
+            TaskResponseDto taskResponseDto = new TaskResponseDto();
+            csvWriter.write(task, header);
+        }
+
+        csvWriter.close();
     }
 
     @RequestMapping(value = "/createTask", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -156,7 +191,6 @@ public class TasksRest {
         String jsonStr = mapper.writeValueAsString(taskRequestForRestDto);
         HttpEntity requestEntity = new HttpEntity(jsonStr, headers);
 
-
         return restTemplate.exchange(url, HttpMethod.PUT, requestEntity, ResponseEntity.class);
     }
 
@@ -168,51 +202,5 @@ public class TasksRest {
         url += urlParameters;
 
         return restTemplate.exchange(url, HttpMethod.DELETE, null, ResponseEntity.class);
-    }
-
-    @RequestMapping(value = "/generateReport", method = RequestMethod.GET)
-    public void generateReport(@PageableDefault Pageable pageable, Principal user,
-                             @RequestParam(value = "project", required = false) List<String> project,
-                             @RequestParam(value = "type", required = false) List<String> type,
-                             @RequestParam(value = "status", required = false) List<String> status,
-                             @RequestParam(value = "description", required = false) String description,
-                             HttpServletResponse response) throws IOException {
-
-        String csvFileName = "Tasks.csv";
-
-        response.setContentType("text/csv");
-
-        String headerKey = "Content-Disposition";
-        String headerValue = String.format("attachment; filename=\"%s\"", csvFileName);
-        response.setHeader(headerKey, headerValue);
-
-        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
-
-        String[] header = { "Project", "Type", "Status", "Description", "CreatedAt"};
-
-        csvWriter.writeHeader(header);
-
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://" + tasksManagerRestHost + ":" + tasksManagerRestPort + tasksManagerRestGetTasksUrl;
-
-        String urlParameters = this.prepareGetTasksParams(pageable, user, project, type, status, description);
-
-        url += urlParameters;
-
-        // Note: Page page = restTemplate.getForObject(url, Page.class) doesn't work due to serialization issue
-        // raw jsonString is used instead
-        String jsonStr = restTemplate.getForObject(url, String.class);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = mapper.readTree(jsonStr);
-
-
-        //logic to generate List of entities based on jsonNode is missing here ...
-
-//        if (taskEntities != null) {
-//            for (TaskEntity taskEntity : taskEntities.getContent()) {
-//                csvWriter.write(taskEntity, header);
-//            }
-//        }
-//        csvWriter.close();
     }
 }
