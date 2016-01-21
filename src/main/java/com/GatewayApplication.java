@@ -249,7 +249,7 @@ public class GatewayApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		File pid = new File("app.pid");
-		//pid.deleteOnExit();
+		pid.deleteOnExit();
 
 		SpringApplication app = new SpringApplication(GatewayApplication.class);
 		app.setShowBanner(false);
