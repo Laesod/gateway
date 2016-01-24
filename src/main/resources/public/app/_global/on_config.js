@@ -22,13 +22,13 @@
 function OnConfig($urlRouterProvider, $httpProvider, $translateProvider, APP_SETTINGS) {
     $urlRouterProvider.otherwise('login');
 
-    $httpProvider.interceptors.push(function($injector, $window, $cookies, $q) {
-        return {
-            'responseError': function(err, status) {
-                return $q.reject(err);
-            }
-        };
-    });
+    // $httpProvider.interceptors.push(function($injector, $window, $cookies, $q) {
+    //     return {
+    //         'responseError': function(err, status) {
+    //             return $q.reject(err);
+    //         }
+    //     };
+    // });
 
     //translation tables can be specified for each module
     $translateProvider.translations('en', {
