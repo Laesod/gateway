@@ -26,26 +26,27 @@
             <md-input-container>
                 <label>{{'firstName' | translate}}</label>
                 <input type="text" id="firstName" ng-model="signUpPayload.firstName" ng-change="onFormElementChange('userRequestDto_firstName')">
+                <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_firstName}}</span>                
             </md-input-container>
-            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_firstName}}</span>
 
             <md-input-container>
                 <label>{{'lastName' | translate}}</label>
                 <input type="text" id="lastName" ng-model="signUpPayload.lastName" ng-change="onFormElementChange('userRequestDto_lastName')">
+                <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_lastName}}</span>                
             </md-input-container>
-            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_lastName}}</span>
+            
 
             <md-input-container>
                 <label>{{'email' | translate}}</label>
                 <input type="email" id="username" ng-model="signUpPayload.username" ng-change="onFormElementChange('userRequestDto_username')">
+                <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_username}}</span>                
             </md-input-container>
-            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_username}}</span>
 
             <md-input-container>
                 <label>{{'password' | translate}}</label>
                 <input type="password" id="password" ng-model="signUpPayload.password" ng-change="onFormElementChange('userRequestDto_password')">
+                <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_password}}</span>                
             </md-input-container>
-            <span class="formItemErrorMessage">{{$root.formElementsErrors.userRequestDto_password}}</span>
 
             <md-input-container>
                 <label>{{'confirmPassword' | translate}}</label>
