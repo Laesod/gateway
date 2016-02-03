@@ -24,34 +24,36 @@ module.exports = angular.module('globals', []);
 function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $rootScope) {
     var service = {};
 
-    service.request = function(params) {
+    service.request = function (params) {
         var that = this;
         var deferred = $q.defer();
         params.withCredentials = true;
 
         $http(params).
-        success(function(data) {
-            deferred.resolve(data);
-        }).
-        error(function(err, status) {
-            switch (err.status) {
-                case 500:
-                    that.displayToast({
-                        messageText: err.message,
-                        messageType: "error"
-                    });
-                    break;
-                case 400:
-                    that.parseSpringValidationError(err);
-                    break;
-            }
-            deferred.reject(err);
-        });
+            success(function (data) {
+                deferred.resolve(data);
+            }).
+            error(function (err, status) {
+                if(err && err.status){
+                    switch (err.status) {
+                        case 500:
+                            that.displayToast({
+                                messageText: err.message,
+                                messageType: "error"
+                            });
+                            break;
+                        case 400:
+                            that.parseSpringValidationError(err);
+                            break;
+                    }                    
+                }
+                deferred.reject(err);
+            });
 
         return deferred.promise;
     };
 
-    service.login = function(parameters) {
+    service.login = function (parameters) {
         var url = APP_SETTINGS.apiUrl.loginUrl;
 
         return this.request({
@@ -64,7 +66,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
         });
     };
 
-    service.signUp = function(parameters) {
+    service.signUp = function (parameters) {
         var url = APP_SETTINGS.apiUrl.createUserUrl;
 
         return this.request({
@@ -74,7 +76,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
         });
     };
 
-    service.activateUser = function(parameters) {
+    service.activateUser = function (parameters) {
         var url = APP_SETTINGS.apiUrl.activateUser + '?emailVerificationToken=' + parameters.emailVerificationToken;
 
         return this.request({
@@ -83,7 +85,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
         });
     };
 
-    service.initiateResetPassword = function(parameters) {
+    service.initiateResetPassword = function (parameters) {
         var url = APP_SETTINGS.apiUrl.initiateResetPassword;
 
         return this.request({
@@ -93,7 +95,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
         });
     };
 
-    service.resetPassword = function(parameters) {
+    service.resetPassword = function (parameters) {
         var url = APP_SETTINGS.apiUrl.resetPassword + parameters.resetPasswordToken;
 
         return this.request({
@@ -103,7 +105,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
         });
     };
 
-    service.displayToast = function(parameters) {
+    service.displayToast = function (parameters) {
         var templateUrl = APP_SETTINGS.contextPrefix + "/templates/toast-template.html";
 
         $rootScope.toastMessageText = [parameters.messageText];
@@ -111,7 +113,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
 
         var oToast = {
             controller: "ToastCtrl",
-            templateUrl: templateUrl,
+            templateUrl: templateUrl, //"templates/toast-template.html",
             hideDelay: 3000,
             position: "top right"
         };
@@ -119,7 +121,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
         $mdToast.show(oToast);
     };
 
-    service.parseSpringValidationError = function(parameters) {
+    service.parseSpringValidationError = function (parameters) {
         var errorMessages = [];
         var errorMessage = "";
         var fieldName = "";
