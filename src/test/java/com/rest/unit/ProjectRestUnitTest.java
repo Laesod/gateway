@@ -21,13 +21,9 @@ package com.rest.unit;
  */
 
 
-import com.dto.GroupRequestDto;
-import com.dto.InvitationRequestDto;
-import com.dto.InvitationResponseDto;
 import com.dto.ProjectRequestDto;
 import com.entity.*;
 import com.repository.*;
-import com.rest.InvitationRest;
 import com.rest.ProjectRest;
 import com.utils.SecurityContextReader;
 import org.junit.Before;
@@ -35,19 +31,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.security.Principal;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectRestUnitTest {
@@ -65,16 +57,19 @@ public class ProjectRestUnitTest {
     private ITranslationRepository mockTranslationRepository;
 
     @Mock
-    private IGroupRepository mockGroupRepository;
+    private Principal mockPrincipalUser;
 
-    @Mock
-    private IProjectGroupRepository mockProjectGroupRepository;
+//    @Mock
+//    private IGroupRepository mockGroupRepository;
 
-    @Mock
-    private IInvitationRepository mockInvitationRepository;
+//    @Mock
+//    private IProjectGroupRepository mockProjectGroupRepository;
 
-    @Mock
-    private IInvitationGroupRepository mockInvitationGroupRepository;
+//    @Mock
+//    private IInvitationRepository mockInvitationRepository;
+//
+//    @Mock
+//    private IInvitationGroupRepository mockInvitationGroupRepository;
 
     @Mock
     private SecurityContextReader mockSecurityContextReader;
@@ -88,20 +83,20 @@ public class ProjectRestUnitTest {
     public void setup() {
         projectRequestDto.setDescription("My project");
 
-        ArrayList<GroupRequestDto> groups = new ArrayList<GroupRequestDto>();
-        GroupRequestDto group = new GroupRequestDto();
-        group.setGroupGuid("1");
-        group.setGroupName("group_1");
-        groups.add(group);
-
-        projectRequestDto.setGroups(groups);
-
-        ArrayList<InvitationRequestDto> invitations = new ArrayList<InvitationRequestDto>();
-        InvitationRequestDto invitation = new InvitationRequestDto();
-        invitation.setGroups(groups);
-        invitations.add(invitation);
-
-        projectRequestDto.setInvitations(invitations);
+//        ArrayList<GroupRequestDto> groups = new ArrayList<GroupRequestDto>();
+//        GroupRequestDto group = new GroupRequestDto();
+//        group.setGroupGuid("1");
+//        group.setGroupName("group_1");
+//        groups.add(group);
+//
+//        projectRequestDto.setGroups(groups);
+//
+//        ArrayList<InvitationRequestDto> invitations = new ArrayList<InvitationRequestDto>();
+//        InvitationRequestDto invitation = new InvitationRequestDto();
+//        invitation.setGroups(groups);
+//        invitations.add(invitation);
+//
+//        projectRequestDto.setInvitations(invitations);
     }
 
     //user story 1.
@@ -117,9 +112,19 @@ public class ProjectRestUnitTest {
         verify(mockProjectUserRepository, times(1)).save(any(ProjectUserEntity.class));
         verify(mockAuthorityRepository, times(1)).save(any(AuthorityEntity.class));
         verify(mockTranslationRepository, times(1)).save(any(TranslationEntity.class));
-        verify(mockGroupRepository, times(1)).save(any(GroupEntity.class));
-        verify(mockProjectGroupRepository, times(1)).save(any(ProjectGroupEntity.class));
-        verify(mockInvitationRepository, times(1)).save(any(InvitationEntity.class));
-        verify(mockInvitationGroupRepository, times(1)).save(any(InvitationGroupEntity.class));
+//        verify(mockGroupRepository, times(1)).save(any(GroupEntity.class));
+//        verify(mockProjectGroupRepository, times(1)).save(any(ProjectGroupEntity.class));
+//        verify(mockInvitationRepository, times(1)).save(any(InvitationEntity.class));
+//        verify(mockInvitationGroupRepository, times(1)).save(any(InvitationGroupEntity.class));
     }
+
+    @Test
+    public void getProjects(){
+        when(mockSecurityContextReader.getUsername()).thenReturn("admin@gmail.com");
+
+        projectRest.getProjects(mockPrincipalUser);
+
+        verify(mockProjectRepository, times(1)).findByCreatedByUser(any(String.class));
+    }
+
 }

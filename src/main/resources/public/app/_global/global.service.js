@@ -141,10 +141,7 @@ function globalService($http, $q, $cookies, $window, APP_SETTINGS, $mdToast, $ro
                     message: errorMessage
                 });
 
-                // if ($rootScope.formElementsErrors[objectName + '_' + fieldName]) {
-                // debugger;
                 $rootScope.formElementsErrors[objectName + '_' + fieldName] = errorMessage;
-                // }
             }
         }
 

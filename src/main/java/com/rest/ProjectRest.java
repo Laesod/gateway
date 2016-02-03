@@ -21,10 +21,12 @@ package com.rest;
  */
 
 
-import com.dto.GroupRequestDto;
-import com.dto.InvitationRequestDto;
 import com.dto.ProjectRequestDto;
-import com.entity.*;
+import com.dto.ProjectResponseDto;
+import com.entity.AuthorityEntity;
+import com.entity.ProjectEntity;
+import com.entity.ProjectUserEntity;
+import com.entity.TranslationEntity;
 import com.repository.*;
 import com.utils.SecurityContextReader;
 import org.modelmapper.ModelMapper;
@@ -40,6 +42,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by aautushk on 9/13/2015.
@@ -102,69 +107,66 @@ public class ProjectRest {
 
         authorityRepository.save(authorityEntity);//admin role is assigned to the project author
 
-        for(GroupRequestDto groupRequestDto : projectRequestDto.getGroups()){
-            GroupEntity groupEntity = new GroupEntity();
-            groupEntity.setGroupName(groupRequestDto.getGroupName());
-            if(groupRequestDto.getGroupGuid() != ""){
-                groupEntity.setGroupGuid(groupRequestDto.getGroupGuid());
-            }
-
-            groupRepository.save(groupEntity);//group is created
-
-            ProjectGroupEntity projectGroupEntity = new ProjectGroupEntity();
-            projectGroupEntity.setProjectGuid(project.getProjectGuid());
-            projectGroupEntity.setGroupGuid(groupEntity.getGroupGuid());
-            projectGroupRepository.save(projectGroupEntity);//group is assigned to the project
-        }
-
-        for(InvitationRequestDto invitation : projectRequestDto.getInvitations()){
-            InvitationEntity invitationEntity = new InvitationEntity();
-            invitationEntity.setRecipientEmail(invitation.getRecipientEmail());
-            invitationEntity.setProjectGuid(project.getProjectGuid());
-            invitationEntity.setAuthority(invitation.getAuthority());
-            invitationEntity.setIsInvitationAccepted(false);
-
-            invitationRepository.save(invitationEntity);//invitation is created
-
-            for(GroupRequestDto groupRequestDto : invitation.getGroups()){
-                InvitationGroupEntity invitationGroupEntity = new InvitationGroupEntity();
-                invitationGroupEntity.setInvitationGuid(invitationEntity.getInvitationGuid());
-                invitationGroupEntity.setGroupGuid(groupRequestDto.getGroupGuid());
-
-                invitationGroupRepository.save(invitationGroupEntity);//group is assigned to the invitation
-            }
-        }
+//        for(GroupRequestDto groupRequestDto : projectRequestDto.getGroups()){
+//            GroupEntity groupEntity = new GroupEntity();
+//            groupEntity.setGroupName(groupRequestDto.getGroupName());
+//            if(groupRequestDto.getGroupGuid() != ""){
+//                groupEntity.setGroupGuid(groupRequestDto.getGroupGuid());
+//            }
+//
+//            groupRepository.save(groupEntity);//group is created
+//
+//            ProjectGroupEntity projectGroupEntity = new ProjectGroupEntity();
+//            projectGroupEntity.setProjectGuid(project.getProjectGuid());
+//            projectGroupEntity.setGroupGuid(groupEntity.getGroupGuid());
+//            projectGroupRepository.save(projectGroupEntity);//group is assigned to the project
+//        }
+//
+//        for(InvitationRequestDto invitation : projectRequestDto.getInvitations()){
+//            InvitationEntity invitationEntity = new InvitationEntity();
+//            invitationEntity.setRecipientEmail(invitation.getRecipientEmail());
+//            invitationEntity.setProjectGuid(project.getProjectGuid());
+//            invitationEntity.setAuthority(invitation.getAuthority());
+//            invitationEntity.setIsInvitationAccepted(false);
+//
+//            invitationRepository.save(invitationEntity);//invitation is created
+//
+//            for(GroupRequestDto groupRequestDto : invitation.getGroups()){
+//                InvitationGroupEntity invitationGroupEntity = new InvitationGroupEntity();
+//                invitationGroupEntity.setInvitationGuid(invitationEntity.getInvitationGuid());
+//                invitationGroupEntity.setGroupGuid(groupRequestDto.getGroupGuid());
+//
+//                invitationGroupRepository.save(invitationGroupEntity);//group is assigned to the invitation
+//            }
+//        }
 
         return new ResponseEntity(HttpStatus.OK);
     }
 
-//    private ProjectResponseDto convertToResponseDto(ProjectEntity project) {
-//        ProjectResponseDto projectResponseDto = modelMapper.map(project, ProjectResponseDto.class);
-//        TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(projectResponseDto.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
-//
-//        if(translationEntity != null){
-//            projectResponseDto.setDescription(translationEntity.getContent());
-//        }else{
-//            projectResponseDto.setDescription("");
-//        }
-//
-//        return projectResponseDto;
-//    }
-//
-//    @RequestMapping(value = "/getProjects", method = RequestMethod.GET)
-//    public Page<ProjectResponseDto> getProjects(Pageable pageable) {
-//        int totalElements = 0;
-//        List<ProjectResponseDto> projectsResponseDto = new ArrayList<ProjectResponseDto>();
-//        Page<ProjectEntity> projects = projectRepository.findAll(pageable);
-//
-//        if(projects != null){
-//            totalElements = projects.getNumberOfElements();
-//            for(ProjectEntity project : projects){
-//                ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
-//                projectsResponseDto.add(projectResponseDto);
-//            }
-//        }
-//
-//        return new PageImpl<>(projectsResponseDto, pageable, totalElements);
-//    }
+    private ProjectResponseDto convertToResponseDto(ProjectEntity project) {
+        ProjectResponseDto projectResponseDto = modelMapper.map(project, ProjectResponseDto.class);
+        TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(projectResponseDto.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
+
+        if(translationEntity != null){
+            projectResponseDto.setDescription(translationEntity.getContent());
+        }else{
+            projectResponseDto.setDescription("");
+        }
+
+        return projectResponseDto;
+    }
+
+    @RequestMapping(value = "/getProjects", method = RequestMethod.GET)
+    public List<ProjectResponseDto> getProjects(Principal user) {
+
+        List<ProjectResponseDto> projectsResponseDto = new ArrayList<ProjectResponseDto>();
+        List<ProjectEntity> projects = projectRepository.findByCreatedByUser(user.getName());
+
+        for(ProjectEntity project : projects){
+            ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
+            projectsResponseDto.add(projectResponseDto);
+        }
+
+        return projectsResponseDto;
+    }
 }
