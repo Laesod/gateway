@@ -36,4 +36,5 @@ import java.util.List;
 public interface IProjectRepository extends JpaRepository<ProjectEntity, Long> {
     Page<ProjectEntity> findAll(Pageable pageable);
     List<ProjectEntity> findByCreatedByUser(String createdBy);
+    ProjectEntity findByProjectGuidAndCreatedByUser(String guid, String createdBy);
 }

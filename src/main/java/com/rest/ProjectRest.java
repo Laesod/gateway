@@ -36,10 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -154,6 +151,37 @@ public class ProjectRest {
         }
 
         return projectResponseDto;
+    }
+
+    @RequestMapping(value = "/getProject/{projectGuid}", method = RequestMethod.GET)
+    public ProjectResponseDto getProject(@PathVariable String projectGuid, Principal user) {
+        ProjectEntity project = projectRepository.findByProjectGuidAndCreatedByUser(projectGuid, user.getName());
+
+        ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
+
+        return projectResponseDto;
+    }
+
+    @RequestMapping(value = "/updateProject/{projectGuid}", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity updateProject(@Valid @RequestBody ProjectRequestDto projectRequestDto, @PathVariable String projectGuid, Principal user) {
+        ProjectEntity project = projectRepository.findByProjectGuidAndCreatedByUser(projectGuid, user.getName());
+
+        TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(project.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
+        if(translationEntity != null){
+            translationEntity.setContent(projectRequestDto.getDescription());
+        }else{
+            translationEntity = new TranslationEntity();
+            translationEntity.setParentGuid(project.getProjectGuid());
+            translationEntity.setParentEntity("Project");
+            translationEntity.setField("description");
+            translationEntity.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
+            translationEntity.setContent(projectRequestDto.getDescription());
+
+            translationRepository.save(translationEntity);//project description translation is created
+        }
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/getProjects", method = RequestMethod.GET)
