@@ -38,7 +38,7 @@ public class CORSFilter implements Filter {
             if(((SecurityContextHolderAwareRequestWrapper) req).getHeaders("Origin") != null && ((SecurityContextHolderAwareRequestWrapper) req).getHeaders("Origin").hasMoreElements()){
                 String origin = ((SecurityContextHolderAwareRequestWrapper) req).getHeaders("Origin").nextElement().toString();
 
-                if(origin.equals("http://localhost:63769") || origin.equals("http://localhost:1000") || origin.equals("http://localhost:1001") || origin.equals("http://main-ui-app.s3-website-us-west-2.amazonaws.com")){
+                if(origin.equals("http://localhost:63769") || origin.equals("http://localhost:1000") || origin.equals("http://localhost:1001") || origin.equals("http://main-ui-app.s3-website-us-west-2.amazonaws.com")  || origin.equals("http://192.168.2.14:63769")){
                     response.setHeader("Access-Control-Allow-Origin", origin);
                 }
             }
