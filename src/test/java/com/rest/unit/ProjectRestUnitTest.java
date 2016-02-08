@@ -47,8 +47,8 @@ public class ProjectRestUnitTest {
     @Mock
     private IProjectRepository mockProjectRepository;
 
-    @Mock
-    private IProjectUserRepository mockProjectUserRepository;
+//    @Mock
+//    private IProjectUserRepository mockProjectUserRepository;
 
     @Mock
     private IAuthorityRepository mockAuthorityRepository;
@@ -109,7 +109,7 @@ public class ProjectRestUnitTest {
         assertTrue(responseEntity.getStatusCode() == HttpStatus.OK);
         verify(mockProjectRepository, times(1)).save(any(ProjectEntity.class));
 
-        verify(mockProjectUserRepository, times(1)).save(any(ProjectUserEntity.class));
+//        verify(mockProjectUserRepository, times(1)).save(any(ProjectUserEntity.class));
         verify(mockAuthorityRepository, times(1)).save(any(AuthorityEntity.class));
         verify(mockTranslationRepository, times(1)).save(any(TranslationEntity.class));
 //        verify(mockGroupRepository, times(1)).save(any(GroupEntity.class));

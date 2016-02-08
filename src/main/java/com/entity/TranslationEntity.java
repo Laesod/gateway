@@ -41,8 +41,8 @@ public class TranslationEntity extends BaseEntity {
     @Column(name = "translation_guid"   )
     private String translationGuid;
 
-    @Column(name = "parent_guid")
-    private String parentGuid;
+//    @Column(name = "parent_guid")
+//    private String parentGuid;
 
     @Column(name = "parent_entity")
     private String parentEntity;
@@ -56,6 +56,22 @@ public class TranslationEntity extends BaseEntity {
     @Column(name = "content")
     private String content;
 
+    @ManyToOne
+    @JoinColumn(name="translation_map_guid")
+//    private String translationMapGuid;
+//   // private String translation_map_guid;
+//
+//
+//    public String getTranslationMapGuid() {
+//        return translationMapGuid;
+//    }
+//
+//    public void setTranslationMapGuid(String translationMapGuid) {
+//        this.translationMapGuid = translationMapGuid;
+//    }
+
+    private TranslationMapEntity translationMap;
+
     public String getTranslationGuid() {
         return translationGuid;
     }
@@ -64,13 +80,13 @@ public class TranslationEntity extends BaseEntity {
         this.translationGuid = translationGuid;
     }
 
-    public String getParentGuid() {
-        return parentGuid;
-    }
-
-    public void setParentGuid(String parentGuid) {
-        this.parentGuid = parentGuid;
-    }
+//    public String getParentGuid() {
+//        return parentGuid;
+//    }
+//
+//    public void setParentGuid(String parentGuid) {
+//        this.parentGuid = parentGuid;
+//    }
 
     public String getParentEntity() {
         return parentEntity;
@@ -104,4 +120,19 @@ public class TranslationEntity extends BaseEntity {
         this.content = content;
     }
 
+//    public String getTranslation_map_guid() {
+//        return translation_map_guid;
+//    }
+//
+//    public void setTranslation_map_guid(String translation_map_guid) {
+//        this.translation_map_guid = translation_map_guid;
+//    }
+
+    public TranslationMapEntity getTranslationMap() {
+        return translationMap;
+    }
+
+    public void setTranslationMap(TranslationMapEntity translationMap) {
+        this.translationMap = translationMap;
+    }
 }

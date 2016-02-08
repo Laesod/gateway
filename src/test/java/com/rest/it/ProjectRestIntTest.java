@@ -59,8 +59,8 @@ public class ProjectRestIntTest {
     @Autowired
     public IProjectRepository projectRepository;
 
-    @Autowired
-    public IProjectUserRepository projectUserRepository;
+//    @Autowired
+//    public IProjectUserRepository projectUserRepository;
 
     @Autowired
     public IAuthorityRepository authorityRepository;
@@ -129,7 +129,7 @@ public class ProjectRestIntTest {
 
         projectRest.projectRepository = projectRepository;
         projectRest.translationRepository = translationRepository;
-        projectRest.projectUserRepository = projectUserRepository;
+//        projectRest.projectUserRepository = projectUserRepository;
         projectRest.authorityRepository = authorityRepository;
 //        projectRest.groupRepository = groupRepository;
 //        projectRest.projectGroupRepository = projectGroupRepository;
@@ -140,7 +140,7 @@ public class ProjectRestIntTest {
 
         List<ProjectEntity> projects = projectRepository.findByCreatedByUser("test@gmail.com");
         List<TranslationEntity> translations = translationRepository.findByCreatedByUser("test@gmail.com");
-        List<ProjectUserEntity> projectUsers = projectUserRepository.findByCreatedByUser("test@gmail.com");
+//        List<ProjectUserEntity> projectUsers = projectUserRepository.findByCreatedByUser("test@gmail.com");
         List<AuthorityEntity> authorities = authorityRepository.findByCreatedByUser("test@gmail.com");
 //        List<GroupEntity> foundGroups = groupRepository.findByCreatedByUser("test@gmail.com");
 //        List<ProjectGroupEntity> projectGroups = projectGroupRepository.findByCreatedByUser("test@gmail.com");
@@ -149,7 +149,7 @@ public class ProjectRestIntTest {
 
         assertEquals(projects.size(), 1);
         assertEquals(translations.size(), 1);
-        assertEquals(projectUsers.size(), 1);
+//        assertEquals(projectUsers.size(), 1);
         assertEquals(authorities.size(), 1);
 //        assertEquals(groups.size(), 1);
 //        assertEquals(projectGroups.size(), 1);
@@ -158,7 +158,7 @@ public class ProjectRestIntTest {
 
         projectRepository.delete(projects.get(0));
         translationRepository.delete(translations.get(0));
-        projectUserRepository.delete(projectUsers.get(0));
+//        projectUserRepository.delete(projectUsers.get(0));
         authorityRepository.delete(authorities.get(0));
 //        groupRepository.delete(foundGroups.get(0));
 //        projectGroupRepository.delete(projectGroups.get(0));

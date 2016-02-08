@@ -25,6 +25,7 @@ import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Created by aautushk on 8/30/2015.
@@ -58,6 +59,14 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "avatar_s3_object_key")
     private String avatarS3ObjectKey;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "users_projects", joinColumns = { @JoinColumn(name = "username") }, inverseJoinColumns = { @JoinColumn(name = "project_guid") })
+    private Set<ProjectEntity> projects;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "username") }, inverseJoinColumns = { @JoinColumn(name = "roleName") })
+    private Set<RoleEntity> roles;
 
     public String getUsername() {
         return username;
@@ -115,5 +124,21 @@ public class UserEntity extends BaseEntity {
 
     public void setAvatarS3ObjectKey(String avatarS3ObjectKey) {
         this.avatarS3ObjectKey = avatarS3ObjectKey;
+    }
+
+    public Set<ProjectEntity> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<ProjectEntity> projects) {
+        this.projects = projects;
+    }
+
+    public Set<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
     }
 }

@@ -1,31 +1,11 @@
 package com.entity;
 
-/*
- * #%L
- * Gateway
- * %%
- * Copyright (C) 2015 Powered by Sergey
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Created by aautushk on 9/7/2015.
@@ -41,6 +21,14 @@ public class ProjectEntity extends BaseEntity {
     @Column(name = "project_guid"   )
     private String projectGuid;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "users_projects", joinColumns = { @JoinColumn(name = "project_guid") }, inverseJoinColumns = { @JoinColumn(name = "username") })
+    private Set<UserEntity> users;
+
+    @OneToOne
+    @JoinColumn(name = "translationMapGuid")
+    private TranslationMapEntity translationMap;
+
     public String getProjectGuid() {
         return projectGuid;
     }
@@ -48,4 +36,19 @@ public class ProjectEntity extends BaseEntity {
         this.projectGuid = value;
     }
 
+    public Set<UserEntity> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<UserEntity> users) {
+        this.users = users;
+    }
+
+    public TranslationMapEntity getTranslationMap() {
+        return translationMap;
+    }
+
+    public void setTranslationMap(TranslationMapEntity translationMap) {
+        this.translationMap = translationMap;
+    }
 }

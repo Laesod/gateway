@@ -23,14 +23,14 @@ package com.rest;
 
 import com.dto.ProjectRequestDto;
 import com.dto.ProjectResponseDto;
-import com.entity.AuthorityEntity;
-import com.entity.ProjectEntity;
-import com.entity.ProjectUserEntity;
-import com.entity.TranslationEntity;
+import com.dto.ProjectUserResponseDto;
+import com.dto.UserResponseDto;
+import com.entity.*;
 import com.repository.*;
 import com.utils.SecurityContextReader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +41,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by aautushk on 9/13/2015.
@@ -55,11 +57,17 @@ public class ProjectRest {
     @Autowired
     public IProjectRepository projectRepository;
 
+//    @Autowired
+//    public IProjectUserRepository projectUserRepository;
+
     @Autowired
-    public IProjectUserRepository projectUserRepository;
+    public IUserRepository userRepository;
 
     @Autowired
     public IAuthorityRepository authorityRepository;
+
+    @Autowired
+    public ITranslationMapRepository translationMapRepository;
 
     @Autowired
     public ITranslationRepository translationRepository;
@@ -82,27 +90,43 @@ public class ProjectRest {
     @Transactional
     public ResponseEntity createProject(@Valid @RequestBody ProjectRequestDto projectRequestDto) {
         ProjectEntity project = new ProjectEntity();
-        projectRepository.save(project);//project is created
 
-        TranslationEntity translationEntity = new TranslationEntity();
-        translationEntity.setParentGuid(project.getProjectGuid());
-        translationEntity.setParentEntity("Project");
-        translationEntity.setField("description");
-        translationEntity.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
-        translationEntity.setContent(projectRequestDto.getDescription());
+        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
 
-        translationRepository.save(translationEntity);//project description translation is created
+        Set<UserEntity> users = new HashSet<UserEntity>();
+        users.add(user);
 
-        ProjectUserEntity projectUserEntity = new ProjectUserEntity();
-        projectUserEntity.setUsername(securityContextReader.getUsername());
+        project.setUsers(users);
 
-        projectUserRepository.save(projectUserEntity);//project is assigned to its author
+        TranslationEntity translation = new TranslationEntity();
+        translation.setParentEntity("Project");
+        translation.setField("description");
+        translation.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
+        translation.setContent(projectRequestDto.getDescription());
 
-        AuthorityEntity authorityEntity = new AuthorityEntity();
-        authorityEntity.setUsername(securityContextReader.getUsername());
-        authorityEntity.setAuthority(project.getProjectGuid() + "_admin");
+        TranslationMapEntity translationMap = new TranslationMapEntity();
 
-        authorityRepository.save(authorityEntity);//admin role is assigned to the project author
+        Set<TranslationEntity> translations = new HashSet<TranslationEntity>();
+        translations.add(translation);
+
+        translationMap.setTranslations(translations);
+        translation.setTranslationMap(translationMap);
+
+        translationMapRepository.save(translationMap);
+        translationRepository.save(translation);
+
+        project.setTranslationMap(translationMap);
+
+        projectRepository.save(project);
+
+        RoleEntity role = new RoleEntity();
+        role.setRoleName(project.getProjectGuid() + "_admin");
+
+        Set<RoleEntity> roles = user.getRoles();
+        roles.add(role);
+        user.setRoles(roles);
+
+        userRepository.save(user);
 
 //        for(GroupRequestDto groupRequestDto : projectRequestDto.getGroups()){
 //            GroupEntity groupEntity = new GroupEntity();
@@ -140,46 +164,63 @@ public class ProjectRest {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    private ProjectResponseDto convertToResponseDto(ProjectEntity project) {
-        ProjectResponseDto projectResponseDto = modelMapper.map(project, ProjectResponseDto.class);
-        TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(projectResponseDto.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
-
-        if(translationEntity != null){
-            projectResponseDto.setDescription(translationEntity.getContent());
-        }else{
-            projectResponseDto.setDescription("");
-        }
-
-        return projectResponseDto;
-    }
-
     @RequestMapping(value = "/getProject/{projectGuid}", method = RequestMethod.GET)
-    public ProjectResponseDto getProject(@PathVariable String projectGuid, Principal user) {
-        ProjectEntity project = projectRepository.findByProjectGuidAndCreatedByUser(projectGuid, user.getName());
+    public List<ProjectResponseDto> getProject(@PathVariable String projectGuid, Principal user) {
+        //auh check user has admin role
 
-        ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
+        List<ProjectResponseDto> projectResponsesDto = projectRepository.getProject(projectGuid);
 
-        return projectResponseDto;
+
+        return projectResponsesDto;
     }
 
     @RequestMapping(value = "/updateProject/{projectGuid}", method = RequestMethod.PUT)
     @Transactional
     public ResponseEntity updateProject(@Valid @RequestBody ProjectRequestDto projectRequestDto, @PathVariable String projectGuid, Principal user) {
-        ProjectEntity project = projectRepository.findByProjectGuidAndCreatedByUser(projectGuid, user.getName());
+        TranslationEntity translation = null;
+        //auh check user has admin role
 
-        TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(project.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
-        if(translationEntity != null){
-            translationEntity.setContent(projectRequestDto.getDescription());
+        ProjectEntity project = projectRepository.findByProjectGuid(projectGuid);
+
+        TranslationMapEntity translationMap = project.getTranslationMap();
+        List<TranslationEntity> translations = translationRepository.getTranslation(translationMap.getTranslationMapGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
+        if(translations.size() > 0){
+           // translation = modelMapper.map(user, UserResponseDto.class);
+
+            translation = translations.get(0);
+            translation.setContent(projectRequestDto.getDescription());
+            translationRepository.save(translation);
         }else{
-            translationEntity = new TranslationEntity();
-            translationEntity.setParentGuid(project.getProjectGuid());
-            translationEntity.setParentEntity("Project");
-            translationEntity.setField("description");
-            translationEntity.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
-            translationEntity.setContent(projectRequestDto.getDescription());
+            translation = new TranslationEntity();
+            translation.setParentEntity("Project");
+            translation.setField("description");
+            translation.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
+            translation.setContent(projectRequestDto.getDescription());
+            translation.setTranslationMap(translationMap);
 
-            translationRepository.save(translationEntity);//project description translation is created
+            Set<TranslationEntity> translationEntities = translationMap.getTranslations();
+            translationEntities.add(translation);
+            translationMap.setTranslations(translationEntities);
+
+            translationMapRepository.save(translationMap);
+            translationRepository.save(translation);
         }
+//
+//        translationRepository.save(translation);
+
+//        TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(project.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
+//        if(translationEntity != null){
+//            translationEntity.setContent(projectRequestDto.getDescription());
+//        }else{
+//            translationEntity = new TranslationEntity();
+////            translationEntity.setParentGuid(project.getProjectGuid());
+//            translationEntity.setParentEntity("Project");
+//            translationEntity.setField("description");
+//            translationEntity.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
+//            translationEntity.setContent(projectRequestDto.getDescription());
+//
+//            translationRepository.save(translationEntity);//project description translation is created
+//        }
 
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -190,11 +231,20 @@ public class ProjectRest {
         List<ProjectResponseDto> projectsResponseDto = new ArrayList<ProjectResponseDto>();
         List<ProjectEntity> projects = projectRepository.findByCreatedByUser(user.getName());
 
-        for(ProjectEntity project : projects){
-            ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
-            projectsResponseDto.add(projectResponseDto);
-        }
+//        for(ProjectEntity project : projects){
+//            ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
+//            projectsResponseDto.add(projectResponseDto);
+//        }
 
         return projectsResponseDto;
+    }
+
+    @RequestMapping(value = "/getProjectUsers/{projectGuid}", method = RequestMethod.GET)
+    public List<ProjectUserResponseDto> getProjectUsers(@PathVariable String projectGuid, Principal user) {
+        //auth check and exception call if needed
+
+         List<ProjectUserResponseDto> projects = projectRepository.getProjectUsers(projectGuid);
+
+        return projects;
     }
 }

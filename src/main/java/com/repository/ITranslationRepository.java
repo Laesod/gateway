@@ -22,11 +22,14 @@ package com.repository;
 
 
 
+import com.dto.ProjectResponseDto;
 import com.entity.ProjectEntity;
 import com.entity.TranslationEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,7 +40,12 @@ import java.util.List;
 @Repository
 public interface ITranslationRepository extends JpaRepository<TranslationEntity, Long> {
     Page<TranslationEntity> findAll(Pageable pageable);
-    TranslationEntity findByParentGuidAndFieldAndLanguage(String parentGuid, String field, String language);
+//    TranslationEntity findByParentGuidAndFieldAndLanguage(String parentGuid, String field, String language);
     List<TranslationEntity> findByCreatedByUser(String createdBy);
+
+    @Query("select a from TranslationEntity a where a.translationMap.translationMapGuid=:translationMapGuid and a.field=:field and a.language=:language")
+    List<TranslationEntity> getTranslation(@Param("translationMapGuid") String translationMapGuid, @Param("field") String field, @Param("language") String language);
+
+   // List<TranslationEntity> findByTranslationMapGuid(String translationMapGuid);
 }
 

@@ -66,13 +66,13 @@ public class InvitationRest {
                 InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
                 invitationResponseDto.setInvtitationGuid(invitationEntity.getInvitationGuid());
 
-                TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(invitationEntity.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
+               // TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(invitationEntity.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
 
-                if(translationEntity != null){
-                    invitationResponseDto.setProjectDescription(translationEntity.getContent());
-                    invitationResponseDto.setCreatedBy(invitationEntity.getCreatedByUser());
-                    invitationResponseDto.setCreatedAt(invitationEntity.getCreatedAt());
-                }
+//                if(translationEntity != null){
+//                    invitationResponseDto.setProjectDescription(translationEntity.getContent());
+//                    invitationResponseDto.setCreatedBy(invitationEntity.getCreatedByUser());
+//                    invitationResponseDto.setCreatedAt(invitationEntity.getCreatedAt());
+//                }
 
                 invitationResponseDtos.add(invitationResponseDto);
             }
