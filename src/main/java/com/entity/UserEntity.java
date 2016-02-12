@@ -65,7 +65,7 @@ public class UserEntity extends BaseEntity {
     private Set<ProjectEntity> projects;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "username") }, inverseJoinColumns = { @JoinColumn(name = "roleName") })
+    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "username") }, inverseJoinColumns = { @JoinColumn(name = "role_name") })
     private Set<RoleEntity> roles;
 
     public String getUsername() {

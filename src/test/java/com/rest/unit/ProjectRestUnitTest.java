@@ -122,7 +122,7 @@ public class ProjectRestUnitTest {
     public void getProjects(){
         when(mockSecurityContextReader.getUsername()).thenReturn("admin@gmail.com");
 
-        projectRest.getProjects(mockPrincipalUser);
+      //  projectRest.getProjects(mockPrincipalUser);
 
         verify(mockProjectRepository, times(1)).findByCreatedByUser(any(String.class));
     }

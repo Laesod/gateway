@@ -49,6 +49,12 @@ public interface IProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Query("select b.username, b.firstName, b.lastName from ProjectEntity a join a.users b where a.projectGuid=:projectGuid")
     List<ProjectUserResponseDto> getProjectUsers(@Param("projectGuid") String projectGuid);
 
+
+
+//    @Query("select a from ProjectEntity a where a. b where a.projectGuid=:projectGuid")
+//    List<ProjectEntity> getUserProjects(@Param("projectGuid") String projectGuid);
+
+
 //    @Query("select b.username, b.firstName, b.lastName from ProjectEntity a join a.users b where a.projectGuid=:projectGuid")
 //    List<ProjectUserResponseDto> getProjectUsers(@Param("projectGuid") String projectGuid);
 }

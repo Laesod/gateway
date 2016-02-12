@@ -24,13 +24,12 @@ package com.rest;
 import com.dto.ProjectRequestDto;
 import com.dto.ProjectResponseDto;
 import com.dto.ProjectUserResponseDto;
-import com.dto.UserResponseDto;
+import com.dto.UserProjectResponseDto;
 import com.entity.*;
 import com.repository.*;
 import com.utils.SecurityContextReader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Role;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -225,18 +224,39 @@ public class ProjectRest {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getProjects", method = RequestMethod.GET)
-    public List<ProjectResponseDto> getProjects(Principal user) {
+    @RequestMapping(value = "/getUserProjects", method = RequestMethod.GET)
+    public List<UserProjectResponseDto> getUserProjects(Principal user) {
 
-        List<ProjectResponseDto> projectsResponseDto = new ArrayList<ProjectResponseDto>();
-        List<ProjectEntity> projects = projectRepository.findByCreatedByUser(user.getName());
+        List<UserProjectResponseDto> userProjectResponseDtos = new ArrayList<UserProjectResponseDto>();
+        List<ProjectResponseDto> projectResponseDtos = userRepository.getUserProjects(user.getName());
 
-//        for(ProjectEntity project : projects){
+        UserEntity userEntity = userRepository.findByUsername(user.getName());
+
+       // List<ProjectEntity> projects = projectRepository.getUserProject(user.getName());
+
+
+        //here there is a problem - result is just a map and not an object of type ProjectResponseDto
+        for(ProjectResponseDto projectResponseDto : projectResponseDtos){
+            List<String> roles = new ArrayList<String>();
+            UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
+
+            for(RoleEntity role : userEntity.getRoles()){
+                String[] parts = role.getRoleName().split("_");
+
+                if(projectResponseDto.getProjectGuid().equals(parts[0])){
+                    roles.add(parts[1]);
+                }
+            }
+            userProjectResponseDto.setProjectGuid(projectResponseDto.getProjectGuid());
+            userProjectResponseDto.setProjectDescription(projectResponseDto.getDescription());
+            userProjectResponseDto.setRoles(roles);
+
+            userProjectResponseDtos.add(userProjectResponseDto);
 //            ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
 //            projectsResponseDto.add(projectResponseDto);
-//        }
+        }
 
-        return projectsResponseDto;
+        return userProjectResponseDtos;
     }
 
     @RequestMapping(value = "/getProjectUsers/{projectGuid}", method = RequestMethod.GET)
@@ -244,6 +264,8 @@ public class ProjectRest {
         //auth check and exception call if needed
 
          List<ProjectUserResponseDto> projects = projectRepository.getProjectUsers(projectGuid);
+
+
 
         return projects;
     }

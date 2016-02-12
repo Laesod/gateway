@@ -1,8 +1,5 @@
 package com.entity;
 
-import com.entity.BaseEntity;
-import com.entity.UserEntity;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,6 +17,10 @@ public class RoleEntity extends BaseEntity {
     @Id
     @Column(name = "role_name"   )
     private String roleName;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "role_name") }, inverseJoinColumns = { @JoinColumn(name = "username") })
+    private Set<UserEntity> users;
 
 //    @OneToOne
 //    @JoinColumn(name = "translationMapGuid")
@@ -40,4 +41,13 @@ public class RoleEntity extends BaseEntity {
 //    public void setTranslationMap(TranslationMapEntity translationMap) {
 //        this.translationMap = translationMap;
 //    }
+
+
+    public Set<UserEntity> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<UserEntity> users) {
+        this.users = users;
+    }
 }

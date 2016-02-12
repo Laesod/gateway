@@ -21,7 +21,7 @@ package com.repository;
  */
 
 
-import com.dto.ProjectUserResponseDto;
+import com.dto.ProjectResponseDto;
 import com.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +41,9 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByUsername(String username);
     UserEntity findByEmailVerificationToken(String emailVerificationToken);
     UserEntity findByResetPasswordToken(String emailVerificationToken);
+
+    @Query("select b.projectGuid as projectGuid, d.content as description from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username")
+    List<ProjectResponseDto> getUserProjects(@Param("username") String username);
 
 //    @Query("select b.username, b.firstName, b.lastName from ProjectEntity a join a.users b where a.projectGuid=:projectGuid")
 //    List<ProjectUserResponseDto> getUserProject(@Param("projectGuid") String projectGuid);
