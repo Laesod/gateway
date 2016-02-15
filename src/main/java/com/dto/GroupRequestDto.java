@@ -31,10 +31,6 @@ import javax.validation.constraints.NotNull;
 public class GroupRequestDto {
     @NotNull(message = "{FieldIsMandatory}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
-    private String groupGuid;
-
-    @NotNull(message = "{FieldIsMandatory}")
-    @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String groupName;
 
     public String getGroupName() {
@@ -43,13 +39,5 @@ public class GroupRequestDto {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
-    }
-
-    public String getGroupGuid() {
-        return groupGuid;
-    }
-
-    public void setGroupGuid(String groupGuid) {
-        this.groupGuid = groupGuid;
     }
 }

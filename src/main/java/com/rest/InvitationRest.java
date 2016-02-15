@@ -21,19 +21,18 @@ package com.rest;
  */
 
 
+import com.dto.InvitationRequestDto;
 import com.dto.InvitationResponseDto;
 import com.entity.InvitationEntity;
-import com.entity.TranslationEntity;
 import com.repository.IInvitationRepository;
 import com.repository.ITranslationRepository;
 import com.utils.SecurityContextReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +51,14 @@ public class InvitationRest {
     public ITranslationRepository translationRepository;
 
     public SecurityContextReader securityContextReader = new SecurityContextReader();
+
+    @RequestMapping(value = "/createInvitation", method = RequestMethod.POST)
+    @Transactional
+    public ResponseEntity createInvitation(@RequestBody InvitationRequestDto invitationRequestDto) {
+
+
+        return new ResponseEntity(HttpStatus.OK);
+    };
 
     @RequestMapping(value = "/getReceivedInvitations", method = RequestMethod.GET)
     @Transactional

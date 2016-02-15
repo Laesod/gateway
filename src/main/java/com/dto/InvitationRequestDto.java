@@ -23,7 +23,6 @@ package com.dto;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
@@ -35,25 +34,30 @@ public class InvitationRequestDto {
     @NotNull(message = "{FieldIsMandatory}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     @Pattern(regexp=".+@.+\\.[a-z]+", message = "{NotValidEmailValue}")
-    private String recipientEmail;
+    private String email;
 
+    @NotNull(message = "{FieldIsMandatory}")
+    @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String projectGuid;
 
     @NotNull(message = "{FieldIsMandatory}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
-    @Column(name = "authority")
-    private String authority;
+    private String[] rolesToAdd;
 
     @NotNull(message = "{FieldIsMandatory}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
-    private List<GroupRequestDto> groups;
+    private List<GroupRequestDto> groupsToAdd;
 
-    public String getRecipientEmail() {
-        return recipientEmail;
+    @NotNull(message = "{FieldIsMandatory}")
+    @NotEmpty(message = "{FieldCanNotBeEmpty}")
+    private List<GroupRequestDto> groupsToCreateAndAdd;
+
+    public String getEmail() {
+        return email;
     }
 
-    public void setRecipientEmail(String recipientEmail) {
-        this.recipientEmail = recipientEmail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getProjectGuid() {
@@ -64,19 +68,27 @@ public class InvitationRequestDto {
         this.projectGuid = projectGuid;
     }
 
-    public String getAuthority() {
-        return authority;
+    public String[] getRolesToAdd() {
+        return rolesToAdd;
     }
 
-    public void setAuthority(String authority) {
-        this.authority = authority;
+    public void setRolesToAdd(String[] rolesToAdd) {
+        this.rolesToAdd = rolesToAdd;
     }
 
-    public List<GroupRequestDto> getGroups() {
-        return groups;
+    public List<GroupRequestDto> getGroupsToAdd() {
+        return groupsToAdd;
     }
 
-    public void setGroups(List<GroupRequestDto> groups) {
-        this.groups = groups;
+    public void setGroupsToAdd(List<GroupRequestDto> groupsToAdd) {
+        this.groupsToAdd = groupsToAdd;
+    }
+
+    public List<GroupRequestDto> getGroupsToCreateAndAdd() {
+        return groupsToCreateAndAdd;
+    }
+
+    public void setGroupsToCreateAndAdd(List<GroupRequestDto> groupsToCreateAndAdd) {
+        this.groupsToCreateAndAdd = groupsToCreateAndAdd;
     }
 }
