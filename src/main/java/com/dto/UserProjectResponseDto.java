@@ -8,7 +8,7 @@ import java.util.List;
 public class UserProjectResponseDto {
     private String projectGuid;
     private String projectDescription;
-    private List<String> roles;
+    private List<RoleResponseDto> roles;
 
     public String getProjectGuid() {
         return projectGuid;
@@ -26,11 +26,11 @@ public class UserProjectResponseDto {
         this.projectDescription = projectDescription;
     }
 
-    public List<String> getRoles() {
+    public List<RoleResponseDto> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+    public void setRoles(List<RoleResponseDto> roles) {
         this.roles = roles;
     }
 }

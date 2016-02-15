@@ -1,34 +1,12 @@
 package com.rest;
 
-/*
- * #%L
- * Gateway
- * %%
- * Copyright (C) 2015 Powered by Sergey
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-
-import com.dto.ProjectRequestDto;
-import com.dto.ProjectResponseDto;
-import com.dto.ProjectUserResponseDto;
-import com.dto.UserProjectResponseDto;
+import com.dto.*;
 import com.entity.*;
+import com.google.common.collect.ObjectArrays;
 import com.repository.*;
 import com.utils.SecurityContextReader;
 import org.modelmapper.ModelMapper;
+import org.omg.CORBA.IRObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -38,11 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.lang.reflect.Array;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by aautushk on 9/13/2015.
@@ -56,8 +32,8 @@ public class ProjectRest {
     @Autowired
     public IProjectRepository projectRepository;
 
-//    @Autowired
-//    public IProjectUserRepository projectUserRepository;
+    @Autowired
+    public IRoleRepository roleRepository;
 
     @Autowired
     public IUserRepository userRepository;
@@ -75,19 +51,14 @@ public class ProjectRest {
     public IGroupRepository groupRepository;
 
     @Autowired
-    public IProjectGroupRepository projectGroupRepository;
-
-    @Autowired
     public IInvitationRepository invitationRepository;
-
-    @Autowired
-    public IInvitationGroupRepository invitationGroupRepository;
 
     public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     @RequestMapping(value = "/createProject", method = RequestMethod.POST)
     @Transactional
     public ResponseEntity createProject(@Valid @RequestBody ProjectRequestDto projectRequestDto) {
+        //no auth check - any one can create new projects
         ProjectEntity project = new ProjectEntity();
 
         UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
@@ -111,21 +82,45 @@ public class ProjectRest {
         translationMap.setTranslations(translations);
         translation.setTranslationMap(translationMap);
 
+        project.setTranslationMap(translationMap);
+
         translationMapRepository.save(translationMap);
         translationRepository.save(translation);
 
-        project.setTranslationMap(translationMap);
-
-        projectRepository.save(project);
-
         RoleEntity role = new RoleEntity();
-        role.setRoleName(project.getProjectGuid() + "_admin");
+        role.setProject(project);
+        role.setRoleName("user");// can modify entries within his groups
+        roleRepository.save(role);
+
+        role = new RoleEntity();
+        role.setProject(project);
+        role.setRoleName("viewer");// can view entries within his groups
+        roleRepository.save(role);
+
+        role = new RoleEntity();
+        role.setProject(project);
+        role.setRoleName("manager");//can create/modify any entries for the project, assign entries to the groups
+        roleRepository.save(role);
 
         Set<RoleEntity> roles = user.getRoles();
         roles.add(role);
+
+        role = new RoleEntity();
+        role.setProject(project);
+        role.setRoleName("admin");// manages project (invites/removed users, gives roles, assign/create groups)
+        roles.add(role);
+
         user.setRoles(roles);
 
+        Set<RoleEntity> projectRoles = new HashSet<RoleEntity>();
+        projectRoles.add(role);
+
+        project.setRoles(projectRoles);
+
+        roleRepository.save(role);
+
         userRepository.save(user);
+        projectRepository.save(project);
 
 //        for(GroupRequestDto groupRequestDto : projectRequestDto.getGroups()){
 //            GroupEntity groupEntity = new GroupEntity();
@@ -164,32 +159,32 @@ public class ProjectRest {
     }
 
     @RequestMapping(value = "/getProject/{projectGuid}", method = RequestMethod.GET)
-    public List<ProjectResponseDto> getProject(@PathVariable String projectGuid, Principal user) {
-        //auh check user has admin role
+    public ProjectResponseDto getProject(@PathVariable String projectGuid) {
+        //auth check if user has one of the project related roles
+        ArrayList<Object[]> projects = projectRepository.getProject(projectGuid);
 
-        List<ProjectResponseDto> projectResponsesDto = projectRepository.getProject(projectGuid);
+        ProjectResponseDto projectResponseDto = new ProjectResponseDto();
+        projectResponseDto.setProjectGuid((String) projects.get(0)[0]);
+        projectResponseDto.setDescription((String) projects.get(0)[1]);
 
-
-        return projectResponsesDto;
+        return projectResponseDto;
     }
 
     @RequestMapping(value = "/updateProject/{projectGuid}", method = RequestMethod.PUT)
     @Transactional
-    public ResponseEntity updateProject(@Valid @RequestBody ProjectRequestDto projectRequestDto, @PathVariable String projectGuid, Principal user) {
+    public ResponseEntity updateProject(@Valid @RequestBody ProjectRequestDto projectRequestDto, @PathVariable String projectGuid) {
+        //auh check user has admin role for the project
         TranslationEntity translation = null;
-        //auh check user has admin role
 
         ProjectEntity project = projectRepository.findByProjectGuid(projectGuid);
 
         TranslationMapEntity translationMap = project.getTranslationMap();
         List<TranslationEntity> translations = translationRepository.getTranslation(translationMap.getTranslationMapGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
-        if(translations.size() > 0){
-           // translation = modelMapper.map(user, UserResponseDto.class);
-
+        if (translations.size() > 0) {
             translation = translations.get(0);
             translation.setContent(projectRequestDto.getDescription());
             translationRepository.save(translation);
-        }else{
+        } else {
             translation = new TranslationEntity();
             translation.setParentEntity("Project");
             translation.setField("description");
@@ -204,69 +199,218 @@ public class ProjectRest {
             translationMapRepository.save(translationMap);
             translationRepository.save(translation);
         }
-//
-//        translationRepository.save(translation);
-
-//        TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(project.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
-//        if(translationEntity != null){
-//            translationEntity.setContent(projectRequestDto.getDescription());
-//        }else{
-//            translationEntity = new TranslationEntity();
-////            translationEntity.setParentGuid(project.getProjectGuid());
-//            translationEntity.setParentEntity("Project");
-//            translationEntity.setField("description");
-//            translationEntity.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
-//            translationEntity.setContent(projectRequestDto.getDescription());
-//
-//            translationRepository.save(translationEntity);//project description translation is created
-//        }
 
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/getUserProjects", method = RequestMethod.GET)
-    public List<UserProjectResponseDto> getUserProjects(Principal user) {
-
+    public List<UserProjectResponseDto> getUserProjects() {
+        //no auth check - any one can see list of projects he/she is assigned to
         List<UserProjectResponseDto> userProjectResponseDtos = new ArrayList<UserProjectResponseDto>();
-        List<ProjectResponseDto> projectResponseDtos = userRepository.getUserProjects(user.getName());
+        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername());
 
-        UserEntity userEntity = userRepository.findByUsername(user.getName());
+        UserEntity userEntity = userRepository.findByUsername(securityContextReader.getUsername());
 
-       // List<ProjectEntity> projects = projectRepository.getUserProject(user.getName());
-
-
-        //here there is a problem - result is just a map and not an object of type ProjectResponseDto
-        for(ProjectResponseDto projectResponseDto : projectResponseDtos){
-            List<String> roles = new ArrayList<String>();
+        for (Object[] userProject : userProjects) {
+            List<RoleResponseDto> roles = new ArrayList<>();
             UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
 
-            for(RoleEntity role : userEntity.getRoles()){
-                String[] parts = role.getRoleName().split("_");
+            for (RoleEntity role : userEntity.getRoles()) {
+                if (userProject[0].equals(role.getProject().getProjectGuid())) {
+                    RoleResponseDto roleResponseDto = new RoleResponseDto();
+                    roleResponseDto.setRoleGuid(role.getRoleGuid());
+                    roleResponseDto.setRoleName(role.getRoleName());
 
-                if(projectResponseDto.getProjectGuid().equals(parts[0])){
-                    roles.add(parts[1]);
+                    roles.add(roleResponseDto);
                 }
             }
-            userProjectResponseDto.setProjectGuid(projectResponseDto.getProjectGuid());
-            userProjectResponseDto.setProjectDescription(projectResponseDto.getDescription());
+            userProjectResponseDto.setProjectGuid((String) userProject[0]);
+            userProjectResponseDto.setProjectDescription((String) userProject[1]);
             userProjectResponseDto.setRoles(roles);
 
             userProjectResponseDtos.add(userProjectResponseDto);
-//            ProjectResponseDto projectResponseDto = this.convertToResponseDto(project);
-//            projectsResponseDto.add(projectResponseDto);
         }
 
         return userProjectResponseDtos;
     }
 
     @RequestMapping(value = "/getProjectUsers/{projectGuid}", method = RequestMethod.GET)
-    public List<ProjectUserResponseDto> getProjectUsers(@PathVariable String projectGuid, Principal user) {
-        //auth check and exception call if needed
+    public List<ProjectUserResponseDto> getProjectUsers(@PathVariable String projectGuid) {
+        //auth check if user has admin role for the project
+        ArrayList<Object[]> users = projectRepository.getProjectUsers(projectGuid);
+        List<ProjectUserResponseDto> projectUserResponseDtos = new ArrayList<>();
 
-         List<ProjectUserResponseDto> projects = projectRepository.getProjectUsers(projectGuid);
+        for (Object[] user : users) {
+            UserEntity userEntity = userRepository.findByUsername((String) user[0]);
+            ProjectUserResponseDto projectUserResponseDto = new ProjectUserResponseDto();
 
+            projectUserResponseDto.setUsername((String) user[0]);
+            projectUserResponseDto.setFirstName((String) user[1]);
+            projectUserResponseDto.setLastName((String) user[2]);
 
+            List<RoleResponseDto> userRoles = new ArrayList<>();
 
-        return projects;
+            for (RoleEntity role : userEntity.getRoles()) {
+                if (role.getProject().getProjectGuid().equals(projectGuid)) {
+                    RoleResponseDto roleResponseDto = new RoleResponseDto();
+                    roleResponseDto.setRoleGuid(role.getRoleGuid());
+                    roleResponseDto.setRoleName(role.getRoleName());
+                    userRoles.add(roleResponseDto);
+                }
+            }
+            projectUserResponseDto.setRoles(userRoles);
+
+            projectUserResponseDtos.add(projectUserResponseDto);
+        }
+
+        return projectUserResponseDtos;
     }
+
+    @RequestMapping(value = "/getProjectRoles/{projectGuid}", method = RequestMethod.GET)
+    public List<RoleResponseDto> getProjectRoles(@PathVariable String projectGuid) {
+        //auth check if user has admin role for the project
+        List<RoleResponseDto> roles = new ArrayList<>();
+
+        ArrayList<Object[]> projectRoles = roleRepository.getProjectRoles(projectGuid);
+        for (Object[] projectRole : projectRoles) {
+            RoleResponseDto role = new RoleResponseDto();
+            role.setRoleGuid((String) projectRole[0]);
+            role.setRoleName((String) projectRole[1]);
+
+            roles.add(role);
+        }
+
+        return roles;
+    }
+
+    @RequestMapping(value = "/removeUserFromProject/{projectGuid}", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity removeUserFromProject(@PathVariable String projectGuid, @RequestParam String username) {
+        //auth check if user has admin role for the project
+        RoleEntity role = new RoleEntity();
+        ProjectEntity project = new ProjectEntity();
+        UserEntity user = userRepository.findByUsername(username);
+        Set<RoleEntity> userRoles = user.getRoles();
+        Set<ProjectEntity> userProjects = user.getProjects();
+
+        Iterator<RoleEntity> iteratorForRoles = userRoles.iterator();
+        while (iteratorForRoles.hasNext()) {
+            role = iteratorForRoles.next();
+
+            if (role.getProject().getProjectGuid().equals(projectGuid)) {
+                iteratorForRoles.remove();
+            }
+        }
+
+        Iterator<ProjectEntity> iteratorForProjects = userProjects.iterator();
+        while (iteratorForProjects.hasNext()) {
+            project = iteratorForProjects.next();
+
+            if (project.getProjectGuid().equals(projectGuid)) {
+                iteratorForProjects.remove();
+            }
+        }
+
+        userRepository.save(user);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/updateUserRolesForProject/{projectGuid}", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity updateUserRolesForProject(@RequestBody UpdateUserRolesRequestDto updateUserRolesRequestDto, @PathVariable String projectGuid, @RequestParam String username) {
+        //auth check if user has admin role for the project
+        RoleEntity role = new RoleEntity();
+        UserEntity user = userRepository.findByUsername(username);
+        Set<RoleEntity> userRoles = user.getRoles();
+
+        if (updateUserRolesRequestDto.getRolesToRemove() != null) {
+            List<String> rolesToRemove = Arrays.asList(updateUserRolesRequestDto.getRolesToRemove());
+
+            Iterator<RoleEntity> iterator = userRoles.iterator();
+            while (iterator.hasNext()) {
+                role = iterator.next();
+
+                if (rolesToRemove.contains(role.getRoleGuid())) {
+                    iterator.remove();
+                }
+            }
+        }
+
+        if (updateUserRolesRequestDto.getRolesToAdd() != null) {
+            for (String roleGuid : updateUserRolesRequestDto.getRolesToAdd()) {
+                role = roleRepository.findByRoleGuid(roleGuid);
+                userRoles.add(role);
+            }
+        }
+
+        userRepository.save(user);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getProjectGroups/{projectGuid}", method = RequestMethod.GET)
+    public List<GroupResponseDto> getProjectGroups(@PathVariable String projectGuid) {
+        //auth check if user has admin role for the project
+        List<GroupResponseDto> groups = new ArrayList<>();
+
+        ArrayList<Object[]> projectGroups = groupRepository.getProjectGroups(projectGuid);
+        for (Object[] projectGroup : projectGroups) {
+            GroupResponseDto group = new GroupResponseDto();
+            group.setGroupGuid((String) projectGroup[0]);
+            group.setGroupName((String) projectGroup[1]);
+
+            groups.add(group);
+        }
+
+        return groups;
+    }
+
+    @RequestMapping(value = "/updateUserGroupsForProject/{projectGuid}", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity updateUserGroupsForProject(@RequestBody UpdateUserGroupsRequestDto updateUserGroupsRequestDto, @PathVariable String projectGuid, @RequestParam String username) {
+        //auth check if user has admin role for the project
+
+        GroupEntity group = new GroupEntity();
+        UserEntity user = userRepository.findByUsername(username);
+        Set<GroupEntity> userGroups = user.getGroups();
+
+        if (updateUserGroupsRequestDto.getGroupsToRemove() != null) {
+            List<String> groupsToRemove = Arrays.asList(updateUserGroupsRequestDto.getGroupsToRemove());
+
+            Iterator<GroupEntity> iterator = userGroups.iterator();
+            while (iterator.hasNext()) {
+                group = iterator.next();
+
+                if (groupsToRemove.contains(group.getGroupGuid())) {
+                    iterator.remove();
+                }
+            }
+        }
+
+        if (updateUserGroupsRequestDto.getGroupsToAdd() != null) {
+            for (String groupGuid : updateUserGroupsRequestDto.getGroupsToAdd()) {
+                group = groupRepository.findByGroupGuid(groupGuid);
+                userGroups.add(group);
+            }
+        }
+
+        if (updateUserGroupsRequestDto.getGroupsToCreateAndAdd() != null) {
+            for (GroupRequestDto groupToCreate : updateUserGroupsRequestDto.getGroupsToCreateAndAdd()) {
+                group = new GroupEntity();
+                group.setGroupName(groupToCreate.getGroupName());
+
+                userGroups.add(group);
+
+                groupRepository.save(group);
+            }
+        }
+
+        user.setGroups(userGroups);
+
+        userRepository.save(user);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }

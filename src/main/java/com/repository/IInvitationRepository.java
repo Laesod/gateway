@@ -34,6 +34,6 @@ import java.util.List;
  */
 @Repository
 public interface IInvitationRepository extends JpaRepository<InvitationEntity, Long> {
-    List<InvitationEntity> findByRecipientEmailAndIsInvitationAccepted(String recipientEmail, boolean isInvitationAccepted);
-    List<InvitationEntity> findByCreatedByUser(String createdBy);
+//    List<InvitationEntity> findByRecipientEmailAndIsInvitationAccepted(String recipientEmail, boolean isInvitationAccepted);
+//    List<InvitationEntity> findByCreatedByUser(String createdBy);
 }

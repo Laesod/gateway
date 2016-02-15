@@ -31,6 +31,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,12 +44,15 @@ public interface IProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     ProjectEntity findByProjectGuid(String guid);
 
-    @Query("select a.projectGuid, c.content as description from ProjectEntity a join a.translationMap b join b.translations c where a.projectGuid=:projectGuid")
-    List<ProjectResponseDto> getProject(@Param("projectGuid") String projectGuid);
+    @Query("select a.projectGuid, c.content as description from ProjectEntity a join a.translationMap b join b.translations c where a.projectGuid=:projectGuid and c.field='description'")
+    ArrayList<Object[]> getProject(@Param("projectGuid") String projectGuid);
 
     @Query("select b.username, b.firstName, b.lastName from ProjectEntity a join a.users b where a.projectGuid=:projectGuid")
-    List<ProjectUserResponseDto> getProjectUsers(@Param("projectGuid") String projectGuid);
+    ArrayList<Object[]> getProjectUsers(@Param("projectGuid") String projectGuid);
 
+
+//    @Query("select b.username, b.firstName, b.lastName from ProjectEntity a join a.users b where a.projectGuid=:projectGuid")
+//    ArrayList<Object[]> getProjectGroups(@Param("projectGuid") String projectGuid);
 
 
 //    @Query("select a from ProjectEntity a where a. b where a.projectGuid=:projectGuid")

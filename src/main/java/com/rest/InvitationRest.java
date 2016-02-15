@@ -59,7 +59,7 @@ public class InvitationRest {
         List<InvitationEntity> invitationEntities = new ArrayList<InvitationEntity>();
         List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
 
-        invitationEntities = invitationRepository.findByRecipientEmailAndIsInvitationAccepted(securityContextReader.getUsername(), false);
+      //  invitationEntities = invitationRepository.findByRecipientEmailAndIsInvitationAccepted(securityContextReader.getUsername(), false);
 
         if(invitationEntities != null){
             for(InvitationEntity invitationEntity : invitationEntities){

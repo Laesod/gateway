@@ -29,6 +29,15 @@ public class ProjectEntity extends BaseEntity {
     @JoinColumn(name = "translationMapGuid")
     private TranslationMapEntity translationMap;
 
+    @OneToMany(mappedBy="project")
+    private Set<GroupEntity> groups;
+
+    @OneToMany(mappedBy="project")
+    private Set<RoleEntity> roles;
+
+    @OneToMany(mappedBy="project")
+    private Set<InvitationEntity> invitations;
+
     public String getProjectGuid() {
         return projectGuid;
     }
@@ -50,5 +59,29 @@ public class ProjectEntity extends BaseEntity {
 
     public void setTranslationMap(TranslationMapEntity translationMap) {
         this.translationMap = translationMap;
+    }
+
+    public Set<GroupEntity> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<GroupEntity> groups) {
+        this.groups = groups;
+    }
+
+    public Set<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
+    }
+
+    public Set<InvitationEntity> getInvitations() {
+        return invitations;
+    }
+
+    public void setInvitations(Set<InvitationEntity> invitations) {
+        this.invitations = invitations;
     }
 }

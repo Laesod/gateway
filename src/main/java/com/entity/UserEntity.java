@@ -22,6 +22,7 @@ package com.entity;
 
 
 import org.hibernate.envers.Audited;
+import org.hibernate.validator.internal.engine.groups.Group;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -65,8 +66,12 @@ public class UserEntity extends BaseEntity {
     private Set<ProjectEntity> projects;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "username") }, inverseJoinColumns = { @JoinColumn(name = "role_name") })
+    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "username") }, inverseJoinColumns = { @JoinColumn(name = "role_guid") })
     private Set<RoleEntity> roles;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "users_groups", joinColumns = { @JoinColumn(name = "username") }, inverseJoinColumns = { @JoinColumn(name = "group_guid") })
+    private Set<GroupEntity> groups;
 
     public String getUsername() {
         return username;
@@ -140,5 +145,13 @@ public class UserEntity extends BaseEntity {
 
     public void setRoles(Set<RoleEntity> roles) {
         this.roles = roles;
+    }
+
+    public Set<GroupEntity> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<GroupEntity> groups) {
+        this.groups = groups;
     }
 }

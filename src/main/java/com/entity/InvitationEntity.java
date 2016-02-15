@@ -1,31 +1,11 @@
 package com.entity;
 
-/*
- * #%L
- * Gateway
- * %%
- * Copyright (C) 2015 Powered by Sergey
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Created by aautushk on 9/15/2015.
@@ -37,21 +17,28 @@ import javax.persistence.*;
 public class InvitationEntity extends BaseEntity {
     @Id
     @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
-    @Column(name = "invitation_guid"   )
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
+    @Column(name = "invitation_guid")
     private String invitationGuid;
 
-    @Column(name = "recipient_email")
-    private String recipientEmail;
-
-    @Column(name = "project_guid")
-    private String projectGuid;
-
-    @Column(name = "authority")
-    private String authority;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "is_invitation_accepted")
     private boolean isInvitationAccepted;
+
+    @ManyToOne
+    @JoinColumn(name = "project_guid")
+
+    private ProjectEntity project;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "invitations_roles", joinColumns = {@JoinColumn(name = "invitation_guid")}, inverseJoinColumns = {@JoinColumn(name = "role_guid")})
+    private Set<RoleEntity> roles;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "invitations_groups", joinColumns = {@JoinColumn(name = "invitation_guid")}, inverseJoinColumns = {@JoinColumn(name = "group_guid")})
+    private Set<GroupEntity> groups;
 
     public String getInvitationGuid() {
         return invitationGuid;
@@ -61,28 +48,12 @@ public class InvitationEntity extends BaseEntity {
         this.invitationGuid = invitationGuid;
     }
 
-    public String getRecipientEmail() {
-        return recipientEmail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setRecipientEmail(String recipientEmail) {
-        this.recipientEmail = recipientEmail;
-    }
-
-    public String getProjectGuid() {
-        return projectGuid;
-    }
-
-    public void setProjectGuid(String projectGuid) {
-        this.projectGuid = projectGuid;
-    }
-
-    public String getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(String authority) {
-        this.authority = authority;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public boolean isInvitationAccepted() {
@@ -91,5 +62,33 @@ public class InvitationEntity extends BaseEntity {
 
     public void setIsInvitationAccepted(boolean isInvitationAccepted) {
         this.isInvitationAccepted = isInvitationAccepted;
+    }
+
+    public void setInvitationAccepted(boolean invitationAccepted) {
+        isInvitationAccepted = invitationAccepted;
+    }
+
+    public ProjectEntity getProject() {
+        return project;
+    }
+
+    public void setProject(ProjectEntity project) {
+        this.project = project;
+    }
+
+    public Set<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
+    }
+
+    public Set<GroupEntity> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<GroupEntity> groups) {
+        this.groups = groups;
     }
 }

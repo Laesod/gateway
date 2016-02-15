@@ -30,6 +30,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,9 +43,9 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByEmailVerificationToken(String emailVerificationToken);
     UserEntity findByResetPasswordToken(String emailVerificationToken);
 
-    @Query("select b.projectGuid as projectGuid, d.content as description from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username")
-    List<ProjectResponseDto> getUserProjects(@Param("username") String username);
+    @Query("select b.projectGuid, d.content from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username and d.field='description'")
+    ArrayList<Object[]> getUserProjects(@Param("username") String username);
 
-//    @Query("select b.username, b.firstName, b.lastName from ProjectEntity a join a.users b where a.projectGuid=:projectGuid")
-//    List<ProjectUserResponseDto> getUserProject(@Param("projectGuid") String projectGuid);
+//    @Query("select b.roleName from UserEntity a join a.roles b where a.username=:username and b.project.projectGuid=:projectGuid")
+//    ArrayList<Object[]> getUserRolesForProject(@Param("username") String username, @Param("projectGuid") String projectGuid);
 }

@@ -1,5 +1,6 @@
 package com.entity;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,33 +16,38 @@ import java.util.Set;
 @Audited
 public class RoleEntity extends BaseEntity {
     @Id
-    @Column(name = "role_name"   )
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @Column(name = "role_guid"   )
+    private String roleGuid;
+
+    @Column(name = "role_name")
     private String roleName;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "role_name") }, inverseJoinColumns = { @JoinColumn(name = "username") })
+    @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "role_guid") }, inverseJoinColumns = { @JoinColumn(name = "username") })
     private Set<UserEntity> users;
-
-//    @OneToOne
-//    @JoinColumn(name = "translationMapGuid")
-//    private TranslationMapEntity translationMap;
 
     public String getRoleName() {
         return roleName;
     }
 
+    @ManyToOne
+    @JoinColumn(name="project_guid")
+
+    private ProjectEntity project;
+
+    public String getRoleGuid() {
+        return roleGuid;
+    }
+
+    public void setRoleGuid(String roleGuid) {
+        this.roleGuid = roleGuid;
+    }
+
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
-
-//    public TranslationMapEntity getTranslationMap() {
-//        return translationMap;
-//    }
-//
-//    public void setTranslationMap(TranslationMapEntity translationMap) {
-//        this.translationMap = translationMap;
-//    }
-
 
     public Set<UserEntity> getUsers() {
         return users;
@@ -49,5 +55,13 @@ public class RoleEntity extends BaseEntity {
 
     public void setUsers(Set<UserEntity> users) {
         this.users = users;
+    }
+
+    public ProjectEntity getProject() {
+        return project;
+    }
+
+    public void setProject(ProjectEntity project) {
+        this.project = project;
     }
 }
