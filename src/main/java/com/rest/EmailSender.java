@@ -112,6 +112,32 @@ public class EmailSender {
         }
     }
 
+    public void sendInvitationEmail(String requestBaseUrl){
+        Locale locale = LocaleContextHolder.getLocale();
+        String invitationTemplate = "";
+        switch (locale.toString()){
+            case "fr":
+                invitationTemplate = "invitationTemplate_fr";
+                break;
+            default:
+                invitationTemplate = "invitationTemplate_en";
+                break;
+        }
+
+        Context ctx = new Context();
+//        ctx.setVariable("emailVerificationToken", emailVerificationToken.toString());
+        ctx.setVariable("requestBaseUrl", requestBaseUrl.toString());
+
+        String emailText = thymeleaf.process(invitationTemplate, ctx);
+
+        try {
+            sendMessage(bundleMessageReader.getMessage("EmailVerificationEmailHeader"), emailText);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void sendMessage(String emailHeader, String emailText) throws MessagingException{
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);

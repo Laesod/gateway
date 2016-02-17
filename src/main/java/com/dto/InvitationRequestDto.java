@@ -46,7 +46,7 @@ public class InvitationRequestDto {
 
     @NotNull(message = "{FieldIsMandatory}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
-    private List<GroupRequestDto> groupsToAdd;
+    private String[] groupsToAdd;
 
     @NotNull(message = "{FieldIsMandatory}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
@@ -76,11 +76,11 @@ public class InvitationRequestDto {
         this.rolesToAdd = rolesToAdd;
     }
 
-    public List<GroupRequestDto> getGroupsToAdd() {
+    public String[] getGroupsToAdd() {
         return groupsToAdd;
     }
 
-    public void setGroupsToAdd(List<GroupRequestDto> groupsToAdd) {
+    public void setGroupsToAdd(String[] groupsToAdd) {
         this.groupsToAdd = groupsToAdd;
     }
 

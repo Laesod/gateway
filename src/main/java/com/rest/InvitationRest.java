@@ -1,41 +1,23 @@
 package com.rest;
 
-/*
- * #%L
- * Gateway
- * %%
- * Copyright (C) 2015 Powered by Sergey
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-
+import com.dto.GroupRequestDto;
 import com.dto.InvitationRequestDto;
 import com.dto.InvitationResponseDto;
-import com.entity.InvitationEntity;
-import com.repository.IInvitationRepository;
-import com.repository.ITranslationRepository;
+import com.entity.*;
+import com.repository.*;
 import com.utils.SecurityContextReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.spring3.SpringTemplateEngine;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by aautushk on 9/19/2015.
@@ -48,43 +30,152 @@ public class InvitationRest {
     public IInvitationRepository invitationRepository;
 
     @Autowired
+    public IRoleRepository roleRepository;
+
+    @Autowired
+    public IUserRepository userRepository;
+
+    @Autowired
     public ITranslationRepository translationRepository;
+
+    @Autowired
+    public IProjectRepository projectRepository;
+
+    @Autowired
+    public IGroupRepository groupRepository;
+
+    @Autowired
+    public JavaMailSender mailSender;
+
+    @Autowired
+    public ClassLoaderTemplateResolver emailTemplateResolver;
+
+    @Autowired
+    public SpringTemplateEngine thymeleaf;
+
+    @Value("${mailserver.sendFrom}")
+    public String mailSendFrom;
+
+    @Value("${gatewayHost}")
+    public String gatewayHost;
+
+    @Value("${gatewayPort}")
+    public String gatewayPort;
+
+    @Value("${server.contextPath}")
+    public String contextPath;
+
+    public EmailSender emailSender;
 
     public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     @RequestMapping(value = "/createInvitation", method = RequestMethod.POST)
     @Transactional
     public ResponseEntity createInvitation(@RequestBody InvitationRequestDto invitationRequestDto) {
+        //auth check if user has admin role for the project
 
+        //check if user is already on the project...
+
+        InvitationEntity invitation = new InvitationEntity();
+
+        RoleEntity role = new RoleEntity();
+        ProjectEntity project = new ProjectEntity();
+        GroupEntity group = new GroupEntity();
+        Set<RoleEntity> roles = new HashSet<RoleEntity>();
+        Set<GroupEntity> groups = new HashSet<GroupEntity>();
+
+        project = projectRepository.findByProjectGuid(invitationRequestDto.getProjectGuid());
+
+        if (invitationRequestDto.getRolesToAdd() != null) {
+            for (String roleGuid : invitationRequestDto.getRolesToAdd()) {
+                role = roleRepository.findByRoleGuid(roleGuid);
+                roles.add(role);
+            }
+        }
+
+        if (invitationRequestDto.getGroupsToAdd() != null) {
+            for (String groupGuid : invitationRequestDto.getGroupsToAdd()) {
+                group = groupRepository.findByGroupGuid(groupGuid);
+                groups.add(group);
+            }
+        }
+
+        if (invitationRequestDto.getGroupsToCreateAndAdd() != null) {
+            for (GroupRequestDto groupToCreate : invitationRequestDto.getGroupsToCreateAndAdd()) {
+                group = new GroupEntity();
+                group.setGroupName(groupToCreate.getGroupName());
+
+                groups.add(group);
+
+                groupRepository.save(group);
+            }
+        }
+
+        invitation.setEmail(invitationRequestDto.getEmail());
+        invitation.setProject(project);
+        invitation.setRoles(roles);
+        invitation.setGroups(groups);
+
+        invitationRepository.save(invitation);
+
+//        if(emailSender == null){// this check needed for unit testing perposes
+//            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, securityContextReader.getUsername(), mailSendFrom);
+//        }
+//
+//        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
+//        emailSender.sendInvitationEmail(requestBaseUrl);
 
         return new ResponseEntity(HttpStatus.OK);
     };
 
-    @RequestMapping(value = "/getReceivedInvitations", method = RequestMethod.GET)
-    @Transactional
-    public List<InvitationResponseDto> getReceivedInvitations() {
-        List<InvitationEntity> invitationEntities = new ArrayList<InvitationEntity>();
+    @RequestMapping(value = "/getPendingInvitations", method = RequestMethod.GET)
+    public List<InvitationResponseDto> getPendingInvitations(@RequestParam String projectGuid) {
+        //auth check if user has admin role for the project
+
         List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
 
-      //  invitationEntities = invitationRepository.findByRecipientEmailAndIsInvitationAccepted(securityContextReader.getUsername(), false);
+        ArrayList<Object[]> invitations = invitationRepository.getPendingInvitationsForProject(projectGuid);
 
-        if(invitationEntities != null){
-            for(InvitationEntity invitationEntity : invitationEntities){
-                InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
-                invitationResponseDto.setInvtitationGuid(invitationEntity.getInvitationGuid());
+        for (Object[] invitation : invitations) {
+            InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
+            invitationResponseDto.setInvtitationGuid((String) invitation[0]);
+            invitationResponseDto.setEmail((String) invitation[1]);
+            invitationResponseDto.setProjectDescription((String) invitation[2]);
+            invitationResponseDto.setCreatedAt((Date) invitation[3]);
 
-               // TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(invitationEntity.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
+            UserEntity user = userRepository.findByUsername((String) invitation[4]);
+            invitationResponseDto.setCreatedBy(user.getFirstName() + " " + user.getLastName());
 
-//                if(translationEntity != null){
-//                    invitationResponseDto.setProjectDescription(translationEntity.getContent());
-//                    invitationResponseDto.setCreatedBy(invitationEntity.getCreatedByUser());
-//                    invitationResponseDto.setCreatedAt(invitationEntity.getCreatedAt());
-//                }
-
-                invitationResponseDtos.add(invitationResponseDto);
-            }
+            invitationResponseDtos.add(invitationResponseDto);
         }
 
         return invitationResponseDtos;
-    };
+    }
+//    @RequestMapping(value = "/getReceivedInvitations", method = RequestMethod.GET)
+//    @Transactional
+//    public List<InvitationResponseDto> getReceivedInvitations() {
+//        List<InvitationEntity> invitationEntities = new ArrayList<InvitationEntity>();
+//        List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
+//
+//      //  invitationEntities = invitationRepository.findByRecipientEmailAndIsInvitationAccepted(securityContextReader.getUsername(), false);
+//
+//        if(invitationEntities != null){
+//            for(InvitationEntity invitationEntity : invitationEntities){
+//                InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
+//                invitationResponseDto.setInvtitationGuid(invitationEntity.getInvitationGuid());
+//
+//               // TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(invitationEntity.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
+//
+////                if(translationEntity != null){
+////                    invitationResponseDto.setProjectDescription(translationEntity.getContent());
+////                    invitationResponseDto.setCreatedBy(invitationEntity.getCreatedByUser());
+////                    invitationResponseDto.setCreatedAt(invitationEntity.getCreatedAt());
+////                }
+//
+//                invitationResponseDtos.add(invitationResponseDto);
+//            }
+//        }
+//
+//        return invitationResponseDtos;
+//    };
 }

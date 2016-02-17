@@ -2,11 +2,9 @@ package com.rest;
 
 import com.dto.*;
 import com.entity.*;
-import com.google.common.collect.ObjectArrays;
 import com.repository.*;
 import com.utils.SecurityContextReader;
 import org.modelmapper.ModelMapper;
-import org.omg.CORBA.IRObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -16,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.lang.reflect.Array;
-import java.security.Principal;
 import java.util.*;
 
 /**
@@ -289,9 +285,11 @@ public class ProjectRest {
         //auth check if user has admin role for the project
         RoleEntity role = new RoleEntity();
         ProjectEntity project = new ProjectEntity();
+        GroupEntity group = new GroupEntity();
         UserEntity user = userRepository.findByUsername(username);
         Set<RoleEntity> userRoles = user.getRoles();
         Set<ProjectEntity> userProjects = user.getProjects();
+        Set<GroupEntity> userGroups = user.getGroups();
 
         Iterator<RoleEntity> iteratorForRoles = userRoles.iterator();
         while (iteratorForRoles.hasNext()) {
@@ -307,6 +305,15 @@ public class ProjectRest {
             project = iteratorForProjects.next();
 
             if (project.getProjectGuid().equals(projectGuid)) {
+                iteratorForProjects.remove();
+            }
+        }
+
+        Iterator<GroupEntity> iteratorForGroups = userGroups.iterator();
+        while (iteratorForGroups.hasNext()) {
+            group = iteratorForGroups.next();
+
+            if (group.getProject().getProjectGuid().equals(projectGuid)) {
                 iteratorForProjects.remove();
             }
         }

@@ -28,6 +28,7 @@ import java.util.Date;
  */
 public class InvitationResponseDto {
     private String invtitationGuid;
+    private String email;
     private String projectDescription;
 
     private String createdBy;
@@ -40,6 +41,14 @@ public class InvitationResponseDto {
 
     public void setInvtitationGuid(String invtitationGuid) {
         this.invtitationGuid = invtitationGuid;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getCreatedBy() {
