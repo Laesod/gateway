@@ -40,16 +40,10 @@ public class InvitationRequestDto {
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String projectGuid;
 
-    @NotNull(message = "{FieldIsMandatory}")
-    @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String[] rolesToAdd;
 
-    @NotNull(message = "{FieldIsMandatory}")
-    @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String[] groupsToAdd;
 
-    @NotNull(message = "{FieldIsMandatory}")
-    @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private List<GroupRequestDto> groupsToCreateAndAdd;
 
     public String getEmail() {

@@ -16,8 +16,10 @@ public interface IInvitationRepository extends JpaRepository<InvitationEntity, L
     @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.project.projectGuid=:projectGuid and a.isInvitationAccepted = false and d.field='description'")
     ArrayList<Object[]> getPendingInvitationsForProject(@Param("projectGuid") String projectGuid);
 
+    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.email=:username and a.isInvitationAccepted = false and d.field='description'")
+    ArrayList<Object[]> getReceivedInvitations(@Param("username") String username);
 
-
+    InvitationEntity findByInvitationGuid(String guid);
 //    List<InvitationEntity> findByRecipientEmailAndIsInvitationAccepted(String recipientEmail, boolean isInvitationAccepted);
 //    List<InvitationEntity> findByCreatedByUser(String createdBy);
 }

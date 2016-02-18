@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -71,7 +72,7 @@ public class InvitationRest {
 
     @RequestMapping(value = "/createInvitation", method = RequestMethod.POST)
     @Transactional
-    public ResponseEntity createInvitation(@RequestBody InvitationRequestDto invitationRequestDto) {
+    public ResponseEntity createInvitation(@Valid @RequestBody InvitationRequestDto invitationRequestDto) {
         //auth check if user has admin role for the project
 
         //check if user is already on the project...
@@ -118,12 +119,12 @@ public class InvitationRest {
 
         invitationRepository.save(invitation);
 
-//        if(emailSender == null){// this check needed for unit testing perposes
-//            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, securityContextReader.getUsername(), mailSendFrom);
-//        }
-//
-//        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
-//        emailSender.sendInvitationEmail(requestBaseUrl);
+        if(emailSender == null){// this check needed for unit testing perposes
+            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, securityContextReader.getUsername(), mailSendFrom);
+        }
+
+        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
+        emailSender.sendInvitationEmail(requestBaseUrl);
 
         return new ResponseEntity(HttpStatus.OK);
     };
@@ -151,31 +152,58 @@ public class InvitationRest {
 
         return invitationResponseDtos;
     }
-//    @RequestMapping(value = "/getReceivedInvitations", method = RequestMethod.GET)
-//    @Transactional
-//    public List<InvitationResponseDto> getReceivedInvitations() {
-//        List<InvitationEntity> invitationEntities = new ArrayList<InvitationEntity>();
-//        List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
-//
-//      //  invitationEntities = invitationRepository.findByRecipientEmailAndIsInvitationAccepted(securityContextReader.getUsername(), false);
-//
-//        if(invitationEntities != null){
-//            for(InvitationEntity invitationEntity : invitationEntities){
-//                InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
-//                invitationResponseDto.setInvtitationGuid(invitationEntity.getInvitationGuid());
-//
-//               // TranslationEntity translationEntity = translationRepository.findByParentGuidAndFieldAndLanguage(invitationEntity.getProjectGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
-//
-////                if(translationEntity != null){
-////                    invitationResponseDto.setProjectDescription(translationEntity.getContent());
-////                    invitationResponseDto.setCreatedBy(invitationEntity.getCreatedByUser());
-////                    invitationResponseDto.setCreatedAt(invitationEntity.getCreatedAt());
-////                }
-//
-//                invitationResponseDtos.add(invitationResponseDto);
-//            }
-//        }
-//
-//        return invitationResponseDtos;
-//    };
+
+    @RequestMapping(value = "/getReceivedInvitations", method = RequestMethod.GET)
+    public List<InvitationResponseDto> getReceivedInvitations() {
+        //no auth check - any one can get list of received invitations
+        List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
+
+        ArrayList<Object[]> invitations = invitationRepository.getReceivedInvitations(securityContextReader.getUsername());
+
+        for (Object[] invitation : invitations) {
+            InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
+            invitationResponseDto.setInvtitationGuid((String) invitation[0]);
+            invitationResponseDto.setEmail((String) invitation[1]);
+            invitationResponseDto.setProjectDescription((String) invitation[2]);
+            invitationResponseDto.setCreatedAt((Date) invitation[3]);
+
+            UserEntity user = userRepository.findByUsername((String) invitation[4]);
+            invitationResponseDto.setCreatedBy(user.getFirstName() + " " + user.getLastName());
+
+            invitationResponseDtos.add(invitationResponseDto);
+        }
+
+        return invitationResponseDtos;
+    }
+
+    @RequestMapping(value = "/acceptInvitation/{invitationGuid}", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity acceptInvitation(@PathVariable String invitationGuid) {
+        //auth check - user should be able to accept only his invitations
+        InvitationEntity invitation = invitationRepository.findByInvitationGuid(invitationGuid);
+        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+
+        Set<ProjectEntity> projects = user.getProjects();
+        projects.add(invitation.getProject());
+        user.setProjects(projects);
+
+        Set<RoleEntity> roles = user.getRoles();
+        for (RoleEntity role : invitation.getRoles()) {
+            roles.add(role);
+        }
+        user.setRoles(roles);
+
+        Set<GroupEntity> groups = user.getGroups();
+        for (GroupEntity group : invitation.getGroups()) {
+            groups.add(group);
+        }
+        user.setGroups(groups);
+
+        invitation.setIsInvitationAccepted(true);
+
+        invitationRepository.save(invitation);
+        userRepository.save(user);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }
