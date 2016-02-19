@@ -24,8 +24,11 @@ public class InvitationEntity extends BaseEntity {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "is_invitation_accepted")
-    private boolean isInvitationAccepted;
+    @Column(name = "is_accepted")
+    private boolean isAccepted;
+
+    @Column(name = "is_declined")
+    private boolean isDeclined;
 
     @ManyToOne
     @JoinColumn(name = "project_guid")
@@ -56,16 +59,20 @@ public class InvitationEntity extends BaseEntity {
         this.email = email;
     }
 
-    public boolean isInvitationAccepted() {
-        return isInvitationAccepted;
+    public boolean isAccepted() {
+        return isAccepted;
     }
 
-    public void setIsInvitationAccepted(boolean isInvitationAccepted) {
-        this.isInvitationAccepted = isInvitationAccepted;
+    public void setAccepted(boolean accepted) {
+        isAccepted = accepted;
     }
 
-    public void setInvitationAccepted(boolean invitationAccepted) {
-        isInvitationAccepted = invitationAccepted;
+    public boolean isDeclined() {
+        return isDeclined;
+    }
+
+    public void setDeclined(boolean declined) {
+        isDeclined = declined;
     }
 
     public ProjectEntity getProject() {

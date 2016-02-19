@@ -5,6 +5,8 @@ import com.dto.InvitationRequestDto;
 import com.dto.InvitationResponseDto;
 import com.entity.*;
 import com.repository.*;
+import com.utils.BundleMessageReader;
+import com.utils.PermissionsValidator;
 import com.utils.SecurityContextReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,14 +70,40 @@ public class InvitationRest {
 
     public EmailSender emailSender;
 
+    public BundleMessageReader bundleMessageReader = new BundleMessageReader();
+
     public SecurityContextReader securityContextReader = new SecurityContextReader();
+
+    public PermissionsValidator permissionsValidator = new PermissionsValidator();
 
     @RequestMapping(value = "/createInvitation", method = RequestMethod.POST)
     @Transactional
     public ResponseEntity createInvitation(@Valid @RequestBody InvitationRequestDto invitationRequestDto) {
         //auth check if user has admin role for the project
+        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        String[] requiredRoles = {"admin"};
+        if(!permissionsValidator.rolesForProjectCheck(user, invitationRequestDto.getProjectGuid(), requiredRoles)){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
 
-        //check if user is already on the project...
+        //check if user is already on the project or invitation for the project is already pending...
+        UserEntity recipient = userRepository.findByUsername(invitationRequestDto.getEmail());
+
+        if(recipient != null){
+            Set<ProjectEntity> projects = recipient.getProjects();
+            for (ProjectEntity project : projects) {
+                if(project.getProjectGuid().equals(invitationRequestDto.getProjectGuid())){
+                    throw new RuntimeException(bundleMessageReader.getMessage("UserIsAlreadyAssignedToProject"));
+                }
+            }
+        }
+
+        List<InvitationEntity> existingInvitations = invitationRepository.findByEmailAndIsAcceptedAndIsDeclined(invitationRequestDto.getEmail(), false, false);
+        for (InvitationEntity existingInvitation : existingInvitations) {
+            if(existingInvitation.getProject().getProjectGuid().equals(invitationRequestDto.getProjectGuid())){
+                throw new RuntimeException(bundleMessageReader.getMessage("PendingIvitationAlreadyExists"));
+            }
+        }
 
         InvitationEntity invitation = new InvitationEntity();
 
@@ -116,6 +144,8 @@ public class InvitationRest {
         invitation.setProject(project);
         invitation.setRoles(roles);
         invitation.setGroups(groups);
+        invitation.setAccepted(false);
+        invitation.setDeclined(false);
 
         invitationRepository.save(invitation);
 
@@ -132,6 +162,11 @@ public class InvitationRest {
     @RequestMapping(value = "/getPendingInvitations", method = RequestMethod.GET)
     public List<InvitationResponseDto> getPendingInvitations(@RequestParam String projectGuid) {
         //auth check if user has admin role for the project
+        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        String[] requiredRoles = {"admin"};
+        if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
 
         List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
 
@@ -144,8 +179,8 @@ public class InvitationRest {
             invitationResponseDto.setProjectDescription((String) invitation[2]);
             invitationResponseDto.setCreatedAt((Date) invitation[3]);
 
-            UserEntity user = userRepository.findByUsername((String) invitation[4]);
-            invitationResponseDto.setCreatedBy(user.getFirstName() + " " + user.getLastName());
+            UserEntity creator = userRepository.findByUsername((String) invitation[4]);
+            invitationResponseDto.setCreatedBy(creator.getFirstName() + " " + creator.getLastName());
 
             invitationResponseDtos.add(invitationResponseDto);
         }
@@ -181,6 +216,11 @@ public class InvitationRest {
     public ResponseEntity acceptInvitation(@PathVariable String invitationGuid) {
         //auth check - user should be able to accept only his invitations
         InvitationEntity invitation = invitationRepository.findByInvitationGuid(invitationGuid);
+
+        if(!invitation.getEmail().equals(securityContextReader.getUsername())){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
+
         UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
 
         Set<ProjectEntity> projects = user.getProjects();
@@ -199,10 +239,27 @@ public class InvitationRest {
         }
         user.setGroups(groups);
 
-        invitation.setIsInvitationAccepted(true);
+        invitation.setAccepted(true);
 
         invitationRepository.save(invitation);
         userRepository.save(user);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/declineInvitation/{invitationGuid}", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity declineInvitation(@PathVariable String invitationGuid) {
+        //auth check - user should be able to decline only his invitations
+
+        InvitationEntity invitation = invitationRepository.findByInvitationGuid(invitationGuid);
+
+        if(!invitation.getEmail().equals(securityContextReader.getUsername())){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
+
+        invitation.setDeclined(true);
+        invitationRepository.save(invitation);
 
         return new ResponseEntity(HttpStatus.OK);
     }

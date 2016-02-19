@@ -7,16 +7,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by aautushk on 9/19/2015.
  */
 @Repository
 public interface IInvitationRepository extends JpaRepository<InvitationEntity, Long> {
-    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.project.projectGuid=:projectGuid and a.isInvitationAccepted = false and d.field='description'")
+    List<InvitationEntity> findByEmailAndIsAcceptedAndIsDeclined(String invitationGuid, Boolean isAccepted, Boolean isDenied);
+
+    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.project.projectGuid=:projectGuid and a.isAccepted = false and a.isDeclined = false and d.field='description'")
     ArrayList<Object[]> getPendingInvitationsForProject(@Param("projectGuid") String projectGuid);
 
-    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.email=:username and a.isInvitationAccepted = false and d.field='description'")
+    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.email=:username and a.isAccepted = false and  a.isDeclined = false and d.field='description'")
     ArrayList<Object[]> getReceivedInvitations(@Param("username") String username);
 
     InvitationEntity findByInvitationGuid(String guid);
