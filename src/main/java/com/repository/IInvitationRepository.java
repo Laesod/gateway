@@ -16,11 +16,11 @@ import java.util.List;
 public interface IInvitationRepository extends JpaRepository<InvitationEntity, Long> {
     List<InvitationEntity> findByEmailAndIsAcceptedAndIsDeclined(String invitationGuid, Boolean isAccepted, Boolean isDenied);
 
-    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.project.projectGuid=:projectGuid and a.isAccepted = false and a.isDeclined = false and d.field='description'")
-    ArrayList<Object[]> getPendingInvitationsForProject(@Param("projectGuid") String projectGuid);
+    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.project.projectGuid=:projectGuid and a.isAccepted = false and a.isDeclined = false and d.field='description' and d.language=:language")
+    ArrayList<Object[]> getPendingInvitationsForProject(@Param("projectGuid") String projectGuid, @Param("language") String language);
 
-    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.email=:username and a.isAccepted = false and  a.isDeclined = false and d.field='description'")
-    ArrayList<Object[]> getReceivedInvitations(@Param("username") String username);
+    @Query("select a.invitationGuid, a.email, d.content, a.createdAt, a.createdByUser from InvitationEntity a join a.project b join b.translationMap c join c.translations d where a.email=:username and a.isAccepted = false and  a.isDeclined = false and d.field='description' and d.language=:language")
+    ArrayList<Object[]> getReceivedInvitations(@Param("username") String username, @Param("language") String language);
 
     InvitationEntity findByInvitationGuid(String guid);
 //    List<InvitationEntity> findByRecipientEmailAndIsInvitationAccepted(String recipientEmail, boolean isInvitationAccepted);

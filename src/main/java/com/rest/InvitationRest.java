@@ -10,6 +10,7 @@ import com.utils.PermissionsValidator;
 import com.utils.SecurityContextReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -149,12 +150,12 @@ public class InvitationRest {
 
         invitationRepository.save(invitation);
 
-        if(emailSender == null){// this check needed for unit testing perposes
-            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, securityContextReader.getUsername(), mailSendFrom);
-        }
-
-        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
-        emailSender.sendInvitationEmail(requestBaseUrl);
+//        if(emailSender == null){// this check needed for unit testing perposes
+//            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, securityContextReader.getUsername(), mailSendFrom);
+//        }
+//
+//        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
+//        emailSender.sendInvitationEmail(requestBaseUrl);
 
         return new ResponseEntity(HttpStatus.OK);
     };
@@ -170,7 +171,7 @@ public class InvitationRest {
 
         List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
 
-        ArrayList<Object[]> invitations = invitationRepository.getPendingInvitationsForProject(projectGuid);
+        ArrayList<Object[]> invitations = invitationRepository.getPendingInvitationsForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage());
 
         for (Object[] invitation : invitations) {
             InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
@@ -193,7 +194,7 @@ public class InvitationRest {
         //no auth check - any one can get list of received invitations
         List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
 
-        ArrayList<Object[]> invitations = invitationRepository.getReceivedInvitations(securityContextReader.getUsername());
+        ArrayList<Object[]> invitations = invitationRepository.getReceivedInvitations(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
 
         for (Object[] invitation : invitations) {
             InvitationResponseDto invitationResponseDto = new InvitationResponseDto();

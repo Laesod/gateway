@@ -20,6 +20,6 @@ import java.util.List;
 public interface IRoleRepository extends JpaRepository<RoleEntity, Long> {
     RoleEntity findByRoleGuid(String roleGuid);
 
-    @Query("select a.roleGuid, a.roleName from RoleEntity a where a.project.projectGuid=:projectGuid")
-    ArrayList<Object[]> getProjectRoles(@Param("projectGuid") String projectGuid);
+    @Query("select a.roleGuid, a.roleName from RoleEntity a where a.project.projectGuid=:projectGuid and a.roleName like :nameContains")
+    ArrayList<Object[]> getProjectRoles(@Param("projectGuid") String projectGuid, @Param("nameContains") String nameContains);
 }

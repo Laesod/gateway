@@ -1,20 +1,40 @@
 package com.dto;
 
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Created by aautushk on 12/17/2015.
  */
 public class UserProfileDto {
-    private Principal user;
+    private String firstName;
+    private String lastName;
+    private List<UserProjectResponseDto> userProjects;
+
     private String avatarS3ObjectKey;
 
-    public Principal getUser() {
-        return user;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUser(Principal user) {
-        this.user = user;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public List<UserProjectResponseDto> getUserProjects() {
+        return userProjects;
+    }
+
+    public void setUserProjects(List<UserProjectResponseDto> userProjects) {
+        this.userProjects = userProjects;
     }
 
     public String getAvatarS3ObjectKey() {

@@ -6,6 +6,7 @@ import com.repository.*;
 import com.utils.BundleMessageReader;
 import com.utils.PermissionsValidator;
 import com.utils.SecurityContextReader;
+import com.utils.TranslationManager;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -57,6 +58,8 @@ public class ProjectRest {
 
     public BundleMessageReader bundleMessageReader = new BundleMessageReader();
 
+    public TranslationManager translationManager = new TranslationManager();
+
     @RequestMapping(value = "/createProject", method = RequestMethod.POST)
     @Transactional
     public ResponseEntity createProject(@Valid @RequestBody ProjectRequestDto projectRequestDto) {
@@ -70,24 +73,16 @@ public class ProjectRest {
 
         project.setUsers(users);
 
-        TranslationEntity translation = new TranslationEntity();
-        translation.setParentEntity("Project");
-        translation.setField("description");
-        translation.setLanguage(LocaleContextHolder.getLocale().getDisplayLanguage());
-        translation.setContent(projectRequestDto.getDescription());
-
         TranslationMapEntity translationMap = new TranslationMapEntity();
+        Set<TranslationEntity> translations = translationManager.addTranslation(projectRequestDto.getDescription(), "Project", "description", translationMap);
 
-        Set<TranslationEntity> translations = new HashSet<TranslationEntity>();
-        translations.add(translation);
-
-        translationMap.setTranslations(translations);
-        translation.setTranslationMap(translationMap);
+        for (TranslationEntity translation : translations) {
+            translationRepository.save(translation);
+        }
 
         project.setTranslationMap(translationMap);
 
         translationMapRepository.save(translationMap);
-        translationRepository.save(translation);
 
         RoleEntity role = new RoleEntity();
         role.setProject(project);
@@ -135,7 +130,7 @@ public class ProjectRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
-        ArrayList<Object[]> projects = projectRepository.getProject(projectGuid);
+        ArrayList<Object[]> projects = projectRepository.getProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage());
 
         ProjectResponseDto projectResponseDto = new ProjectResponseDto();
         projectResponseDto.setProjectGuid((String) projects.get(0)[0]);
@@ -187,26 +182,45 @@ public class ProjectRest {
     public List<UserProjectResponseDto> getUserProjects() {
         //no auth check - any one can see list of projects he/she is assigned to
         List<UserProjectResponseDto> userProjectResponseDtos = new ArrayList<UserProjectResponseDto>();
-        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername());
+        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
 
         UserEntity userEntity = userRepository.findByUsername(securityContextReader.getUsername());
 
         for (Object[] userProject : userProjects) {
-            List<RoleResponseDto> roles = new ArrayList<>();
             UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
 
-            for (RoleEntity role : userEntity.getRoles()) {
-                if (userProject[0].equals(role.getProject().getProjectGuid())) {
-                    RoleResponseDto roleResponseDto = new RoleResponseDto();
-                    roleResponseDto.setRoleGuid(role.getRoleGuid());
-                    roleResponseDto.setRoleName(role.getRoleName());
+            List<RoleResponseDto> roles = new ArrayList<>();
+            if(userEntity.getRoles() != null){
+                for (RoleEntity role : userEntity.getRoles()) {
+                    if (userProject[0].equals(role.getProject().getProjectGuid())) {
+                        RoleResponseDto roleResponseDto = new RoleResponseDto();
+                        roleResponseDto.setRoleGuid(role.getRoleGuid());
+                        roleResponseDto.setRoleName(role.getRoleName());
 
-                    roles.add(roleResponseDto);
+                        roles.add(roleResponseDto);
+                    }
+                }
+                userProjectResponseDto.setRoles(roles);
+            }
+
+            List<GroupResponseDto> groups = new ArrayList<>();
+            if(userEntity.getGroups() != null){
+                for (GroupEntity group : userEntity.getGroups()) {
+                    if (userProject[0].equals(group.getProject().getProjectGuid())) {
+                        GroupResponseDto groupResponseDto = new GroupResponseDto();
+                        groupResponseDto.setGroupGuid(group.getGroupGuid());
+                        groupResponseDto.setGroupName(group.getGroupName());
+
+                        groups.add(groupResponseDto);
+                    }
                 }
             }
+
+            userProjectResponseDto.setGroups(groups);
+
             userProjectResponseDto.setProjectGuid((String) userProject[0]);
             userProjectResponseDto.setProjectDescription((String) userProject[1]);
-            userProjectResponseDto.setRoles(roles);
+
 
             userProjectResponseDtos.add(userProjectResponseDto);
         }
@@ -235,7 +249,6 @@ public class ProjectRest {
             projectUserResponseDto.setLastName((String) userItem[2]);
 
             List<RoleResponseDto> userRoles = new ArrayList<>();
-
             for (RoleEntity role : userEntity.getRoles()) {
                 if (role.getProject().getProjectGuid().equals(projectGuid)) {
                     RoleResponseDto roleResponseDto = new RoleResponseDto();
@@ -246,14 +259,29 @@ public class ProjectRest {
             }
             projectUserResponseDto.setRoles(userRoles);
 
+            List<GroupResponseDto> userGroups = new ArrayList<>();
+
+            if(userEntity.getGroups() != null){
+                for (GroupEntity group : userEntity.getGroups()) {
+                    if (group.getProject().getProjectGuid().equals(projectGuid)) {
+                        GroupResponseDto groupResponseDto = new GroupResponseDto();
+                        groupResponseDto.setGroupGuid(group.getGroupGuid());
+                        groupResponseDto.setGroupName(group.getGroupName());
+                        userGroups.add(groupResponseDto);
+                    }
+                }
+                projectUserResponseDto.setGroups(userGroups);
+            }
+
+
             projectUserResponseDtos.add(projectUserResponseDto);
         }
 
         return projectUserResponseDtos;
     }
 
-    @RequestMapping(value = "/getProjectRoles/{projectGuid}", method = RequestMethod.GET)
-    public List<RoleResponseDto> getProjectRoles(@PathVariable String projectGuid) {
+    @RequestMapping(value = "/getProjectRoles/{projectGuid}", method = RequestMethod.PUT)
+    public List<RoleResponseDto> getProjectRoles(@PathVariable String projectGuid, @RequestBody RoleSearchDto roleSearchDto) {
         //auth check if user has admin role for the project
         UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
@@ -261,16 +289,27 @@ public class ProjectRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
-
         List<RoleResponseDto> roles = new ArrayList<>();
 
-        ArrayList<Object[]> projectRoles = roleRepository.getProjectRoles(projectGuid);
+        ArrayList<Object[]> projectRoles = roleRepository.getProjectRoles(projectGuid, '%' + roleSearchDto.getNameContains() + '%');
         for (Object[] projectRole : projectRoles) {
-            RoleResponseDto role = new RoleResponseDto();
-            role.setRoleGuid((String) projectRole[0]);
-            role.setRoleName((String) projectRole[1]);
+            Boolean addRole = true;
+            if(roleSearchDto.getCurrentRoles() != null){
+                for (RoleResponseDto roleResponseDto : roleSearchDto.getCurrentRoles()) {
+                    if(roleResponseDto.getRoleName().equals((String) projectRole[1])){
+                        addRole = false;
+                        break;
+                    }
+                }
+            }
 
-            roles.add(role);
+            if(addRole){
+                RoleResponseDto role = new RoleResponseDto();
+                role.setRoleGuid((String) projectRole[0]);
+                role.setRoleName((String) projectRole[1]);
+
+                roles.add(role);
+            }
         }
 
         return roles;
@@ -365,8 +404,8 @@ public class ProjectRest {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getProjectGroups/{projectGuid}", method = RequestMethod.GET)
-    public List<GroupResponseDto> getProjectGroups(@PathVariable String projectGuid) {
+    @RequestMapping(value = "/getProjectGroups/{projectGuid}", method = RequestMethod.PUT)
+    public List<GroupResponseDto> getProjectGroups(@PathVariable String projectGuid, @RequestBody GroupSearchDto groupSearchDto) {
         //auth check if user has admin role for the project
         UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
@@ -376,13 +415,25 @@ public class ProjectRest {
 
         List<GroupResponseDto> groups = new ArrayList<>();
 
-        ArrayList<Object[]> projectGroups = groupRepository.getProjectGroups(projectGuid);
+        ArrayList<Object[]> projectGroups = groupRepository.getProjectGroups(projectGuid, '%' + groupSearchDto.getNameContains() + '%');
         for (Object[] projectGroup : projectGroups) {
-            GroupResponseDto group = new GroupResponseDto();
-            group.setGroupGuid((String) projectGroup[0]);
-            group.setGroupName((String) projectGroup[1]);
+            Boolean addGroup = true;
+            if(groupSearchDto.getCurrentGroups() != null){
+                for (GroupResponseDto groupRequestDto : groupSearchDto.getCurrentGroups()) {
+                    if(groupRequestDto.getGroupName().equals((String) projectGroup[1])){
+                        addGroup = false;
+                        break;
+                    }
+                }
+            }
 
-            groups.add(group);
+            if(addGroup){
+                GroupResponseDto group = new GroupResponseDto();
+                group.setGroupGuid((String) projectGroup[0]);
+                group.setGroupName((String) projectGroup[1]);
+
+                groups.add(group);
+            }
         }
 
         return groups;
@@ -399,6 +450,7 @@ public class ProjectRest {
         }
 
         user = userRepository.findByUsername(username);
+        ProjectEntity project = projectRepository.findByProjectGuid(projectGuid);
         GroupEntity group = new GroupEntity();
         Set<GroupEntity> userGroups = user.getGroups();
 
@@ -426,7 +478,7 @@ public class ProjectRest {
             for (GroupRequestDto groupToCreate : updateUserGroupsRequestDto.getGroupsToCreateAndAdd()) {
                 group = new GroupEntity();
                 group.setGroupName(groupToCreate.getGroupName());
-
+                group.setProject(project);
                 userGroups.add(group);
 
                 groupRepository.save(group);

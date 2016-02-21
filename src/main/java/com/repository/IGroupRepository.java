@@ -41,6 +41,6 @@ import java.util.List;
 public interface IGroupRepository extends JpaRepository<GroupEntity, Long> {
     GroupEntity findByGroupGuid(String groupGuid);
 
-    @Query("select a.groupGuid, a.groupName from GroupEntity a where a.project.projectGuid=:projectGuid")
-    ArrayList<Object[]> getProjectGroups(@Param("projectGuid") String projectGuid);
+    @Query("select a.groupGuid, a.groupName from GroupEntity a where a.project.projectGuid=:projectGuid and a.groupName like :nameContains")
+    ArrayList<Object[]> getProjectGroups(@Param("projectGuid") String projectGuid, @Param("nameContains") String nameContains);
 }

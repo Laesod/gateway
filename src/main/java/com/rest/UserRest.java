@@ -23,13 +23,16 @@ package com.rest;
 
 import com.dto.*;
 import com.entity.AuthorityEntity;
+import com.entity.RoleEntity;
 import com.entity.UserEntity;
 import com.repository.IAuthorityRepository;
 import com.repository.IUserRepository;
 import com.utils.BundleMessageReader;
+import com.utils.SecurityContextReader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -44,6 +47,8 @@ import javax.validation.Valid;
 import javax.validation.Validator;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 ;
@@ -64,6 +69,8 @@ public class UserRest {
     public IAuthorityRepository authorityRepository;
 
     private BundleMessageReader bundleMessageReader = new BundleMessageReader();
+
+    public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     @Autowired
     public Validator validator;
@@ -208,16 +215,39 @@ public class UserRest {
     }
 
     @RequestMapping(value = "/getUserProfile", method = RequestMethod.GET)
-    public UserProfileDto getUserProfile(Principal user) {
-        UserEntity userEntity = new UserEntity();
-        if(user != null){
-            userEntity = userRepository.findByUsername(user.getName());
+    public UserProfileDto getUserProfile() {
+        UserProfileDto userProfileDto = new UserProfileDto();
+        List<UserProjectResponseDto> userProjectResponseDtos = new ArrayList<UserProjectResponseDto>();
+        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
+
+        UserEntity userEntity = userRepository.findByUsername(securityContextReader.getUsername());
+
+        for (Object[] userProject : userProjects) {
+            List<RoleResponseDto> roles = new ArrayList<>();
+            UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
+
+            for (RoleEntity role : userEntity.getRoles()) {
+                if (userProject[0].equals(role.getProject().getProjectGuid())) {
+                    RoleResponseDto roleResponseDto = new RoleResponseDto();
+                    roleResponseDto.setRoleGuid(role.getRoleGuid());
+                    roleResponseDto.setRoleName(role.getRoleName());
+
+                    roles.add(roleResponseDto);
+                }
+            }
+            userProjectResponseDto.setProjectGuid((String) userProject[0]);
+            userProjectResponseDto.setProjectDescription((String) userProject[1]);
+            userProjectResponseDto.setRoles(roles);
+
+            userProjectResponseDtos.add(userProjectResponseDto);
         }
 
-        UserProfileDto userProfileDto = new UserProfileDto();
-        userProfileDto.setUser(user);
-
+        userProfileDto.setFirstName(userEntity.getFirstName());
+        userProfileDto.setLastName(userEntity.getLastName());
         userProfileDto.setAvatarS3ObjectKey(userEntity.getAvatarS3ObjectKey());
+        userProfileDto.setUserProjects(userProjectResponseDtos);
+
+
         return userProfileDto;
     }
 

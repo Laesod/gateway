@@ -44,8 +44,8 @@ public interface IProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     ProjectEntity findByProjectGuid(String guid);
 
-    @Query("select a.projectGuid, c.content as description from ProjectEntity a join a.translationMap b join b.translations c where a.projectGuid=:projectGuid and c.field='description'")
-    ArrayList<Object[]> getProject(@Param("projectGuid") String projectGuid);
+    @Query("select a.projectGuid, c.content as description from ProjectEntity a join a.translationMap b join b.translations c where a.projectGuid=:projectGuid and c.field='description' and c.language=:language")
+    ArrayList<Object[]> getProject(@Param("projectGuid") String projectGuid, @Param("language") String language);
 
     @Query("select b.username, b.firstName, b.lastName from ProjectEntity a join a.users b where a.projectGuid=:projectGuid")
     ArrayList<Object[]> getProjectUsers(@Param("projectGuid") String projectGuid);

@@ -10,6 +10,7 @@ public class ProjectUserResponseDto {
     private String firstName;
     private String lastName;
     private List<RoleResponseDto> roles;
+    private List<GroupResponseDto> groups;
 
     public String getUsername(){
         return this.username;
@@ -38,5 +39,13 @@ public class ProjectUserResponseDto {
 
     public void setRoles(List<RoleResponseDto> roles) {
         this.roles = roles;
+    }
+
+    public List<GroupResponseDto> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<GroupResponseDto> groups) {
+        this.groups = groups;
     }
 }
