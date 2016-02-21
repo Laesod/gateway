@@ -219,9 +219,12 @@ public class UserRest {
     public UserProfileDto getUserProfile() {
         UserProfileDto userProfileDto = new UserProfileDto();
         List<UserProjectResponseDto> userProjectResponseDtos = new ArrayList<UserProjectResponseDto>();
-        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
 
         UserEntity userEntity = userRepository.findByUsername(securityContextReader.getUsername());
+        if(userEntity == null){
+            return userProfileDto;
+        }
+        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
 
         for (Object[] userProject : userProjects) {
             UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
