@@ -23,6 +23,7 @@ package com.rest;
 
 import com.dto.*;
 import com.entity.AuthorityEntity;
+import com.entity.GroupEntity;
 import com.entity.RoleEntity;
 import com.entity.UserEntity;
 import com.repository.IAuthorityRepository;
@@ -223,24 +224,45 @@ public class UserRest {
         UserEntity userEntity = userRepository.findByUsername(securityContextReader.getUsername());
 
         for (Object[] userProject : userProjects) {
-            List<RoleResponseDto> roles = new ArrayList<>();
             UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
 
-            for (RoleEntity role : userEntity.getRoles()) {
-                if (userProject[0].equals(role.getProject().getProjectGuid())) {
-                    RoleResponseDto roleResponseDto = new RoleResponseDto();
-                    roleResponseDto.setRoleGuid(role.getRoleGuid());
-                    roleResponseDto.setRoleName(role.getRoleName());
+            List<RoleResponseDto> roles = new ArrayList<>();
+            if(userEntity.getRoles() != null){
+                for (RoleEntity role : userEntity.getRoles()) {
+                    if (userProject[0].equals(role.getProject().getProjectGuid())) {
+                        RoleResponseDto roleResponseDto = new RoleResponseDto();
+                        roleResponseDto.setRoleGuid(role.getRoleGuid());
+                        roleResponseDto.setRoleName(role.getRoleName());
 
-                    roles.add(roleResponseDto);
+                        roles.add(roleResponseDto);
+                    }
                 }
             }
+            userProjectResponseDto.setRoles(roles);
+
+            List<GroupResponseDto> groups = new ArrayList<>();
+            if(userEntity.getGroups() != null){
+                for (GroupEntity group : userEntity.getGroups()) {
+                    if (group.getProject().getProjectGuid().equals((String) userProject[0])) {
+                        GroupResponseDto groupResponseDto = new GroupResponseDto();
+                        groupResponseDto.setGroupGuid(group.getGroupGuid());
+                        groupResponseDto.setGroupName(group.getGroupName());
+                        groups.add(groupResponseDto);
+                    }
+                }
+                userProjectResponseDto.setGroups(groups);
+            }
+
             userProjectResponseDto.setProjectGuid((String) userProject[0]);
             userProjectResponseDto.setProjectDescription((String) userProject[1]);
-            userProjectResponseDto.setRoles(roles);
+
 
             userProjectResponseDtos.add(userProjectResponseDto);
         }
+
+        List<GroupResponseDto> userGroups = new ArrayList<>();
+
+
 
         userProfileDto.setFirstName(userEntity.getFirstName());
         userProfileDto.setLastName(userEntity.getLastName());
