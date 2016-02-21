@@ -262,13 +262,11 @@ public class UserRest {
 
         List<GroupResponseDto> userGroups = new ArrayList<>();
 
-
-
+        userProfileDto.setUsername(userEntity.getUsername());
         userProfileDto.setFirstName(userEntity.getFirstName());
         userProfileDto.setLastName(userEntity.getLastName());
         userProfileDto.setAvatarS3ObjectKey(userEntity.getAvatarS3ObjectKey());
         userProfileDto.setUserProjects(userProjectResponseDtos);
-
 
         return userProfileDto;
     }

@@ -7,11 +7,20 @@ import java.util.List;
  * Created by aautushk on 12/17/2015.
  */
 public class UserProfileDto {
+    private String username;
     private String firstName;
     private String lastName;
     private List<UserProjectResponseDto> userProjects;
 
     private String avatarS3ObjectKey;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public String getFirstName() {
         return firstName;
