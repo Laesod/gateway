@@ -376,7 +376,7 @@ public class ProjectRest {
             group = iteratorForGroups.next();
 
             if ((group.getProject() != null && group.getProject().getProjectGuid().equals(projectGuid))) {
-                iteratorForProjects.remove();
+                iteratorForGroups.remove();
             }
         }
 
