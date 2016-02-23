@@ -8,6 +8,7 @@ import com.entity.UserEntity;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -34,5 +35,21 @@ public class TranslationManager {
         }
 
         return translations;
+    }
+
+    public String getTranslation(Set<TranslationEntity> translations, String field, String language){
+        String translationContent = "";
+
+        Iterator<TranslationEntity> iteratorForTranslations = translations.iterator();
+        TranslationEntity translation = new TranslationEntity();
+        while (iteratorForTranslations.hasNext()) {
+            translation = iteratorForTranslations.next();
+
+            if (translation.getField().equals(field) && translation.getLanguage().equals(language)) {
+                translationContent = translation.getContent();
+            }
+        }
+
+        return translationContent;
     }
 }

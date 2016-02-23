@@ -6,22 +6,13 @@ import java.util.ArrayList;
  * Created by root on 14/02/16.
  */
 public class UpdateUserRolesRequestDto {
-    private String[] rolesToRemove;
-    private String[] rolesToAdd;
+    private String[] roles;
 
-    public String[] getRolesToRemove() {
-        return rolesToRemove;
+    public String[] getRoles() {
+        return roles;
     }
 
-    public void setRolesToRemove(String[] rolesToRemove) {
-        this.rolesToRemove = rolesToRemove;
-    }
-
-    public String[] getRolesToAdd() {
-        return rolesToAdd;
-    }
-
-    public void setRolesToAdd(String[] rolesToAdd) {
-        this.rolesToAdd = rolesToAdd;
+    public void setRoles(String[] roles) {
+        this.roles = roles;
     }
 }

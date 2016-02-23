@@ -1,13 +1,12 @@
 package com.rest;
 
-import com.dto.GroupRequestDto;
-import com.dto.InvitationRequestDto;
-import com.dto.InvitationResponseDto;
+import com.dto.*;
 import com.entity.*;
 import com.repository.*;
 import com.utils.BundleMessageReader;
 import com.utils.PermissionsValidator;
 import com.utils.SecurityContextReader;
+import com.utils.TranslationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -77,9 +76,11 @@ public class InvitationRest {
 
     public PermissionsValidator permissionsValidator = new PermissionsValidator();
 
+    public TranslationManager translationManager = new TranslationManager();
+
     @RequestMapping(value = "/createInvitation", method = RequestMethod.POST)
     @Transactional
-    public ResponseEntity createInvitation(@Valid @RequestBody InvitationRequestDto invitationRequestDto) {
+    public InvitationResponseDto createInvitation(@Valid @RequestBody InvitationRequestDto invitationRequestDto) {
         //auth check if user has admin role for the project
         UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
@@ -87,6 +88,7 @@ public class InvitationRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
+        InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
         //check if user is already on the project or invitation for the project is already pending...
         UserEntity recipient = userRepository.findByUsername(invitationRequestDto.getEmail());
 
@@ -133,6 +135,7 @@ public class InvitationRest {
         if (invitationRequestDto.getGroupsToCreateAndAdd() != null) {
             for (GroupRequestDto groupToCreate : invitationRequestDto.getGroupsToCreateAndAdd()) {
                 group = new GroupEntity();
+                group.setProject(project);
                 group.setGroupName(groupToCreate.getGroupName());
 
                 groups.add(group);
@@ -150,14 +153,21 @@ public class InvitationRest {
 
         invitationRepository.save(invitation);
 
-//        if(emailSender == null){// this check needed for unit testing perposes
-//            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, securityContextReader.getUsername(), mailSendFrom);
-//        }
-//
-//        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
-//        emailSender.sendInvitationEmail(requestBaseUrl);
+        invitationResponseDto.setInvitationGuid(invitation.getInvitationGuid());
+        invitationResponseDto.setEmail(invitation.getEmail());
+        invitationResponseDto.setProjectDescription(translationManager.getTranslation(project.getTranslationMap().getTranslations(), "description", LocaleContextHolder.getLocale().getDisplayLanguage()));
+        invitationResponseDto.setCreatedAt(invitation.getCreatedAt());
+        invitationResponseDto.setCreatedBy(user.getFirstName() + " " + user.getLastName());
 
-        return new ResponseEntity(HttpStatus.OK);
+
+        if(emailSender == null){// this check needed for unit testing perposes
+            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, securityContextReader.getUsername(), mailSendFrom);
+        }
+
+        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
+        emailSender.sendInvitationEmail(requestBaseUrl);
+
+        return invitationResponseDto;
     };
 
     @RequestMapping(value = "/getPendingInvitations", method = RequestMethod.GET)
@@ -175,7 +185,7 @@ public class InvitationRest {
 
         for (Object[] invitation : invitations) {
             InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
-            invitationResponseDto.setInvtitationGuid((String) invitation[0]);
+            invitationResponseDto.setInvitationGuid((String) invitation[0]);
             invitationResponseDto.setEmail((String) invitation[1]);
             invitationResponseDto.setProjectDescription((String) invitation[2]);
             invitationResponseDto.setCreatedAt((Date) invitation[3]);
@@ -198,7 +208,7 @@ public class InvitationRest {
 
         for (Object[] invitation : invitations) {
             InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
-            invitationResponseDto.setInvtitationGuid((String) invitation[0]);
+            invitationResponseDto.setInvitationGuid((String) invitation[0]);
             invitationResponseDto.setEmail((String) invitation[1]);
             invitationResponseDto.setProjectDescription((String) invitation[2]);
             invitationResponseDto.setCreatedAt((Date) invitation[3]);
@@ -214,7 +224,7 @@ public class InvitationRest {
 
     @RequestMapping(value = "/acceptInvitation/{invitationGuid}", method = RequestMethod.PUT)
     @Transactional
-    public ResponseEntity acceptInvitation(@PathVariable String invitationGuid) {
+    public UserProjectResponseDto acceptInvitation(@PathVariable String invitationGuid) {
         //auth check - user should be able to accept only his invitations
         InvitationEntity invitation = invitationRepository.findByInvitationGuid(invitationGuid);
 
@@ -222,30 +232,46 @@ public class InvitationRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
+        UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
         UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
 
         Set<ProjectEntity> projects = user.getProjects();
         projects.add(invitation.getProject());
+
         user.setProjects(projects);
 
         Set<RoleEntity> roles = user.getRoles();
+        List<RoleResponseDto> listOfRoles = new ArrayList<RoleResponseDto>();
         for (RoleEntity role : invitation.getRoles()) {
+            RoleResponseDto roleResponseDto = new RoleResponseDto();
+            roleResponseDto.setRoleGuid(role.getRoleGuid());
+            roleResponseDto.setRoleName(role.getRoleName());
             roles.add(role);
+            listOfRoles.add(roleResponseDto);
         }
         user.setRoles(roles);
 
         Set<GroupEntity> groups = user.getGroups();
+        List<GroupResponseDto> listOfGroups = new ArrayList<GroupResponseDto>();
         for (GroupEntity group : invitation.getGroups()) {
+            GroupResponseDto groupResponseDto = new GroupResponseDto();
+            groupResponseDto.setGroupGuid(group.getGroupGuid());
+            groupResponseDto.setGroupName(group.getGroupName());
             groups.add(group);
+            listOfGroups.add(groupResponseDto);
         }
-        user.setGroups(groups);
+        user.setGroups(groups);     
 
         invitation.setAccepted(true);
 
         invitationRepository.save(invitation);
         userRepository.save(user);
 
-        return new ResponseEntity(HttpStatus.OK);
+        userProjectResponseDto.setProjectGuid(invitation.getProject().getProjectGuid());
+        userProjectResponseDto.setProjectDescription(translationManager.getTranslation(invitation.getProject().getTranslationMap().getTranslations(), "description", LocaleContextHolder.getLocale().getDisplayLanguage()));
+        userProjectResponseDto.setRoles(listOfRoles);
+        userProjectResponseDto.setGroups(listOfGroups);
+        return userProjectResponseDto;
     }
 
     @RequestMapping(value = "/declineInvitation/{invitationGuid}", method = RequestMethod.PUT)

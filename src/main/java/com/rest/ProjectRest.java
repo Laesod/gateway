@@ -62,8 +62,10 @@ public class ProjectRest {
 
     @RequestMapping(value = "/createProject", method = RequestMethod.POST)
     @Transactional
-    public ResponseEntity createProject(@Valid @RequestBody ProjectRequestDto projectRequestDto) {
+    public UserProjectResponseDto createProject(@Valid @RequestBody ProjectRequestDto projectRequestDto) {
         //no auth check - any one can create new projects
+        UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
+
         ProjectEntity project = new ProjectEntity();
 
         UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
@@ -94,32 +96,48 @@ public class ProjectRest {
         role.setRoleName("viewer");// can view entries within his groups
         roleRepository.save(role);
 
+        List<RoleResponseDto> listOfProjectRoles = new ArrayList<RoleResponseDto>();
+        List<GroupResponseDto> listOfProjectGroups = new ArrayList<GroupResponseDto>();
+        RoleResponseDto roleResponseDto = new RoleResponseDto();
+        Set<RoleEntity> roles = user.getRoles();
         role = new RoleEntity();
         role.setProject(project);
         role.setRoleName("manager");//can create/modify any entries for the project, assign entries to the groups
         roleRepository.save(role);
 
-        Set<RoleEntity> roles = user.getRoles();
+        roleResponseDto.setRoleGuid(role.getRoleGuid());
+        roleResponseDto.setRoleName(role.getRoleName());
+        listOfProjectRoles.add(roleResponseDto);
         roles.add(role);
 
         role = new RoleEntity();
         role.setProject(project);
         role.setRoleName("admin");// manages project (invites/removed users, gives roles, assign/create groups)
+        roleRepository.save(role);
+
+        roleResponseDto = new RoleResponseDto();
+        roleResponseDto.setRoleGuid(role.getRoleGuid());
+        roleResponseDto.setRoleName(role.getRoleName());
+        listOfProjectRoles.add(roleResponseDto);
         roles.add(role);
 
         user.setRoles(roles);
 
         Set<RoleEntity> projectRoles = new HashSet<RoleEntity>();
+
         projectRoles.add(role);
 
         project.setRoles(projectRoles);
 
-        roleRepository.save(role);
-
         userRepository.save(user);
         projectRepository.save(project);
 
-        return new ResponseEntity(HttpStatus.OK);
+        userProjectResponseDto.setProjectGuid(project.getProjectGuid());
+        userProjectResponseDto.setProjectDescription(projectRequestDto.getDescription());
+        userProjectResponseDto.setRoles(listOfProjectRoles);
+        userProjectResponseDto.setGroups(listOfProjectGroups);
+
+        return userProjectResponseDto;
     }
 
     @RequestMapping(value = "/getProject/{projectGuid}", method = RequestMethod.GET)
@@ -206,7 +224,7 @@ public class ProjectRest {
             List<GroupResponseDto> groups = new ArrayList<>();
             if(userEntity.getGroups() != null){
                 for (GroupEntity group : userEntity.getGroups()) {
-                    if (userProject[0].equals(group.getProject().getProjectGuid())) {
+                    if ((group.getProject() != null && userProject[0].equals(group.getProject().getProjectGuid()))) {
                         GroupResponseDto groupResponseDto = new GroupResponseDto();
                         groupResponseDto.setGroupGuid(group.getGroupGuid());
                         groupResponseDto.setGroupName(group.getGroupName());
@@ -220,7 +238,6 @@ public class ProjectRest {
 
             userProjectResponseDto.setProjectGuid((String) userProject[0]);
             userProjectResponseDto.setProjectDescription((String) userProject[1]);
-
 
             userProjectResponseDtos.add(userProjectResponseDto);
         }
@@ -263,7 +280,7 @@ public class ProjectRest {
 
             if(userEntity.getGroups() != null){
                 for (GroupEntity group : userEntity.getGroups()) {
-                    if (group.getProject().getProjectGuid().equals(projectGuid)) {
+                    if ((group.getProject() != null && group.getProject().getProjectGuid().equals(projectGuid))     ) {
                         GroupResponseDto groupResponseDto = new GroupResponseDto();
                         groupResponseDto.setGroupGuid(group.getGroupGuid());
                         groupResponseDto.setGroupName(group.getGroupName());
@@ -272,7 +289,6 @@ public class ProjectRest {
                 }
                 projectUserResponseDto.setGroups(userGroups);
             }
-
 
             projectUserResponseDtos.add(projectUserResponseDto);
         }
@@ -325,6 +341,10 @@ public class ProjectRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
+        if(user.getUsername().equals(username)){
+            throw new RuntimeException(bundleMessageReader.getMessage("UserCantRemoveHimselfFromTheProject"));
+        }
+
         user = userRepository.findByUsername(username);
         RoleEntity role = new RoleEntity();
         ProjectEntity project = new ProjectEntity();
@@ -355,7 +375,7 @@ public class ProjectRest {
         while (iteratorForGroups.hasNext()) {
             group = iteratorForGroups.next();
 
-            if (group.getProject().getProjectGuid().equals(projectGuid)) {
+            if ((group.getProject() != null && group.getProject().getProjectGuid().equals(projectGuid))) {
                 iteratorForProjects.remove();
             }
         }
@@ -378,26 +398,40 @@ public class ProjectRest {
         user = userRepository.findByUsername(username);
         RoleEntity role = new RoleEntity();
         Set<RoleEntity> userRoles = user.getRoles();
+        List<String> updatedRoles = Arrays.asList(updateUserRolesRequestDto.getRoles());
 
-        if (updateUserRolesRequestDto.getRolesToRemove() != null) {
-            List<String> rolesToRemove = Arrays.asList(updateUserRolesRequestDto.getRolesToRemove());
-
+        if (updateUserRolesRequestDto.getRoles() != null) {
             Iterator<RoleEntity> iterator = userRoles.iterator();
+            for (String roleGuid : updateUserRolesRequestDto.getRoles()) {
+                Boolean matchFound = false;
+
+                while (iterator.hasNext()) {
+                    role = iterator.next();
+
+                    if (roleGuid.equals(role.getRoleGuid())) {
+                        matchFound = true;
+                        break;
+                    }
+                }
+
+                if(!matchFound){
+                    role = new RoleEntity();
+                    role = roleRepository.findByRoleGuid(roleGuid);
+                    userRoles.add(role);
+                }
+            }
+
+            iterator = userRoles.iterator();
             while (iterator.hasNext()) {
                 role = iterator.next();
 
-                if (rolesToRemove.contains(role.getRoleGuid())) {
+                if ((role.getProject() != null && role.getProject().getProjectGuid().equals(projectGuid) && !updatedRoles.contains(role.getRoleGuid()))) {
                     iterator.remove();
                 }
             }
         }
 
-        if (updateUserRolesRequestDto.getRolesToAdd() != null) {
-            for (String roleGuid : updateUserRolesRequestDto.getRolesToAdd()) {
-                role = roleRepository.findByRoleGuid(roleGuid);
-                userRoles.add(role);
-            }
-        }
+        user.setRoles(userRoles);
 
         userRepository.save(user);
 
@@ -453,24 +487,36 @@ public class ProjectRest {
         ProjectEntity project = projectRepository.findByProjectGuid(projectGuid);
         GroupEntity group = new GroupEntity();
         Set<GroupEntity> userGroups = user.getGroups();
+        List<String> updatedGroups = Arrays.asList(updateUserGroupsRequestDto.getGroups());
 
-        if (updateUserGroupsRequestDto.getGroupsToRemove() != null) {
-            List<String> groupsToRemove = Arrays.asList(updateUserGroupsRequestDto.getGroupsToRemove());
-
+        if (updateUserGroupsRequestDto.getGroups() != null) {
             Iterator<GroupEntity> iterator = userGroups.iterator();
+            for (String groupGuid : updateUserGroupsRequestDto.getGroups()) {
+                Boolean matchFound = false;
+
+                while (iterator.hasNext()) {
+                    group = iterator.next();
+
+                    if (groupGuid.equals(group.getGroupGuid())) {
+                        matchFound = true;
+                        break;
+                    }
+                }
+
+                if(!matchFound){
+                    group = new GroupEntity();
+                    group = groupRepository.findByGroupGuid(groupGuid);
+                    userGroups.add(group);
+                }
+            }
+
+            iterator = userGroups.iterator();
             while (iterator.hasNext()) {
                 group = iterator.next();
 
-                if (groupsToRemove.contains(group.getGroupGuid())) {
+                if ((group.getProject() != null && group.getProject().getProjectGuid().equals(projectGuid) && !updatedGroups.contains(group.getGroupGuid()))) {
                     iterator.remove();
                 }
-            }
-        }
-
-        if (updateUserGroupsRequestDto.getGroupsToAdd() != null) {
-            for (String groupGuid : updateUserGroupsRequestDto.getGroupsToAdd()) {
-                group = groupRepository.findByGroupGuid(groupGuid);
-                userGroups.add(group);
             }
         }
 

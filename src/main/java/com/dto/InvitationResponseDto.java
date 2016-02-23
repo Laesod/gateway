@@ -27,20 +27,19 @@ import java.util.Date;
  * Created by aautushk on 9/19/2015.
  */
 public class InvitationResponseDto {
-    private String invtitationGuid;
+    private String invitationGuid;
     private String email;
     private String projectDescription;
 
     private String createdBy;
     private Date createdAt;
 
-
-    public String getInvtitationGuid() {
-        return invtitationGuid;
+    public String getInvitationGuid() {
+        return invitationGuid;
     }
 
-    public void setInvtitationGuid(String invtitationGuid) {
-        this.invtitationGuid = invtitationGuid;
+    public void setInvitationGuid(String invitationGuid) {
+        this.invitationGuid = invitationGuid;
     }
 
     public String getEmail() {

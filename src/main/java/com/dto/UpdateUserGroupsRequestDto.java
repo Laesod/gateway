@@ -6,25 +6,15 @@ import java.util.ArrayList;
  * Created by root on 14/02/16.
  */
 public class UpdateUserGroupsRequestDto {
-    private String[] groupsToRemove;
-    private String[] groupsToAdd;
-
+    private String[] groups;
     private GroupRequestDto[] groupsToCreateAndAdd;
 
-    public String[] getGroupsToRemove() {
-        return groupsToRemove;
+    public String[] getGroups() {
+        return groups;
     }
 
-    public void setGroupsToRemove(String[] groupsToRemove) {
-        this.groupsToRemove = groupsToRemove;
-    }
-
-    public String[] getGroupsToAdd() {
-        return groupsToAdd;
-    }
-
-    public void setGroupsToAdd(String[] groupsToAdd) {
-        this.groupsToAdd = groupsToAdd;
+    public void setGroups(String[] groups) {
+        this.groups = groups;
     }
 
     public GroupRequestDto[] getGroupsToCreateAndAdd() {
