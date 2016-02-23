@@ -134,11 +134,11 @@ public class UserRest {
         authorityRepository.save(authorityEntity); // initial role is assigned to the new user (needed by spring security)
 
         if(emailSender == null){// this check needed for unit testing perposes
-            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailSendFrom);
+            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, mailSendFrom);
         }
 
         String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
-        emailSender.sendVerificationTokenEmail(emailVerificationToken.toString(), requestBaseUrl);
+        emailSender.sendVerificationTokenEmail(user.getUsername(), emailVerificationToken.toString(), requestBaseUrl);
 
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -189,11 +189,11 @@ public class UserRest {
         userRepository.save(user);
 
         if(emailSender == null){// this check needed for unit testing perposes
-            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, user.getUsername(), mailSendFrom);
+            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, mailSendFrom);
         }
 
         String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
-        emailSender.sendReserPasswordEmail(resetPasswordToken.toString(), requestBaseUrl);
+        emailSender.sendReserPasswordEmail(user.getUsername(), resetPasswordToken.toString(), requestBaseUrl);
 
         return new ResponseEntity(HttpStatus.OK);
     }

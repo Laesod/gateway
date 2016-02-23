@@ -45,24 +45,22 @@ public class EmailSender {
 
     String sender;
 
-    String recipient;
-
     private BundleMessageReader bundleMessageReader = new BundleMessageReader();
 
     public EmailSender(JavaMailSender mailSenderParam,
-                       ClassLoaderTemplateResolver emailTemplateResolverParam, SpringTemplateEngine thymeleafParam, String recipientParam, String senderParam){
+                       ClassLoaderTemplateResolver emailTemplateResolverParam, SpringTemplateEngine thymeleafParam, String senderParam){
         mailSender = mailSenderParam;
         emailTemplateResolver = emailTemplateResolverParam;
         thymeleaf = thymeleafParam;
         if(!thymeleaf.isInitialized()){
             thymeleaf.setTemplateResolver(emailTemplateResolver);
         }
-        recipient = recipientParam;
+       // recipient = recipientParam;
         sender = senderParam;
 
     }
 
-    public void sendVerificationTokenEmail(String emailVerificationToken, String requestBaseUrl){
+    public void sendVerificationTokenEmail(String recipient, String emailVerificationToken, String requestBaseUrl){
         Locale locale = LocaleContextHolder.getLocale();
         String emailVerificationTemplate = "";
         switch (locale.toString()){
@@ -81,13 +79,13 @@ public class EmailSender {
         String emailText = thymeleaf.process(emailVerificationTemplate, ctx);
 
         try {
-            sendMessage(bundleMessageReader.getMessage("EmailVerificationEmailHeader"), emailText);
+            sendMessage(recipient, bundleMessageReader.getMessage("EmailVerificationEmailHeader"), emailText);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
 
-    public void sendReserPasswordEmail(String resetPasswordToken, String requestBaseUrl){
+    public void sendReserPasswordEmail(String recipient, String resetPasswordToken, String requestBaseUrl){
         Locale locale = LocaleContextHolder.getLocale();
         String resetPasswordTemplate = "";
         switch (locale.toString()){
@@ -106,13 +104,13 @@ public class EmailSender {
         String emailText = thymeleaf.process(resetPasswordTemplate, ctx);
 
         try {
-            sendMessage(bundleMessageReader.getMessage("ResetPasswordEmailHeader"), emailText);
+            sendMessage(recipient, bundleMessageReader.getMessage("ResetPasswordEmailHeader"), emailText);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
 
-    public void sendInvitationEmail(String requestBaseUrl){
+    public void sendInvitationEmail(String recipient, String requestBaseUrl){
         Locale locale = LocaleContextHolder.getLocale();
         String invitationTemplate = "";
         switch (locale.toString()){
@@ -131,14 +129,14 @@ public class EmailSender {
         String emailText = thymeleaf.process(invitationTemplate, ctx);
 
         try {
-            sendMessage(bundleMessageReader.getMessage("EmailVerificationEmailHeader"), emailText);
+            sendMessage(recipient, bundleMessageReader.getMessage("ProjectInvitationEmailHeader"), emailText);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
 
 
-    private void sendMessage(String emailHeader, String emailText) throws MessagingException{
+    private void sendMessage(String recipient, String emailHeader, String emailText) throws MessagingException{
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(sender);

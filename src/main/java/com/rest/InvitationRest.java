@@ -161,11 +161,11 @@ public class InvitationRest {
 
 
         if(emailSender == null){// this check needed for unit testing perposes
-            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, invitation.getEmail(), mailSendFrom);
+            emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, mailSendFrom);
         }
 
         String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
-        emailSender.sendInvitationEmail(requestBaseUrl);
+        emailSender.sendInvitationEmail(invitation.getEmail(), requestBaseUrl);
 
         return invitationResponseDto;
     };
