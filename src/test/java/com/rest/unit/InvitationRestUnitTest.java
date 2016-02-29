@@ -21,22 +21,14 @@ package com.rest.unit;
  */
 
 
-import com.dto.InvitationResponseDto;
-import com.repository.IInvitationRepository;
-import com.rest.InvitationRest;
+import com.repository.userManagement.IInvitationRepository;
+import com.rest.userManagement.InvitationRest;
 import com.utils.SecurityContextReader;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.List;
-
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InvitationRestUnitTest {

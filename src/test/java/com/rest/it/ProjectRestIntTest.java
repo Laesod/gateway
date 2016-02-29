@@ -22,10 +22,16 @@ package com.rest.it;
 
 
 import com.MockGatewayApplication;
-import com.dto.ProjectRequestDto;
+import com.dto.userManagement.ProjectRequestDto;
 import com.entity.*;
+import com.entity.userManagement.AuthorityEntity;
+import com.entity.userManagement.ProjectEntity;
+import com.entity.userManagement.UserEntity;
 import com.repository.*;
-import com.rest.ProjectRest;
+import com.repository.userManagement.IAuthorityRepository;
+import com.repository.userManagement.IProjectRepository;
+import com.repository.userManagement.IUserRepository;
+import com.rest.userManagement.ProjectRest;
 import com.utils.SecurityContextReader;
 import org.junit.Before;
 import org.junit.Test;

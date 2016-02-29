@@ -21,10 +21,10 @@ package com.utils;
  */
 
 
-import com.entity.ProjectEntity;
-import com.entity.RoleEntity;
-import com.entity.UserEntity;
-import com.repository.IUserRepository;
+import com.entity.userManagement.ProjectEntity;
+import com.entity.userManagement.RoleEntity;
+import com.entity.userManagement.UserEntity;
+import com.repository.userManagement.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;

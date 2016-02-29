@@ -77,3 +77,13 @@ insert into authorities
 
 insert into authorities
         values ('2', 'user@gmail.com', 'SYSTEM_USER', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0);
+
+--initial entry types creation...
+insert into translation_maps
+        values ('1');
+insert into translations
+        values ('1', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Deficiency", "name", "English", "EntryType", "1");
+insert into translations
+        values ('2', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Deficiency (fr)", "name", "French", "EntryType", "1");
+insert into entry_types
+        values ('1', '1');

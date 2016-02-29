@@ -22,11 +22,9 @@ package com.rest.it;
 
 
 import com.MockGatewayApplication;
-import com.dto.InvitationResponseDto;
-import com.entity.InvitationEntity;
-import com.repository.IInvitationRepository;
+import com.repository.userManagement.IInvitationRepository;
 import com.repository.ITranslationRepository;
-import com.rest.InvitationRest;
+import com.rest.userManagement.InvitationRest;
 import com.utils.SecurityContextReader;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,9 +39,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

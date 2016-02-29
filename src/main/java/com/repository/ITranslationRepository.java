@@ -22,8 +22,6 @@ package com.repository;
 
 
 
-import com.dto.ProjectResponseDto;
-import com.entity.ProjectEntity;
 import com.entity.TranslationEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

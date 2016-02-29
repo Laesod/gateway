@@ -12,7 +12,7 @@ import java.util.Set;
  */
 
 @Entity
-@Table(name = "translationMaps")
+@Table(name = "translation_maps")
 @EntityListeners(AuditingEntityListener.class)
 @Audited
 public class TranslationMapEntity {
@@ -40,9 +40,4 @@ public class TranslationMapEntity {
     public void setTranslations(Set<TranslationEntity> translations) {
         this.translations = translations;
     }
-
-
-
-
-
 }

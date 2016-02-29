@@ -1,10 +1,7 @@
 package com.utils;
 
-import com.dto.RoleResponseDto;
-import com.entity.RoleEntity;
 import com.entity.TranslationEntity;
 import com.entity.TranslationMapEntity;
-import com.entity.UserEntity;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.HashSet;

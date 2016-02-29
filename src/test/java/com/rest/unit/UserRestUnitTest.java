@@ -21,24 +21,21 @@ package com.rest.unit;
  */
 
 
-import com.dto.InitiateResetPasswordRequestDto;
-import com.dto.ResetPasswordRequestDto;
-import com.dto.UserPasswordRequestDto;
-import com.dto.UserRequestDto;
-import com.entity.AuthorityEntity;
-import com.entity.UserEntity;
-import com.repository.IAuthorityRepository;
-import com.repository.IUserRepository;
+import com.dto.userManagement.InitiateResetPasswordRequestDto;
+import com.dto.userManagement.ResetPasswordRequestDto;
+import com.dto.userManagement.UserPasswordRequestDto;
+import com.dto.userManagement.UserRequestDto;
+import com.entity.userManagement.UserEntity;
+import com.repository.userManagement.IAuthorityRepository;
+import com.repository.userManagement.IUserRepository;
 import com.rest.EmailSender;
-import com.rest.UserRest;
+import com.rest.userManagement.UserRest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 import java.security.Principal;

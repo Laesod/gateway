@@ -21,10 +21,11 @@ package com.rest.unit;
  */
 
 
-import com.dto.ProjectRequestDto;
-import com.entity.*;
+import com.dto.userManagement.ProjectRequestDto;
 import com.repository.*;
-import com.rest.ProjectRest;
+import com.repository.userManagement.IAuthorityRepository;
+import com.repository.userManagement.IProjectRepository;
+import com.rest.userManagement.ProjectRest;
 import com.utils.SecurityContextReader;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +33,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
 

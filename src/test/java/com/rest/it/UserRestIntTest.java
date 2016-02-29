@@ -22,15 +22,15 @@ package com.rest.it;
 
 
 import com.MockGatewayApplication;
-import com.dto.InitiateResetPasswordRequestDto;
-import com.dto.ResetPasswordRequestDto;
-import com.dto.UserPasswordRequestDto;
-import com.dto.UserRequestDto;
-import com.entity.AuthorityEntity;
-import com.entity.UserEntity;
-import com.repository.IAuthorityRepository;
-import com.repository.IUserRepository;
-import com.rest.UserRest;
+import com.dto.userManagement.InitiateResetPasswordRequestDto;
+import com.dto.userManagement.ResetPasswordRequestDto;
+import com.dto.userManagement.UserPasswordRequestDto;
+import com.dto.userManagement.UserRequestDto;
+import com.entity.userManagement.AuthorityEntity;
+import com.entity.userManagement.UserEntity;
+import com.repository.userManagement.IAuthorityRepository;
+import com.repository.userManagement.IUserRepository;
+import com.rest.userManagement.UserRest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
