@@ -87,3 +87,31 @@ insert into translations
         values ('2', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Deficiency (fr)", "name", "French", "EntryType", "1");
 insert into entry_types
         values ('1', '1');
+
+--initial deficiency statuses creation...
+insert into translation_maps
+        values ('2');
+insert into translations
+        values ('3', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Open", "name", "English", "EntryStatus", "2");
+insert into translations
+        values ('4', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Open (fr)", "name", "French", "EntryStatus", "2");
+insert into entry_statuses
+        values ('1', '#ff0000', '', 'Deficiency', 1, '2');
+
+insert into translation_maps
+        values ('3');
+insert into translations
+        values ('5', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "In Progress", "name", "English", "EntryStatus", "3");
+insert into translations
+        values ('6', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "In Progress (fr)", "name", "French", "EntryStatus", "3");
+insert into entry_statuses
+        values ('2', '#ffff33', '', 'Deficiency', 2, '3');
+
+insert into translation_maps
+        values ('4');
+insert into translations
+        values ('7', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Done", "name", "English", "EntryStatus", "4");
+insert into translations
+        values ('8', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Done (fr)", "name", "French", "EntryStatus", "4");
+insert into entry_statuses
+        values ('3', '#33ff33', '', 'Deficiency', 3, '4');

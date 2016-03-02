@@ -30,10 +30,6 @@ public class EntryEntity extends BaseEntity {
     private EntryTypeEntity entryType;
 
     @OneToOne
-    @JoinColumn(name = "entryStatusGuid")
-    private EntryStatusEntity entryStatus;
-
-    @OneToOne
     @JoinColumn(name = "projectGuid")
     private ProjectEntity project;
 
@@ -42,10 +38,58 @@ public class EntryEntity extends BaseEntity {
     private String description;
 
     @OneToOne
-    @JoinColumn(name = "deficiencyDetailsGuid")
-    private ProjectEntity deficiency;
+        @JoinColumn(name = "deficiencyDetailsGuid")
+    private DeficiencyDetailsEntity deficiencyDetails;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "entries_groups", joinColumns = { @JoinColumn(name = "entry_guid") }, inverseJoinColumns = { @JoinColumn(name = "group_guid") })
     private Set<GroupEntity> groups;
+
+    public String getEntryGuid() {
+        return entryGuid;
+    }
+
+    public void setEntryGuid(String entryGuid) {
+        this.entryGuid = entryGuid;
+    }
+
+    public EntryTypeEntity getEntryType() {
+        return entryType;
+    }
+
+    public void setEntryType(EntryTypeEntity entryType) {
+        this.entryType = entryType;
+    }
+
+    public ProjectEntity getProject() {
+        return project;
+    }
+
+    public void setProject(ProjectEntity project) {
+        this.project = project;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public DeficiencyDetailsEntity getDeficiencyDetails() {
+        return deficiencyDetails;
+    }
+
+    public void setDeficiencyDetails(DeficiencyDetailsEntity deficiencyDetails) {
+        this.deficiencyDetails = deficiencyDetails;
+    }
+
+    public Set<GroupEntity> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<GroupEntity> groups) {
+        this.groups = groups;
+    }
 }

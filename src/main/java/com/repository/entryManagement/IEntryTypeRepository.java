@@ -13,4 +13,5 @@ import java.util.List;
 @Repository
 public interface IEntryTypeRepository extends JpaRepository<EntryTypeEntity, Long> {
     List<EntryTypeEntity> findAll();
+    EntryTypeEntity findByEntryTypeGuid(String EntryTypeGuid);
 }
