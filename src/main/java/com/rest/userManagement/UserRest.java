@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 ;
@@ -216,6 +217,23 @@ public class UserRest {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    public List<GroupResponseDto> getUserGroupsForProject(String projectGuid, Set<GroupEntity> userGroups){
+        List<GroupResponseDto> groups = new ArrayList<>();
+
+        if(userGroups != null){
+            for (GroupEntity group : userGroups) {
+                if ((group.getProject() != null && group.getProject().getProjectGuid().equals(projectGuid))) {
+                    GroupResponseDto groupResponseDto = new GroupResponseDto();
+                    groupResponseDto.setGroupGuid(group.getGroupGuid());
+                    groupResponseDto.setGroupName(group.getGroupName());
+                    groups.add(groupResponseDto);
+                }
+            }
+        }
+
+        return groups;
+    }
+
     @RequestMapping(value = "/getUserProfile", method = RequestMethod.GET)
     public UserProfileDto getUserProfile() {
         UserProfileDto userProfileDto = new UserProfileDto();
@@ -245,6 +263,10 @@ public class UserRest {
             userProjectResponseDto.setRoles(roles);
 
             List<GroupResponseDto> groups = new ArrayList<>();
+
+           // this.getUserGroupsForProject();
+
+
             if(userEntity.getGroups() != null){
                 for (GroupEntity group : userEntity.getGroups()) {
                     if ((group.getProject() != null && group.getProject().getProjectGuid().equals((String) userProject[0]))) {

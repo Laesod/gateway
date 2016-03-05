@@ -257,10 +257,32 @@ public class EntryRest {
 
     @RequestMapping(value = "/getEntries", method = RequestMethod.GET)
     @Transactional
-    public Page<EntryResponseDto> getEntries(Pageable pageable) {
-        List<EntryResponseDto> entries = new ArrayList<EntryResponseDto>();
+    public Page<EntryResponseDto> getEntries(@RequestParam String projectGuid, Pageable pageable) {
+        //auth check if user has admin role for the project
+        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        String[] requiredRoles = {"manager", "user", "viewer"};
+        if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
 
-        Page<Object[]> entriesObj = entryRepository.getEntries(LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+
+
+        List<EntryResponseDto> entries = new ArrayList<EntryResponseDto>();
+        Page<Object[]> entriesObj;
+
+        String[] managerRole = {"manager"};
+     //   if(permissionsValidator.rolesForProjectCheck(user, projectGuid, managerRole)) {
+            // throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+            entriesObj = entryRepository.getEntriesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+    //    }
+//        } else {
+//            String [] groups =
+//            entriesObj = entryRepository.getEntriesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+//        }
+
+
+
+        //Page<Object[]> entriesObj = entryRepository.getEntriesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
         Long entiesNumber = entriesObj.getTotalElements();
 
         for (Object[] entryObj : entriesObj.getContent()) {

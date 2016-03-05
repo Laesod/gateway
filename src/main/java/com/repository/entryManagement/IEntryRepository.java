@@ -18,6 +18,10 @@ import java.util.ArrayList;
 public interface IEntryRepository extends JpaRepository<EntryEntity, Long> {
     EntryEntity findByEntryGuid(String EntryGuid);
 
-    @Query("select a.entryGuid, a.description, b.entryTypeGuid, d.content  from EntryEntity a join a.entryType b join b.translationMap c join c.translations d where d.field='name' and d.language=:language")
-    Page<Object[]> getEntries(@Param("language") String language, Pageable pageable);
+    @Query("select a.entryGuid, a.description, b.entryTypeGuid, d.content from EntryEntity a join a.entryType b join b.translationMap c join c.translations d where a.project.projectGuid=:projectGuid and d.field='name' and d.language=:language")
+    Page<Object[]> getEntriesForProject(@Param("projectGuid") String projectGuid, @Param("language") String language, Pageable pageable);
+
+//    @Query("select a.entryGuid, a.description, b.entryTypeGuid, d.content from EntryEntity a join a.entryType b join b.translationMap c join c.translations d where a.project.projectGuid=:projectGuid and d.field='name' and d.language=:language")
+//    Page<Object[]> getEntriesForProjectAndGroups(@Param("projectGuid") String projectGuid, @Param("groups") String[] groups, @Param("language") String language, Pageable pageable);
+
 }
