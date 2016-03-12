@@ -131,12 +131,12 @@ public class ProjectRestIntTest {
 //        invitations.add(invitation);
 //        projectRequestDto.setInvitations(invitations);
 
-        when(securityContextReaderMock.getUsername()).thenReturn("test@gmail.com");
-
-        projectRest.projectRepository = projectRepository;
-        projectRest.translationRepository = translationRepository;
-//        projectRest.projectUserRepository = projectUserRepository;
-        projectRest.authorityRepository = authorityRepository;
+//        when(securityContextReaderMock.getUsername()).thenReturn("test@gmail.com");
+//
+//        projectRest.projectRepository = projectRepository;
+//        projectRest.translationRepository = translationRepository;
+////        projectRest.projectUserRepository = projectUserRepository;
+//        projectRest.authorityRepository = authorityRepository;
 //        projectRest.groupRepository = groupRepository;
 //        projectRest.projectGroupRepository = projectGroupRepository;
 //        projectRest.invitationRepository = invitationRepository;

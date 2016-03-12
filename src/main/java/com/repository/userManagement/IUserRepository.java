@@ -44,6 +44,9 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> {
     @Query("select b.projectGuid, d.content from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username and d.field='description' and d.language=:language")
     ArrayList<Object[]> getUserProjects(@Param("username") String username, @Param("language") String language);
 
+    @Query("select b.projectGuid, d.content from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username and b.projectGuid=:projectGuid and d.field='description' and d.language=:language")
+    ArrayList<Object[]> getUserProject(@Param("username") String username, @Param("projectGuid") String projectGuid, @Param("language") String language);
+
 //    @Query("select b.roleName from UserEntity a join a.roles b where a.username=:username and b.project.projectGuid=:projectGuid")
 //    ArrayList<Object[]> getUserRolesForProject(@Param("username") String username, @Param("projectGuid") String projectGuid);
 }

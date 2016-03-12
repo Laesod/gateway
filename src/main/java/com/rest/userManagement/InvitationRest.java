@@ -74,7 +74,7 @@ public class InvitationRest {
 
     public BundleMessageReader bundleMessageReader = new BundleMessageReader();
 
-    public SecurityContextReader securityContextReader = new SecurityContextReader();
+  //  public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     public PermissionsValidator permissionsValidator = new PermissionsValidator();
 
@@ -84,7 +84,7 @@ public class InvitationRest {
     @Transactional
     public InvitationResponseDto createInvitation(@Valid @RequestBody InvitationRequestDto invitationRequestDto) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, invitationRequestDto.getProjectGuid(), requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -166,8 +166,8 @@ public class InvitationRest {
             emailSender = new EmailSender(mailSender, emailTemplateResolver, thymeleaf, mailSendFrom);
         }
 
-//        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
-//        emailSender.sendInvitationEmail(invitation.getEmail(), requestBaseUrl);
+        String requestBaseUrl = this.gatewayHost + ':' + this.gatewayPort + this.contextPath;
+        emailSender.sendInvitationEmail(invitation.getEmail(), requestBaseUrl);
 
         return invitationResponseDto;
     };
@@ -175,7 +175,7 @@ public class InvitationRest {
     @RequestMapping(value = "/getPendingInvitations", method = RequestMethod.GET)
     public List<InvitationResponseDto> getPendingInvitations(@RequestParam String projectGuid) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -187,13 +187,38 @@ public class InvitationRest {
 
         for (Object[] invitation : invitations) {
             InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
+            List<RoleResponseDto> roles = new ArrayList<RoleResponseDto>();
+            List<GroupResponseDto> groups = new ArrayList<GroupResponseDto>();
+            InvitationEntity invitationEntity = invitationRepository.findByInvitationGuid((String) invitation[0]);
+
             invitationResponseDto.setInvitationGuid((String) invitation[0]);
             invitationResponseDto.setEmail((String) invitation[1]);
+            invitationResponseDto.setProjectGuid(invitationEntity.getProject().getProjectGuid());
             invitationResponseDto.setProjectDescription((String) invitation[2]);
             invitationResponseDto.setCreatedAt((Date) invitation[3]);
 
             UserEntity creator = userRepository.findByUsername((String) invitation[4]);
             invitationResponseDto.setCreatedBy(creator.getFirstName() + " " + creator.getLastName());
+
+            for (RoleEntity role : invitationEntity.getRoles()) {
+                RoleResponseDto roleResponseDto = new RoleResponseDto();
+
+                roleResponseDto.setRoleGuid(role.getRoleGuid());
+                roleResponseDto.setRoleName(role.getRoleName());
+
+                roles.add(roleResponseDto);
+            }
+            invitationResponseDto.setRoles(roles);
+
+            for (GroupEntity group : invitationEntity.getGroups()) {
+                GroupResponseDto groupResponseDto = new GroupResponseDto();
+
+                groupResponseDto.setGroupGuid(group.getGroupGuid());
+                groupResponseDto.setGroupName(group.getGroupName());
+
+                groups.add(groupResponseDto);
+            }
+            invitationResponseDto.setGroups(groups);
 
             invitationResponseDtos.add(invitationResponseDto);
         }
@@ -205,18 +230,44 @@ public class InvitationRest {
     public List<InvitationResponseDto> getReceivedInvitations() {
         //no auth check - any one can get list of received invitations
         List<InvitationResponseDto> invitationResponseDtos = new ArrayList<InvitationResponseDto>();
+        UserEntity userEntity = SecurityContextReader.getUserEntity(userRepository);
 
-        ArrayList<Object[]> invitations = invitationRepository.getReceivedInvitations(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
+        ArrayList<Object[]> invitations = invitationRepository.getReceivedInvitations(userEntity.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
 
         for (Object[] invitation : invitations) {
             InvitationResponseDto invitationResponseDto = new InvitationResponseDto();
+            List<RoleResponseDto> roles = new ArrayList<RoleResponseDto>();
+            List<GroupResponseDto> groups = new ArrayList<GroupResponseDto>();
+            InvitationEntity invitationEntity = invitationRepository.findByInvitationGuid((String) invitation[0]);
+
             invitationResponseDto.setInvitationGuid((String) invitation[0]);
             invitationResponseDto.setEmail((String) invitation[1]);
+            invitationResponseDto.setProjectGuid(invitationEntity.getProject().getProjectGuid());
             invitationResponseDto.setProjectDescription((String) invitation[2]);
             invitationResponseDto.setCreatedAt((Date) invitation[3]);
 
             UserEntity user = userRepository.findByUsername((String) invitation[4]);
             invitationResponseDto.setCreatedBy(user.getFirstName() + " " + user.getLastName());
+
+            for (RoleEntity role : invitationEntity.getRoles()) {
+                RoleResponseDto roleResponseDto = new RoleResponseDto();
+
+                roleResponseDto.setRoleGuid(role.getRoleGuid());
+                roleResponseDto.setRoleName(role.getRoleName());
+
+                roles.add(roleResponseDto);
+            }
+            invitationResponseDto.setRoles(roles);
+
+            for (GroupEntity group : invitationEntity.getGroups()) {
+                GroupResponseDto groupResponseDto = new GroupResponseDto();
+
+                groupResponseDto.setGroupGuid(group.getGroupGuid());
+                groupResponseDto.setGroupName(group.getGroupName());
+
+                groups.add(groupResponseDto);
+            }
+            invitationResponseDto.setGroups(groups);
 
             invitationResponseDtos.add(invitationResponseDto);
         }
@@ -228,14 +279,15 @@ public class InvitationRest {
     @Transactional
     public UserProjectResponseDto acceptInvitation(@PathVariable String invitationGuid) {
         //auth check - user should be able to accept only his invitations
+        UserEntity userEntity = SecurityContextReader.getUserEntity(userRepository);
         InvitationEntity invitation = invitationRepository.findByInvitationGuid(invitationGuid);
 
-        if(!invitation.getEmail().equals(securityContextReader.getUsername())){
+        if(!invitation.getEmail().equals(userEntity.getUsername())){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
         UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = userRepository.findByUsername(userEntity.getUsername());
 
         Set<ProjectEntity> projects = user.getProjects();
         projects.add(invitation.getProject());
@@ -273,6 +325,9 @@ public class InvitationRest {
         userProjectResponseDto.setProjectDescription(translationManager.getTranslation(invitation.getProject().getTranslationMap().getTranslations(), "description", LocaleContextHolder.getLocale().getDisplayLanguage()));
         userProjectResponseDto.setRoles(listOfRoles);
         userProjectResponseDto.setGroups(listOfGroups);
+
+        SecurityContextReader.clear();//reset user security context...
+
         return userProjectResponseDto;
     }
 
@@ -282,8 +337,9 @@ public class InvitationRest {
         //auth check - user should be able to decline only his invitations
 
         InvitationEntity invitation = invitationRepository.findByInvitationGuid(invitationGuid);
+        UserEntity userEntity = SecurityContextReader.getUserEntity(userRepository);
 
-        if(!invitation.getEmail().equals(securityContextReader.getUsername())){
+        if(!invitation.getEmail().equals(userEntity.getUsername())){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 

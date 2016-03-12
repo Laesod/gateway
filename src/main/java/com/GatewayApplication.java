@@ -21,7 +21,10 @@ package com;
  */
 
 
+import com.entity.userManagement.UserEntity;
+import com.repository.userManagement.IUserRepository;
 import com.utils.SecurityContextReader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
@@ -52,7 +55,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -121,11 +126,22 @@ public class GatewayApplication extends SpringBootServletInitializer {
 	@Value("${mailserver.debug}")
 	private String mailDebug;
 
+	@Autowired
+	public IUserRepository userRepository;
+
     private class SpringSecurityAuditorAware implements AuditorAware<String> {
 		@Override
 		public String getCurrentAuditor() {
-			SecurityContextReader securityContextReader = new SecurityContextReader();
-			return securityContextReader.getUsername();
+//			SecurityContextReader securityContextReader = new SecurityContextReader();
+//			return securityContextReader.getUsername();
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+			return authentication.getName();
+//			if(user != null){
+//				return user.getUsername();
+//			}else{
+//				return "";
+//			}
 		}
 	}
 

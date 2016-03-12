@@ -73,7 +73,7 @@ public class UserRest {
 
     private BundleMessageReader bundleMessageReader = new BundleMessageReader();
 
-    public SecurityContextReader securityContextReader = new SecurityContextReader();
+  //  public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     @Autowired
     public Validator validator;
@@ -239,11 +239,11 @@ public class UserRest {
         UserProfileDto userProfileDto = new UserProfileDto();
         List<UserProjectResponseDto> userProjectResponseDtos = new ArrayList<UserProjectResponseDto>();
 
-        UserEntity userEntity = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity userEntity = SecurityContextReader.getUserEntity(userRepository);// userRepository.findByUsername(securityContextReader.getUsername());
         if(userEntity == null){
             return userProfileDto;
         }
-        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
+        ArrayList<Object[]> userProjects = userRepository.getUserProjects(userEntity.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
 
         for (Object[] userProject : userProjects) {
             UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
@@ -262,22 +262,22 @@ public class UserRest {
             }
             userProjectResponseDto.setRoles(roles);
 
-            List<GroupResponseDto> groups = new ArrayList<>();
-
-           // this.getUserGroupsForProject();
+            List<GroupResponseDto> groups = this.getUserGroupsForProject((String) userProject[0], userEntity.getGroups());
 
 
-            if(userEntity.getGroups() != null){
-                for (GroupEntity group : userEntity.getGroups()) {
-                    if ((group.getProject() != null && group.getProject().getProjectGuid().equals((String) userProject[0]))) {
-                        GroupResponseDto groupResponseDto = new GroupResponseDto();
-                        groupResponseDto.setGroupGuid(group.getGroupGuid());
-                        groupResponseDto.setGroupName(group.getGroupName());
-                        groups.add(groupResponseDto);
-                    }
-                }
-                userProjectResponseDto.setGroups(groups);
-            }
+//            if(userEntity.getGroups() != null){
+//                for (GroupEntity group : userEntity.getGroups()) {
+//                    if ((group.getProject() != null && group.getProject().getProjectGuid().equals((String) userProject[0]))) {
+//                        GroupResponseDto groupResponseDto = new GroupResponseDto();
+//                        groupResponseDto.setGroupGuid(group.getGroupGuid());
+//                        groupResponseDto.setGroupName(group.getGroupName());
+//                        groups.add(groupResponseDto);
+//                    }
+//                }
+//
+//            }
+
+            userProjectResponseDto.setGroups(groups);
 
             userProjectResponseDto.setProjectGuid((String) userProject[0]);
             userProjectResponseDto.setProjectDescription((String) userProject[1]);

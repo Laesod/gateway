@@ -22,6 +22,7 @@ package com.rest;
 
 
 import com.config.Config;
+import com.utils.SecurityContextReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,8 @@ public class ConfigRest {
 
     @RequestMapping(value = "/config", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Config getConfig(){
-         return configBean;
+        SecurityContextReader.clear();
+
+        return configBean;
     }
 }

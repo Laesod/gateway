@@ -33,11 +33,6 @@ import java.util.Arrays;
  * Created by aautushk on 9/12/2015.
  */
 public class PermissionsValidator {
-    private SecurityContextReader securityContextReader = new SecurityContextReader();
-
-    @Autowired
-    public IUserRepository userRepository;
-
     public Boolean rolesForProjectCheck(UserEntity user, String projectGuid, String[] roles) {
         Boolean isProjectAssignementValid = false;
         Boolean isRoleAssignementValid = false;

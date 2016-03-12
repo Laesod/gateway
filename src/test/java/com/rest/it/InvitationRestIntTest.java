@@ -72,7 +72,7 @@ public class InvitationRestIntTest {
     //user story 2.
     @Test
     public void getReceivedInvitations() {
-        when(securityContextReaderMock.getUsername()).thenReturn("test@gmail.com");
+      //  when(securityContextReaderMock.getUsername()).thenReturn("test@gmail.com");
 
 //        InvitationEntity invitationEntity = new InvitationEntity();
 //        invitationEntity.setRecipientEmail("test@gmail.com");

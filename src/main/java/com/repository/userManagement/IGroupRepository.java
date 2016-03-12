@@ -38,4 +38,7 @@ public interface IGroupRepository extends JpaRepository<GroupEntity, Long> {
 
     @Query("select a.groupGuid, a.groupName from GroupEntity a where a.project.projectGuid=:projectGuid and a.groupName like :nameContains")
     ArrayList<Object[]> getProjectGroups(@Param("projectGuid") String projectGuid, @Param("nameContains") String nameContains);
+
+    @Query("select a.groupGuid, a.groupName from GroupEntity a where a.project.projectGuid=:projectGuid and a.groupName=:groupName")
+    ArrayList<Object[]> getProjectGroupsByName(@Param("projectGuid") String projectGuid, @Param("groupName") String groupName);
 }

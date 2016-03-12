@@ -21,6 +21,13 @@ package com.utils;
  */
 
 
+import com.dto.userManagement.GroupResponseDto;
+import com.dto.userManagement.RoleResponseDto;
+import com.entity.userManagement.GroupEntity;
+import com.entity.userManagement.UserEntity;
+import com.repository.userManagement.IUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.ShellProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -28,17 +35,33 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+
 /**
  * Created by aautushk on 9/20/2015.
  */
+@Component
+public abstract class SecurityContextReader {
+    public static UserEntity userEntity;
+    //public static String username;
 
-public class SecurityContextReader {
-    public String getUsername() {
+    public static UserEntity getUserEntity(IUserRepository userRepository) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if(authentication != null){
-                return authentication.getName();
+
+        if(authentication.getName().equals("anonymousUser")){
+            userEntity = null;
+            return null;
+        }else{
+            if(userEntity != null){
+                return userEntity;
             }else{
-                return "";
+                userEntity = userRepository.findByUsername(authentication.getName());
+                return userEntity;
             }
         }
+    }
+
+    public static void clear(){
+        userEntity = null;
+    }
 }

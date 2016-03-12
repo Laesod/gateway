@@ -22,6 +22,7 @@ package com.dto.userManagement;
 
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by aautushk on 9/19/2015.
@@ -29,10 +30,14 @@ import java.util.Date;
 public class InvitationResponseDto {
     private String invitationGuid;
     private String email;
+    private String projectGuid;
     private String projectDescription;
 
     private String createdBy;
     private Date createdAt;
+
+    List<RoleResponseDto> roles;
+    List<GroupResponseDto> groups;
 
     public String getInvitationGuid() {
         return invitationGuid;
@@ -48,6 +53,14 @@ public class InvitationResponseDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getProjectGuid() {
+        return projectGuid;
+    }
+
+    public void setProjectGuid(String projectGuid) {
+        this.projectGuid = projectGuid;
     }
 
     public String getCreatedBy() {
@@ -72,5 +85,21 @@ public class InvitationResponseDto {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<RoleResponseDto> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleResponseDto> roles) {
+        this.roles = roles;
+    }
+
+    public List<GroupResponseDto> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<GroupResponseDto> groups) {
+        this.groups = groups;
     }
 }

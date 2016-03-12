@@ -67,7 +67,7 @@ public class EntryRest {
     @Autowired
     public IProjectRepository projectRepository;
 
-    public SecurityContextReader securityContextReader = new SecurityContextReader();
+ //   public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     public PermissionsValidator permissionsValidator = new PermissionsValidator();
 
@@ -79,7 +79,7 @@ public class EntryRest {
     @Transactional
     public List<EntryTypeResponseDto>  getEntryTypesForProject(@RequestParam String projectGuid) {
         //auth check if user is assigned to the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);// userRepository.findByUsername(securityContextReader.getUsername());
         if(!permissionsValidator.projectCheck(user, projectGuid)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
@@ -124,7 +124,7 @@ public class EntryRest {
     @Transactional
     public EntryResponseDto createEntry(@Valid @RequestBody EntryRequestDto entryRequestDto) {
         //auth check if user has manager role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"manager"};
         if(!permissionsValidator.rolesForProjectCheck(user, entryRequestDto.getProjectGuid(), requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -157,7 +157,7 @@ public class EntryRest {
     @Transactional
     public ResponseEntity updateEntry(@Valid @RequestBody EntryRequestDto entryRequestDto) {
         //auth check if user has manager role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"manager", "user"};
         if(!permissionsValidator.rolesForProjectCheck(user, entryRequestDto.getProjectGuid(), requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -212,7 +212,7 @@ public class EntryRest {
     public DeficiencyDetailsResponseDto createDeficiencyDetails(@Valid @RequestBody DeficiencyDetailsRequestDto deficiencyDetailsRequestDto) {
         EntryEntity entry = entryRepository.findByEntryGuid(deficiencyDetailsRequestDto.getParentEntryGuid());
         //auth check if user has manager role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"manager"};
         if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -240,7 +240,7 @@ public class EntryRest {
     public ResponseEntity updateDeficiencyDetails(@Valid @RequestBody DeficiencyDetailsRequestDto deficiencyDetailsRequestDto) {
         EntryEntity entry = entryRepository.findByEntryGuid(deficiencyDetailsRequestDto.getParentEntryGuid());
         //auth check if user has manager role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"manager", "user"};
         if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -255,86 +255,137 @@ public class EntryRest {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    public EntryResponseDto _getEntryDetails(Object[] entryObj){
+        EntryResponseDto entryResponseDto = new EntryResponseDto();
+
+        String entryGuid = (String) entryObj[0];
+        String entryTypeGuid = (String) entryObj[2];
+
+        entryResponseDto.setEntryGuid(entryGuid);
+        entryResponseDto.setDescription((String) entryObj[1]);
+        entryResponseDto.setEntryTypeGuid(entryTypeGuid);
+        entryResponseDto.setEntryTypeName((String) entryObj[3]);
+
+        EntryEntity entry = entryRepository.findByEntryGuid(entryGuid);
+        Set<GroupEntity> groups = entry.getGroups();
+        List<GroupResponseDto> groupsList = new ArrayList<GroupResponseDto>();
+
+        for (GroupEntity group : groups){
+            GroupResponseDto groupResponseDto = new GroupResponseDto();
+            groupResponseDto.setGroupGuid(group.getGroupGuid());
+            groupResponseDto.setGroupName(group.getGroupName());
+
+            groupsList.add(groupResponseDto);
+        }
+
+        entryResponseDto.setGroups(groupsList);
+        //entries.add(entryResponseDto);
+
+        if(entryTypeGuid.equals("1")){//in case of deficiency
+            DeficiencyDetailsEntity deficiencyDetails = entry.getDeficiencyDetails();
+
+            if(deficiencyDetails != null){
+                List<Object[]> deficiencyDetailsObjList = deficiencyDetailsRepository.getDeficiencyDetails(deficiencyDetails    .getDeficiencyDetailsGuid(),  LocaleContextHolder.getLocale().getDisplayLanguage());
+                Object[] deficiencyDetailsObj;
+                if(deficiencyDetailsObjList !=null && deficiencyDetailsObjList.size() > 0){
+                    deficiencyDetailsObj = deficiencyDetailsObjList.get(0);
+
+                    DeficiencyDetailsResponseDto deficiencyDetailsResponseDto = new DeficiencyDetailsResponseDto();
+
+                    deficiencyDetailsResponseDto.setDeficiencyDetailsGuid((String) deficiencyDetailsObj[0]);
+                    deficiencyDetailsResponseDto.setEntryStatusGuid((String) deficiencyDetailsObj[1]);
+                    deficiencyDetailsResponseDto.setEntryStatusName((String) deficiencyDetailsObj[2]);
+                    deficiencyDetailsResponseDto.setEntryStatusBackgroundColor((String) deficiencyDetailsObj[3]);
+
+                    entryResponseDto.setDeficiencyDetails(deficiencyDetailsResponseDto);
+                }
+            }
+        }
+
+        return entryResponseDto;
+    }
+
     @RequestMapping(value = "/getEntries", method = RequestMethod.GET)
     @Transactional
     public Page<EntryResponseDto> getEntries(@RequestParam String projectGuid, Pageable pageable) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"manager", "user", "viewer"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
-
-
         List<EntryResponseDto> entries = new ArrayList<EntryResponseDto>();
         Page<Object[]> entriesObj;
 
         String[] managerRole = {"manager"};
-     //   if(permissionsValidator.rolesForProjectCheck(user, projectGuid, managerRole)) {
-            // throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        if(permissionsValidator.rolesForProjectCheck(user, projectGuid, managerRole)) {
             entriesObj = entryRepository.getEntriesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
-    //    }
-//        } else {
-//            String [] groups =
-//            entriesObj = entryRepository.getEntriesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
-//        }
+        } else {
 
+            List<String> groups = new ArrayList<String>();
+            for (GroupEntity group: user.getGroups()) {
+                if(group.getProject().getProjectGuid().equals(projectGuid)){
+                    groups.add(group.getGroupGuid());
+                }
+            }
 
+            if(groups.size() > 0){
+                entriesObj = entryRepository.getEntriesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+            }else{
+                return null;
+            }
+        }
 
-        //Page<Object[]> entriesObj = entryRepository.getEntriesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
         Long entiesNumber = entriesObj.getTotalElements();
 
         for (Object[] entryObj : entriesObj.getContent()) {
-            EntryResponseDto entryResponseDto = new EntryResponseDto();
-            String entryGuid = (String) entryObj[0];
-            String entryTypeGuid = (String) entryObj[2];
 
-            entryResponseDto.setEntryGuid(entryGuid);
-            entryResponseDto.setDescription((String) entryObj[1]);
-            entryResponseDto.setEntryTypeGuid(entryTypeGuid);
-            entryResponseDto.setEntryTypeName((String) entryObj[3]);
-
-            EntryEntity entry = entryRepository.findByEntryGuid(entryGuid);
-            Set<GroupEntity> groups = entry.getGroups();
-            List<GroupResponseDto> groupsList = new ArrayList<GroupResponseDto>();
-
-            for (GroupEntity group : groups){
-                GroupResponseDto groupResponseDto = new GroupResponseDto();
-                groupResponseDto.setGroupGuid(group.getGroupGuid());
-                groupResponseDto.setGroupName(group.getGroupName());
-
-                groupsList.add(groupResponseDto);
-            }
-
-            entryResponseDto.setGroups(groupsList);
+            EntryResponseDto entryResponseDto = this._getEntryDetails(entryObj);
             entries.add(entryResponseDto);
-
-            if(entryTypeGuid.equals("1")){//in case of deficiency
-                DeficiencyDetailsEntity deficiencyDetails = entry.getDeficiencyDetails();
-
-                if(deficiencyDetails != null){
-                    List<Object[]> deficiencyDetailsObjList = deficiencyDetailsRepository.getDeficiencyDetails(deficiencyDetails    .getDeficiencyDetailsGuid(),  LocaleContextHolder.getLocale().getDisplayLanguage());
-                    Object[] deficiencyDetailsObj;
-                    if(deficiencyDetailsObjList !=null && deficiencyDetailsObjList.size() > 0){
-                        deficiencyDetailsObj = deficiencyDetailsObjList.get(0);
-
-                        DeficiencyDetailsResponseDto deficiencyDetailsResponseDto = new DeficiencyDetailsResponseDto();
-
-                        deficiencyDetailsResponseDto.setDeficiencyDetailsGuid((String) deficiencyDetailsObj[0]);
-                        deficiencyDetailsResponseDto.setEntryStatusGuid((String) deficiencyDetailsObj[1]);
-                        deficiencyDetailsResponseDto.setEntryStatusName((String) deficiencyDetailsObj[2]);
-                        deficiencyDetailsResponseDto.setEntryStatusBackgroundColor((String) deficiencyDetailsObj[3]);
-
-                        entryResponseDto.setDeficiencyDetails(deficiencyDetailsResponseDto);
-                    }
-                }
-
-            }
-
         }
 
         Page<EntryResponseDto> page = new PageImpl<>(entries, pageable, entiesNumber);
         return page;
+    }
+
+    @RequestMapping(value = "/getEntry/{entryGuid}", method = RequestMethod.GET)
+    @Transactional
+    public EntryResponseDto getEntry(@PathVariable String entryGuid) {
+        EntryEntity entry = entryRepository.findByEntryGuid(entryGuid);
+        String projectGuid = entry.getProject().getProjectGuid();
+        //auth check if user has manager role for the project
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
+        String[] requiredRoles = {"manager", "user", "viewer"};
+        if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
+
+        ArrayList<Object[]> entryObj;
+        String[] managerRole = {"manager"};
+        if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), requiredRoles)){
+            List<String> groups = new ArrayList<String>();
+            for (GroupEntity group: user.getGroups()) {
+                if(group.getProject().getProjectGuid().equals(projectGuid)){
+                    groups.add(group.getGroupGuid());
+                }
+            }
+
+            if(groups.size() > 0){
+                entryObj = entryRepository.getEntryByGuidForGroups(entryGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage());
+            }else{
+                return null;
+            }
+        }else{
+            entryObj = entryRepository.getEntryByGuid(entryGuid, LocaleContextHolder.getLocale().getDisplayLanguage());
+        }
+
+        EntryResponseDto entryResponseDto = new EntryResponseDto();
+
+        if(entryObj != null){
+            entryResponseDto = this._getEntryDetails(entryObj.get(0));
+        }
+
+        return entryResponseDto;
     }
 }

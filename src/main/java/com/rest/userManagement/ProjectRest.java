@@ -62,7 +62,7 @@ public class ProjectRest {
     @Autowired
     public IInvitationRepository invitationRepository;
 
-    public SecurityContextReader securityContextReader = new SecurityContextReader();
+   // public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     public PermissionsValidator permissionsValidator = new PermissionsValidator();
 
@@ -78,7 +78,7 @@ public class ProjectRest {
 
         ProjectEntity project = new ProjectEntity();
 
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);// userRepository.findByUsername(securityContextReader.getUsername());
 
         Set<UserEntity> users = new HashSet<UserEntity>();
         users.add(user);
@@ -164,7 +164,7 @@ public class ProjectRest {
     @RequestMapping(value = "/getProject/{projectGuid}", method = RequestMethod.GET)
     public ProjectResponseDto getProject(@PathVariable String projectGuid) {
         //auth check if user is assigned to the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);// userRepository.findByUsername(securityContextReader.getUsername());
         if(!permissionsValidator.projectCheck(user, projectGuid)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
@@ -182,7 +182,7 @@ public class ProjectRest {
     @Transactional
     public ResponseEntity updateProject(@Valid @RequestBody ProjectRequestDto projectRequestDto, @PathVariable String projectGuid) {
         //auh check user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -217,48 +217,53 @@ public class ProjectRest {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    public UserProjectResponseDto _getUserProject(String projectGuid, String projectDescription, UserEntity userEntity){
+        UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
+
+        List<RoleResponseDto> roles = new ArrayList<>();
+        if(userEntity.getRoles() != null){
+            for (RoleEntity role : userEntity.getRoles()) {
+                if (projectGuid.equals(role.getProject().getProjectGuid())) {
+                    RoleResponseDto roleResponseDto = new RoleResponseDto();
+                    roleResponseDto.setRoleGuid(role.getRoleGuid());
+                    roleResponseDto.setRoleName(role.getRoleName());
+
+                    roles.add(roleResponseDto);
+                }
+            }
+            userProjectResponseDto.setRoles(roles);
+        }
+
+        List<GroupResponseDto> groups = new ArrayList<>();
+        if(userEntity.getGroups() != null){
+            for (GroupEntity group : userEntity.getGroups()) {
+                if ((group.getProject() != null && projectGuid.equals(group.getProject().getProjectGuid()))) {
+                    GroupResponseDto groupResponseDto = new GroupResponseDto();
+                    groupResponseDto.setGroupGuid(group.getGroupGuid());
+                    groupResponseDto.setGroupName(group.getGroupName());
+
+                    groups.add(groupResponseDto);
+                }
+            }
+        }
+
+        userProjectResponseDto.setGroups(groups);
+
+        userProjectResponseDto.setProjectGuid(projectGuid);
+        userProjectResponseDto.setProjectDescription(projectDescription);
+
+        return userProjectResponseDto;
+    }
+
     @RequestMapping(value = "/getUserProjects", method = RequestMethod.GET)
     public List<UserProjectResponseDto> getUserProjects() {
         //no auth check - any one can see list of projects he/she is assigned to
+        UserEntity userEntity = SecurityContextReader.getUserEntity(userRepository);
         List<UserProjectResponseDto> userProjectResponseDtos = new ArrayList<UserProjectResponseDto>();
-        ArrayList<Object[]> userProjects = userRepository.getUserProjects(securityContextReader.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
-
-        UserEntity userEntity = userRepository.findByUsername(securityContextReader.getUsername());
+        ArrayList<Object[]> userProjects = userRepository.getUserProjects(userEntity.getUsername(), LocaleContextHolder.getLocale().getDisplayLanguage());
 
         for (Object[] userProject : userProjects) {
-            UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
-
-            List<RoleResponseDto> roles = new ArrayList<>();
-            if(userEntity.getRoles() != null){
-                for (RoleEntity role : userEntity.getRoles()) {
-                    if (userProject[0].equals(role.getProject().getProjectGuid())) {
-                        RoleResponseDto roleResponseDto = new RoleResponseDto();
-                        roleResponseDto.setRoleGuid(role.getRoleGuid());
-                        roleResponseDto.setRoleName(role.getRoleName());
-
-                        roles.add(roleResponseDto);
-                    }
-                }
-                userProjectResponseDto.setRoles(roles);
-            }
-
-            List<GroupResponseDto> groups = new ArrayList<>();
-            if(userEntity.getGroups() != null){
-                for (GroupEntity group : userEntity.getGroups()) {
-                    if ((group.getProject() != null && userProject[0].equals(group.getProject().getProjectGuid()))) {
-                        GroupResponseDto groupResponseDto = new GroupResponseDto();
-                        groupResponseDto.setGroupGuid(group.getGroupGuid());
-                        groupResponseDto.setGroupName(group.getGroupName());
-
-                        groups.add(groupResponseDto);
-                    }
-                }
-            }
-
-            userProjectResponseDto.setGroups(groups);
-
-            userProjectResponseDto.setProjectGuid((String) userProject[0]);
-            userProjectResponseDto.setProjectDescription((String) userProject[1]);
+            UserProjectResponseDto userProjectResponseDto = this._getUserProject((String) userProject[0], (String) userProject[1], userEntity);
 
             userProjectResponseDtos.add(userProjectResponseDto);
         }
@@ -269,7 +274,7 @@ public class ProjectRest {
     @RequestMapping(value = "/getProjectUsers/{projectGuid}", method = RequestMethod.GET)
     public List<ProjectUserResponseDto> getProjectUsers(@PathVariable String projectGuid) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -285,6 +290,7 @@ public class ProjectRest {
             projectUserResponseDto.setUsername((String) userItem[0]);
             projectUserResponseDto.setFirstName((String) userItem[1]);
             projectUserResponseDto.setLastName((String) userItem[2]);
+            projectUserResponseDto.setAvatar((String) userItem[3    ]);
 
             List<RoleResponseDto> userRoles = new ArrayList<>();
             for (RoleEntity role : userEntity.getRoles()) {
@@ -320,7 +326,7 @@ public class ProjectRest {
     @RequestMapping(value = "/getProjectRoles/{projectGuid}", method = RequestMethod.GET)
     public List<RoleResponseDto> getProjectRoles(@PathVariable String projectGuid) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -343,7 +349,7 @@ public class ProjectRest {
     @Transactional
     public ResponseEntity removeUserFromProject(@PathVariable String projectGuid, @RequestParam String username) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -394,7 +400,8 @@ public class ProjectRest {
     }
 
     private void _updateUserRolesForProject(String[] roles, String projectGuid, String username, UserEntity user){
-        user = userRepository.findByUsername(username);
+       // user = userRepository.findByUsername(username);
+        String changerUserName = SecurityContextReader.getUserEntity(userRepository).getUsername();
         RoleEntity role = new RoleEntity();
         Set<RoleEntity> userRoles = user.getRoles();
         List<String> updatedRoles = Arrays.asList(roles);
@@ -425,7 +432,12 @@ public class ProjectRest {
                 role = iterator.next();
 
                 if ((role.getProject() != null && role.getProject().getProjectGuid().equals(projectGuid) && !updatedRoles.contains(role.getRoleGuid()))) {
-                    iterator.remove();
+                    if(changerUserName.equals(username) && role.getRoleName().equals("admin")){// user can't remove admin role from himself...
+                        throw new RuntimeException(bundleMessageReader.getMessage("UserCantRemoveAdminRoleFromHimSelf"));
+                    }else{
+                        iterator.remove();
+                    }
+
                 }
             }
         }
@@ -439,7 +451,7 @@ public class ProjectRest {
     @Transactional
     public ResponseEntity updateUserRolesForProject(@RequestBody UpdateUserRolesRequestDto updateUserRolesRequestDto, @PathVariable String projectGuid, @RequestParam String username) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -455,7 +467,7 @@ public class ProjectRest {
     @RequestMapping(value = "/getProjectGroups/{projectGuid}", method = RequestMethod.GET)
     public List<GroupResponseDto> getProjectGroups(@PathVariable String projectGuid) {
         //auth check if user has admin or manager role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository); //userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin","manager"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -513,8 +525,15 @@ public class ProjectRest {
 
         if (groupsToCreateAndAdd != null) {
             for (GroupRequestDto groupToCreate : groupsToCreateAndAdd) {
+                String groupName = groupToCreate.getGroupName();
+
+                ArrayList<Object[]> projectGroups = groupRepository.getProjectGroupsByName(projectGuid, groupName);
+                if(projectGroups.size() > 0){
+                    throw new RuntimeException(bundleMessageReader.getMessage("GroupNameAlreadyExists"));
+                }
+
                 group = new GroupEntity();
-                group.setGroupName(groupToCreate.getGroupName());
+                group.setGroupName(groupName);
                 group.setProject(project);
                 userGroups.add(group);
 
@@ -533,7 +552,7 @@ public class ProjectRest {
     @Transactional
     public ResponseEntity updateUserGroupsForProject(@RequestBody UpdateUserGroupsRequestDto updateUserGroupsRequestDto, @PathVariable String projectGuid, @RequestParam String username) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -548,9 +567,9 @@ public class ProjectRest {
 
     @RequestMapping(value = "/updateUserRolesAndGroupsForProject/{projectGuid}", method = RequestMethod.PUT)
     @Transactional
-    public ResponseEntity updateUserRolesAndGroupsForProject(@RequestBody UpdateUserRolesAndGroupsRequestDto updateUserRolesAndGroupsRequestDto, @PathVariable String projectGuid, @RequestParam String username) {
+    public UserProjectResponseDto updateUserRolesAndGroupsForProject(@RequestBody UpdateUserRolesAndGroupsRequestDto updateUserRolesAndGroupsRequestDto, @PathVariable String projectGuid, @RequestParam String username) {
         //auth check if user has admin role for the project
-        UserEntity user = userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"admin"};
         if(!permissionsValidator.rolesForProjectCheck(user, projectGuid, requiredRoles)){
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
@@ -561,6 +580,14 @@ public class ProjectRest {
         this._updateUserRolesForProject(updateUserRolesAndGroupsRequestDto.getRoles(), projectGuid, username, user);
             this._updateUserGroupsForProject(updateUserRolesAndGroupsRequestDto.getGroups(), updateUserRolesAndGroupsRequestDto.getGroupsToCreateAndAdd(), projectGuid, username, user);
 
-        return new ResponseEntity(HttpStatus.OK);
+
+        List<Object[]> userProject = userRepository.getUserProject(user.getUsername(), projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage());
+            UserProjectResponseDto userProjectResponseDto = this._getUserProject((String) userProject.get(0)[0], (String) userProject.get(0)[1], user);
+
+        if(username.equals(user.getUsername())){
+            SecurityContextReader.clear();
+        }
+
+        return userProjectResponseDto;
     }
 }

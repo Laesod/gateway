@@ -9,6 +9,7 @@ public class ProjectUserResponseDto {
     private String username;
     private String firstName;
     private String lastName;
+    private String avatar;
     private List<RoleResponseDto> roles;
     private List<GroupResponseDto> groups;
 
@@ -31,6 +32,14 @@ public class ProjectUserResponseDto {
     }
     public void setLastName(String value){
         this.lastName = value;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public List<RoleResponseDto> getRoles() {

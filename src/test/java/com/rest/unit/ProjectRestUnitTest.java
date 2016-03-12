@@ -101,7 +101,7 @@ public class ProjectRestUnitTest {
     //user story 1.
     @Test
     public void createProject(){
-        when(mockSecurityContextReader.getUsername()).thenReturn("admin@gmail.com");
+        //when(mockSecurityContextReader.getUsername()).thenReturn("admin@gmail.com");
 
       //  ResponseEntity responseEntity = projectRest.createProject(projectRequestDto);
 
@@ -119,7 +119,7 @@ public class ProjectRestUnitTest {
 
     @Test
     public void getProjects(){
-        when(mockSecurityContextReader.getUsername()).thenReturn("admin@gmail.com");
+       // when(mockSecurityContextReader.getUsername()).thenReturn("admin@gmail.com");
 
       //  projectRest.getProjects(mockPrincipalUser);
 
