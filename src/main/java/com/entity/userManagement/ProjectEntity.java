@@ -24,24 +24,24 @@ public class ProjectEntity extends BaseEntity {
     @Column(name = "project_guid"   )
     private String projectGuid;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "users_projects", joinColumns = { @JoinColumn(name = "project_guid") }, inverseJoinColumns = { @JoinColumn(name = "username") })
     private Set<UserEntity> users;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "translationMapGuid")
     private TranslationMapEntity translationMap;
 
-    @OneToMany(mappedBy="project")
+    @OneToMany(mappedBy="project", cascade = CascadeType.ALL)
     private Set<GroupEntity> groups;
 
-    @OneToMany(mappedBy="project")
+    @OneToMany(mappedBy="project", cascade = CascadeType.ALL)
     private Set<RoleEntity> roles;
 
-    @OneToMany(mappedBy="project")
+    @OneToMany(mappedBy="project", cascade = CascadeType.ALL)
     private Set<InvitationEntity> invitations;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "projects_entry_types", joinColumns = { @JoinColumn(name = "project_guid") }, inverseJoinColumns = { @JoinColumn(name = "entry_type_guid") })
     private Set<EntryTypeEntity> entryTypes;
 

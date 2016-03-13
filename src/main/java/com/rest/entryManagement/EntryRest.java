@@ -223,7 +223,7 @@ public class EntryRest {
         EntryStatusEntity entryStatus = entryStatusRepository.findByEntryStatusGuid(deficiencyDetailsRequestDto.getEntryStatusGuid());
         deficiencyDetails.setEntryStatus(entryStatus);
 
-        deficiencyDetailsRepository.save(deficiencyDetails);
+       // deficiencyDetailsRepository.save(deficiencyDetails);
 
         entry.setDeficiencyDetails(deficiencyDetails);
 

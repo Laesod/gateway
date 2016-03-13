@@ -63,20 +63,20 @@ create unique index ix_auth_username on authorities (username,authority);
 --		username varchar(100) not null,
 --		group_id bigint not null,
 --		constraint fk_group_members_group foreign key(group_id) references groups(id));
+insert into users values ('admin@gmail.com', '2015-01-01 00:00:01', 'initialPopulation', '2015-01-01 00:00:01', 'initialPopulation', 0, '',  '', true, 'Tom', 'Sawyer', '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef', '');
+--insert into users
+--        values ('admin@gmail.com', "Tom", "Sawyer", '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef',
+--        	true, "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0, '', '', '');
 
-insert into users
-        values ('admin@gmail.com', "Tom", "Sawyer", '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef',
-        	true, "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0, '', '', '');
-
-insert into users
-        values ('user@gmail.com', "Peter", "Pan", '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef',
-         	true, "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0, '', '', '');
-
-insert into authorities
-        values ('1', 'admin@gmail.com', 'SYSTEM_ADMIN', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0);
+--insert into users
+--        values ('user@gmail.com', "Peter", "Pan", '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef',
+--           	true, "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0, '', '', '');
 
 insert into authorities
-        values ('2', 'user@gmail.com', 'SYSTEM_USER', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0);
+        values ('1', '2015-01-01 00:00:01', 'initialPopulation', '2015-01-01 00:00:01', 'initialPopulation', 0, 'SYSTEM_ADMIN', 'admin@gmail.com');
+
+--insert into authorities
+--        values ('2', 'user@gmail.com', 'SYSTEM_USER', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0);
 
 --initial entry types creation...
 insert into translation_maps

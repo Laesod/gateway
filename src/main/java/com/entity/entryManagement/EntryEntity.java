@@ -37,11 +37,11 @@ public class EntryEntity extends BaseEntity {
     @Lob
     private String description;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
         @JoinColumn(name = "deficiencyDetailsGuid")
     private DeficiencyDetailsEntity deficiencyDetails;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "entries_groups", joinColumns = { @JoinColumn(name = "entry_guid") }, inverseJoinColumns = { @JoinColumn(name = "group_guid") })
     private Set<GroupEntity> groups;
 

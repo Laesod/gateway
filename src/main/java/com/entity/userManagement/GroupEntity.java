@@ -30,7 +30,7 @@ public class GroupEntity extends BaseEntity {
     @JoinColumn(name="project_guid")
     private ProjectEntity project;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "users_groups", joinColumns = { @JoinColumn(name = "group_guid") }, inverseJoinColumns = { @JoinColumn(name = "username") })
     private Set<UserEntity> users;
 

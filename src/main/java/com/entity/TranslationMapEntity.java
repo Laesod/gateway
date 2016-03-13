@@ -22,7 +22,7 @@ public class TranslationMapEntity {
     @Column(name = "translation_map_guid"   )
     private String translationMapGuid;
 
-    @OneToMany(mappedBy="translationMap")
+    @OneToMany(mappedBy="translationMap", cascade = CascadeType.ALL)
     private Set<TranslationEntity> translations;
 
     public String getTranslationMapGuid() {

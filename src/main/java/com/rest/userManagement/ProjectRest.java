@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.*;
 
 /**
@@ -77,8 +78,7 @@ public class ProjectRest {
         UserProjectResponseDto userProjectResponseDto = new UserProjectResponseDto();
 
         ProjectEntity project = new ProjectEntity();
-
-        UserEntity user = SecurityContextReader.getUserEntity(userRepository);// userRepository.findByUsername(securityContextReader.getUsername());
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);
 
         Set<UserEntity> users = new HashSet<UserEntity>();
         users.add(user);
@@ -88,59 +88,8 @@ public class ProjectRest {
         TranslationMapEntity translationMap = new TranslationMapEntity();
         Set<TranslationEntity> translations = translationManager.addTranslation(projectRequestDto.getDescription(), "Project", "description", translationMap);
 
-        for (TranslationEntity translation : translations) {
-            translationRepository.save(translation);
-        }
-
+        translationMap.setTranslations(translations);
         project.setTranslationMap(translationMap);
-
-        translationMapRepository.save(translationMap);
-
-        RoleEntity role = new RoleEntity();
-        role.setProject(project);
-        role.setRoleName("user");// can modify entries within his groups
-        roleRepository.save(role);
-
-        role = new RoleEntity();
-        role.setProject(project);
-        role.setRoleName("viewer");// can view entries within his groups
-        roleRepository.save(role);
-
-        List<RoleResponseDto> listOfProjectRoles = new ArrayList<RoleResponseDto>();
-        List<GroupResponseDto> listOfProjectGroups = new ArrayList<GroupResponseDto>();
-        RoleResponseDto roleResponseDto = new RoleResponseDto();
-        Set<RoleEntity> roles = user.getRoles();
-        role = new RoleEntity();
-        role.setProject(project);
-        role.setRoleName("manager");//can create/modify any entries for the project, assign entries to the groups
-        roleRepository.save(role);
-
-        roleResponseDto.setRoleGuid(role.getRoleGuid());
-        roleResponseDto.setRoleName(role.getRoleName());
-        listOfProjectRoles.add(roleResponseDto);
-        roles.add(role);
-
-        role = new RoleEntity();
-        role.setProject(project);
-        role.setRoleName("admin");// manages project (invites/removed users, gives roles, assign/create groups)
-        roleRepository.save(role);
-
-        roleResponseDto = new RoleResponseDto();
-        roleResponseDto.setRoleGuid(role.getRoleGuid());
-        roleResponseDto.setRoleName(role.getRoleName());
-        listOfProjectRoles.add(roleResponseDto);
-        roles.add(role);
-
-        user.setRoles(roles);
-
-        Set<RoleEntity> projectRoles = new HashSet<RoleEntity>();
-
-        projectRoles.add(role);
-
-        project.setRoles(projectRoles);
-
-        userRepository.save(user);
-        projectRepository.save(project);
 
         Set<EntryTypeEntity> entryTypesSet = new HashSet<EntryTypeEntity>();
         List<EntryTypeEntity> entryTypesList = entryTypeRepository.findAll();
@@ -153,10 +102,59 @@ public class ProjectRest {
 
         projectRepository.save(project);
 
+        Set<RoleEntity> projectRoles = new HashSet<RoleEntity>();
+        RoleEntity role = new RoleEntity();
+        role.setProject(project);
+        role.setRoleName("user");// can modify entries within his groups
+        roleRepository.save(role);
+        projectRoles.add(role);
+
+        role = new RoleEntity();
+        role.setProject(project);
+        role.setRoleName("viewer");// can view entries within his groups
+        roleRepository.save(role);
+        projectRoles.add(role);
+
+        List<RoleResponseDto> listOfProjectRoles = new ArrayList<RoleResponseDto>();
+        List<GroupResponseDto> listOfProjectGroups = new ArrayList<GroupResponseDto>();
+        RoleResponseDto roleResponseDto = new RoleResponseDto();
+        Set<RoleEntity> roles = user.getRoles();
+        role = new RoleEntity();
+        role.setProject(project);
+        role.setRoleName("manager");//can create/modify any entries for the project, assign entries to the groups
+        roleRepository.save(role);
+        projectRoles.add(role);
+
+        roleResponseDto.setRoleGuid(role.getRoleGuid());
+        roleResponseDto.setRoleName(role.getRoleName());
+        listOfProjectRoles.add(roleResponseDto);
+        roles.add(role);
+
+        role = new RoleEntity();
+        role.setProject(project);
+        role.setRoleName("admin");// manages project (invites/removed users, gives roles, assign/create groups)
+        roleRepository.save(role);
+        projectRoles.add(role);
+
+        roleResponseDto = new RoleResponseDto();
+        roleResponseDto.setRoleGuid(role.getRoleGuid());
+        roleResponseDto.setRoleName(role.getRoleName());
+        listOfProjectRoles.add(roleResponseDto);
+        roles.add(role);
+
+        user.setRoles(roles);
+
+        project.setRoles(projectRoles);
+
+        userRepository.save(user);
+        projectRepository.save(project);
+
         userProjectResponseDto.setProjectGuid(project.getProjectGuid());
         userProjectResponseDto.setProjectDescription(projectRequestDto.getDescription());
         userProjectResponseDto.setRoles(listOfProjectRoles);
         userProjectResponseDto.setGroups(listOfProjectGroups);
+
+        SecurityContextReader.clear();
 
         return userProjectResponseDto;
     }
@@ -211,7 +209,7 @@ public class ProjectRest {
             translationMap.setTranslations(translationEntities);
 
             translationMapRepository.save(translationMap);
-            translationRepository.save(translation);
+           // translationRepository.save(translation);
         }
 
         return new ResponseEntity(HttpStatus.OK);

@@ -160,6 +160,7 @@ public class InvitationRest {
         invitationResponseDto.setProjectDescription(translationManager.getTranslation(project.getTranslationMap().getTranslations(), "description", LocaleContextHolder.getLocale().getDisplayLanguage()));
         invitationResponseDto.setCreatedAt(invitation.getCreatedAt());
         invitationResponseDto.setCreatedBy(user.getFirstName() + " " + user.getLastName());
+        invitationResponseDto.setCreatorAvatar(user.getAvatarS3ObjectKey());
 
 
         if(emailSender == null){// this check needed for unit testing perposes
@@ -199,6 +200,7 @@ public class InvitationRest {
 
             UserEntity creator = userRepository.findByUsername((String) invitation[4]);
             invitationResponseDto.setCreatedBy(creator.getFirstName() + " " + creator.getLastName());
+                invitationResponseDto.setCreatorAvatar(creator.getAvatarS3ObjectKey());
 
             for (RoleEntity role : invitationEntity.getRoles()) {
                 RoleResponseDto roleResponseDto = new RoleResponseDto();
@@ -248,6 +250,7 @@ public class InvitationRest {
 
             UserEntity user = userRepository.findByUsername((String) invitation[4]);
             invitationResponseDto.setCreatedBy(user.getFirstName() + " " + user.getLastName());
+            invitationResponseDto.setCreatorAvatar(user.getAvatarS3ObjectKey());
 
             for (RoleEntity role : invitationEntity.getRoles()) {
                 RoleResponseDto roleResponseDto = new RoleResponseDto();

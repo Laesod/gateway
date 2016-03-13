@@ -35,6 +35,7 @@ public class InvitationResponseDto {
 
     private String createdBy;
     private Date createdAt;
+    private String creatorAvatar;
 
     List<RoleResponseDto> roles;
     List<GroupResponseDto> groups;
@@ -85,6 +86,14 @@ public class InvitationResponseDto {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getCreatorAvatar() {
+        return creatorAvatar;
+    }
+
+    public void setCreatorAvatar(String creatorAvatrar) {
+        this.creatorAvatar = creatorAvatar;
     }
 
     public List<RoleResponseDto> getRoles() {

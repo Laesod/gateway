@@ -36,11 +36,11 @@ public class InvitationEntity extends BaseEntity {
 
     private ProjectEntity project;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "invitations_roles", joinColumns = {@JoinColumn(name = "invitation_guid")}, inverseJoinColumns = {@JoinColumn(name = "role_guid")})
     private Set<RoleEntity> roles;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "invitations_groups", joinColumns = {@JoinColumn(name = "invitation_guid")}, inverseJoinColumns = {@JoinColumn(name = "group_guid")})
     private Set<GroupEntity> groups;
 

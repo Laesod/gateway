@@ -21,7 +21,7 @@ public class EntryTypeEntity{
     @Column(name = "entry_type_guid"   )
     private String entryTypeGuid;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "translationMapGuid")
     private TranslationMapEntity translationMap;
 

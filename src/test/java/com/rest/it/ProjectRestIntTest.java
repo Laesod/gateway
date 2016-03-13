@@ -142,7 +142,7 @@ public class ProjectRestIntTest {
 //        projectRest.invitationRepository = invitationRepository;
 //        projectRest.invitationGroupRepository = invitationGroupRepository;
 
-        projectRest.createProject(projectRequestDto);
+      //  projectRest.createProject(projectRequestDto);
 
         List<ProjectEntity> projects = projectRepository.findByCreatedByUser("test@gmail.com");
         List<TranslationEntity> translations = translationRepository.findByCreatedByUser("test@gmail.com");

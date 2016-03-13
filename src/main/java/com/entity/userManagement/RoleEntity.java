@@ -25,7 +25,7 @@ public class RoleEntity extends BaseEntity {
     @Column(name = "role_name")
     private String roleName;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "users_roles", joinColumns = { @JoinColumn(name = "role_guid") }, inverseJoinColumns = { @JoinColumn(name = "username") })
     private Set<UserEntity> users;
 

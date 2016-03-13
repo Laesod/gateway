@@ -264,19 +264,6 @@ public class UserRest {
 
             List<GroupResponseDto> groups = this.getUserGroupsForProject((String) userProject[0], userEntity.getGroups());
 
-
-//            if(userEntity.getGroups() != null){
-//                for (GroupEntity group : userEntity.getGroups()) {
-//                    if ((group.getProject() != null && group.getProject().getProjectGuid().equals((String) userProject[0]))) {
-//                        GroupResponseDto groupResponseDto = new GroupResponseDto();
-//                        groupResponseDto.setGroupGuid(group.getGroupGuid());
-//                        groupResponseDto.setGroupName(group.getGroupName());
-//                        groups.add(groupResponseDto);
-//                    }
-//                }
-//
-//            }
-
             userProjectResponseDto.setGroups(groups);
 
             userProjectResponseDto.setProjectGuid((String) userProject[0]);
