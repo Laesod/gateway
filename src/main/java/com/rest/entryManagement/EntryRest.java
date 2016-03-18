@@ -320,7 +320,7 @@ public class EntryRest {
 
         String[] managerRole = {"manager"};
         if(permissionsValidator.rolesForProjectCheck(user, projectGuid, managerRole)) {
-            entriesObj = entryRepository.getEntriesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+            entriesObj = entryRepository.getDeficienciesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
         } else {
 
             List<String> groups = new ArrayList<String>();
@@ -331,7 +331,7 @@ public class EntryRest {
             }
 
             if(groups.size() > 0){
-                entriesObj = entryRepository.getEntriesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+                entriesObj = entryRepository.getDeficienciesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
             }else{
                 return null;
             }
