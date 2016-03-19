@@ -54,6 +54,9 @@ public abstract class BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedAt;
 
+    @Column(name = "marked_as_deleted")
+    private Boolean markedAsDeleted = false;
+
     @Column(name = "version", nullable = false)
     @Version
     private Long version;
@@ -88,5 +91,21 @@ public abstract class BaseEntity {
 
     public void setModifiedAt(Date modifiedAt) {
         this.modifiedAt = modifiedAt;
+    }
+
+    public Boolean getMarkedAsDeleted() {
+        return markedAsDeleted;
+    }
+
+    public void setMarkedAsDeleted(Boolean markedAsDeleted) {
+        this.markedAsDeleted = markedAsDeleted;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

@@ -33,10 +33,7 @@ public class ProjectRequestDto {
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String description;
 
-//    private List<GroupRequestDto> groups;
-//
-//    private List<InvitationRequestDto> invitations;
-
+    private Boolean markedAsDeleted;
 
     public String getDescription() {
         return description;
@@ -46,19 +43,11 @@ public class ProjectRequestDto {
         this.description = description;
     }
 
-//    public List<GroupRequestDto> getGroups() {
-//        return groups;
-//    }
-//
-//    public void setGroups(List<GroupRequestDto> groups) {
-//        this.groups = groups;
-//    }
-//
-//    public List<InvitationRequestDto> getInvitations() {
-//        return invitations;
-//    }
-//
-//    public void setInvitations(List<InvitationRequestDto> invitations) {
-//        this.invitations = invitations;
-//    }
+    public Boolean getMarkedAsDeleted() {
+        return markedAsDeleted;
+    }
+
+    public void setMarkedAsDeleted(Boolean markedAsDeleted) {
+        this.markedAsDeleted = markedAsDeleted;
+    }
 }

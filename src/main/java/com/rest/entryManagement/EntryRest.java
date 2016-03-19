@@ -163,6 +163,13 @@ public class EntryRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
+        if(entryRequestDto.getMarkedAsDeleted()){
+            String[] requiredRolesManager = {"manager"};
+            if(!permissionsValidator.rolesForProjectCheck(user, entryRequestDto.getProjectGuid(), requiredRolesManager)){
+                throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+            }
+        }
+
         EntryEntity entry = entryRepository.findByEntryGuid(entryRequestDto.getEntryGuid());
         GroupEntity group = new GroupEntity();
         Set<GroupEntity> entryGroups = entry.getGroups();
@@ -170,6 +177,7 @@ public class EntryRest {
         List<String> updatedGroups = Arrays.asList(groups);
 
         entry.setDescription(entryRequestDto.getDescription());
+        entry.setMarkedAsDeleted(entryRequestDto.getMarkedAsDeleted());
 
         if (groups != null) {
             Iterator<GroupEntity> iterator = entryGroups.iterator();

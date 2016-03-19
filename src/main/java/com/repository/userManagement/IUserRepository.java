@@ -41,7 +41,7 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByEmailVerificationToken(String emailVerificationToken);
     UserEntity findByResetPasswordToken(String emailVerificationToken);
 
-    @Query("select b.projectGuid, d.content from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username and d.field='description' and d.language=:language")
+    @Query("select b.projectGuid, d.content from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username and b.markedAsDeleted=false and d.field='description' and d.language=:language")
     ArrayList<Object[]> getUserProjects(@Param("username") String username, @Param("language") String language);
 
     @Query("select b.projectGuid, d.content from UserEntity a join a.projects b join b.translationMap c join c.translations d where a.username=:username and b.projectGuid=:projectGuid and d.field='description' and d.language=:language")

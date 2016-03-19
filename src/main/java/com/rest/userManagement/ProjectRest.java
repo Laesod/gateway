@@ -190,6 +190,8 @@ public class ProjectRest {
 
         ProjectEntity project = projectRepository.findByProjectGuid(projectGuid);
 
+        project.setMarkedAsDeleted(projectRequestDto.getMarkedAsDeleted());
+
         TranslationMapEntity translationMap = project.getTranslationMap();
         List<TranslationEntity> translations = translationRepository.getTranslation(translationMap.getTranslationMapGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
         if (translations.size() > 0) {

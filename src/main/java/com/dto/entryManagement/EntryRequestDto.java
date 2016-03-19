@@ -20,6 +20,8 @@ public class EntryRequestDto {
 
     private String description;
 
+    private Boolean markedAsDeleted;
+
     private String[] groups;
 
     public String getEntryGuid() {
@@ -52,6 +54,14 @@ public class EntryRequestDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getMarkedAsDeleted() {
+        return markedAsDeleted;
+    }
+
+    public void setMarkedAsDeleted(Boolean markedAsDeleted) {
+        this.markedAsDeleted = markedAsDeleted;
     }
 
     public String[] getGroups() {
