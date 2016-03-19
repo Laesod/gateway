@@ -35,6 +35,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
 import java.util.*;
 
 /**
@@ -48,11 +49,13 @@ public abstract class SecurityContextReader {
     public static UserEntity getUserEntity(IUserRepository userRepository) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        //Principal currentUser = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         if(authentication.getName().equals("anonymousUser")){
             userEntity = null;
             return null;
         }else{
-            if(userEntity != null){
+            if(userEntity != null && userEntity.getUsername().equals(authentication.getName())){
                 return userEntity;
             }else{
                 userEntity = userRepository.findByUsername(authentication.getName());

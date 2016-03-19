@@ -163,7 +163,7 @@ public class EntryRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
-        if(entryRequestDto.getMarkedAsDeleted()){
+        if(entryRequestDto.getMarkedAsDeleted() != null && entryRequestDto.getMarkedAsDeleted().equals(true)){
             String[] requiredRolesManager = {"manager"};
             if(!permissionsValidator.rolesForProjectCheck(user, entryRequestDto.getProjectGuid(), requiredRolesManager)){
                 throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
