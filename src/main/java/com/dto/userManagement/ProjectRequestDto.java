@@ -35,6 +35,8 @@ public class ProjectRequestDto {
 
     private Boolean markedAsDeleted;
 
+    private String[] entryTypesToAdd;
+
     public String getDescription() {
         return description;
     }
@@ -49,5 +51,13 @@ public class ProjectRequestDto {
 
     public void setMarkedAsDeleted(Boolean markedAsDeleted) {
         this.markedAsDeleted = markedAsDeleted;
+    }
+
+    public String[] getEntryTypesToAdd() {
+        return entryTypesToAdd;
+    }
+
+    public void setEntryTypesToAdd(String[] entryTypesToAdd) {
+        this.entryTypesToAdd = entryTypesToAdd;
     }
 }

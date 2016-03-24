@@ -20,6 +20,8 @@ public class EntryResponseDto {
 
     private DeficiencyDetailsResponseDto deficiencyDetails;
 
+    private ContactDetailsResponseDto contactDetails;
+
     public String getEntryGuid() {
         return entryGuid;
     }
@@ -66,5 +68,13 @@ public class EntryResponseDto {
 
     public void setDeficiencyDetails(DeficiencyDetailsResponseDto deficiencyDetails) {
         this.deficiencyDetails = deficiencyDetails;
+    }
+
+    public ContactDetailsResponseDto getContactDetails() {
+        return contactDetails;
+    }
+
+    public void setContactDetails(ContactDetailsResponseDto contactDetails) {
+        this.contactDetails = contactDetails;
     }
 }

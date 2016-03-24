@@ -39,7 +39,7 @@ import java.util.List;
 public interface ITranslationRepository extends JpaRepository<TranslationEntity, Long> {
     Page<TranslationEntity> findAll(Pageable pageable);
 //    TranslationEntity findByParentGuidAndFieldAndLanguage(String parentGuid, String field, String language);
-    List<TranslationEntity> findByCreatedByUser(String createdBy);
+   //    List<TranslationEntity> findByCreatedByUser(String createdBy);
 
     @Query("select a from TranslationEntity a where a.translationMap.translationMapGuid=:translationMapGuid and a.field=:field and a.language=:language")
     List<TranslationEntity> getTranslation(@Param("translationMapGuid") String translationMapGuid, @Param("field") String field, @Param("language") String language);

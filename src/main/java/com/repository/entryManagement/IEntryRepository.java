@@ -34,7 +34,14 @@ public interface IEntryRepository extends JpaRepository<EntryEntity, Long> {
     @Query("select a.entryGuid, a.description, d.entryTypeGuid, f.content from EntryEntity a join a.deficiencyDetails b join b.entryStatus c join a.entryType d join d.translationMap e join e.translations f where a.project.projectGuid=:projectGuid and a.markedAsDeleted=false and f.field='name' and f.language=:language order by c.ranking asc, a.createdAt desc")
     Page<Object[]> getDeficienciesForProject(@Param("projectGuid") String projectGuid, @Param("language") String language, Pageable pageable);
 
-    @Query("select a.entryGuid, a.description, d.entryTypeGuid, k.content from EntryEntity a join a.deficiencyDetails b join b.entryStatus c join a.entryType d join a.groups e join a.entryType f join f.translationMap g join g.translations k where a.project.projectGuid=:projectGuid  and a.markedAsDeleted=false and e.groupGuid IN (:groups) and k.field='name' and k.language=:language order by c.ranking asc, a.createdAt desc")
+    @Query("select a.entryGuid, a.description, f.entryTypeGuid, k.content from EntryEntity a join a.deficiencyDetails b join b.entryStatus c join a.groups e join a.entryType f join f.translationMap g join g.translations k where a.project.projectGuid=:projectGuid  and a.markedAsDeleted=false and e.groupGuid IN (:groups) and k.field='name' and k.language=:language order by c.ranking asc, a.createdAt desc")
     Page<Object[]> getDeficienciesForProjectAndGroups(@Param("projectGuid") String projectGuid, @Param("groups") List<String> groups, @Param("language") String language, Pageable pageable);
+
+    @Query("select a.entryGuid, a.description, d.entryTypeGuid, f.content from EntryEntity a join a.contactDetails b join b.contactType c join a.entryType d join d.translationMap e join e.translations f where a.project.projectGuid=:projectGuid and a.markedAsDeleted=false and f.field='name' and f.language=:language order by c.ranking asc, b.personLastName asc, b.personFirstName asc, b.organizationName asc, a.createdAt desc")
+    Page<Object[]> getContactsForProject(@Param("projectGuid") String projectGuid, @Param("language") String language, Pageable pageable);
+
+    @Query("select a.entryGuid, a.description, f.entryTypeGuid, k.content from EntryEntity a join a.contactDetails b join b.contactType c join a.groups e join a.entryType f join f.translationMap g join g.translations k where a.project.projectGuid=:projectGuid and a.markedAsDeleted=false and e.groupGuid IN (:groups) and k.field='name' and k.language=:language order by c.ranking asc, b.personLastName asc, b.personFirstName asc, b.organizationName asc, a.createdAt desc")
+    Page<Object[]> getContactsForProjectAndGroups(@Param("projectGuid") String projectGuid, @Param("groups") List<String> groups, @Param("language") String language, Pageable pageable);
+
 
 }

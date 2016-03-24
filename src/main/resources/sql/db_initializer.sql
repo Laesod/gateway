@@ -18,6 +18,8 @@
 -- #L%
 ---
 create database gateway;
+ALTER DATABASE gateway CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
 
 create table users(
 		username varchar(100) not null primary key,
@@ -45,73 +47,90 @@ create table authorities (
 
 create unique index ix_auth_username on authorities (username,authority);
 
---create table projects(
---		project_id long not null primary key,
---		description varchar(250) not null;
-
---create table groups (
---		id bigint AUTO_INCREMENT primary key,
---		group_name varchar(100) not null);
---
---create table group_authorities (
---		group_id bigint not null,
---		authority varchar(100) not null,
---		constraint fk_group_authorities_group foreign key(group_id) references groups(id));
---
---create table group_members (
---		id bigint AUTO_INCREMENT primary key,
---		username varchar(100) not null,
---		group_id bigint not null,
---		constraint fk_group_members_group foreign key(group_id) references groups(id));
-insert into users values ('admin@gmail.com', '2015-01-01 00:00:01', 'initialPopulation', '2015-01-01 00:00:01', 'initialPopulation', 0, '',  '', true, 'Tom', 'Sawyer', '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef', '');
---insert into users
---        values ('admin@gmail.com', "Tom", "Sawyer", '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef',
---        	true, "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0, '', '', '');
-
---insert into users
---        values ('user@gmail.com', "Peter", "Pan", '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef',
---           	true, "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0, '', '', '');
+insert into users values ('admin@gmail.com', '2015-01-01 00:00:01', 'initialPopulation', false, '2015-01-01 00:00:01', 'initialPopulation', 0, '',  '', true, 'Tom', 'Sawyer', '020aa40d02ed72bc980c05caa7506f7c791ecbd91d1210cc4ab4e830881989f06a9fdaff9a5b5bef', '');
 
 insert into authorities
-        values ('1', '2015-01-01 00:00:01', 'initialPopulation', '2015-01-01 00:00:01', 'initialPopulation', 0, 'SYSTEM_ADMIN', 'admin@gmail.com');
-
---insert into authorities
---        values ('2', 'user@gmail.com', 'SYSTEM_USER', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', 0);
+        values ('1', '2015-01-01 00:00:01', 'initialPopulation', false, '2015-01-01 00:00:01', 'initialPopulation', 0, 'SYSTEM_ADMIN', 'admin@gmail.com');
 
 --initial entry types creation...
 insert into translation_maps
         values ('1');
 insert into translations
-        values ('1', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Deficiency", "name", "English", "EntryType", "1");
+        values ('1', "Deficiency", "name", "English", "EntryType", "1");
 insert into translations
-        values ('2', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Deficiency (fr)", "name", "French", "EntryType", "1");
+        values ('2', "Deficiency (fr)", "name", "French", "EntryType", "1");
 insert into entry_types
         values ('1', '1');
 
+insert into translation_maps
+        values ('1');
+insert into translations
+        values ('1', "Deficiency", "name", "English", "EntryType", "1");
+insert into translations
+        values ('2', "Deficiency (fr)", "name", "French", "EntryType", "1");
+insert into entry_types
+        values ('1', '1');
+
+insert into translation_maps
+        values ('1');
+insert into translations
+        values ('1', "Deficiency", "name", "English", "EntryType", "1");
+insert into translations
+        values ('2', "Deficiency (fr)", "name", "French", "EntryType", "1");
+insert into entry_types
+        values ('1', '1');
+
+insert into translation_maps
+        values ('5');
+insert into translations
+        values ('9', "Contact", "name", "English", "EntryType", "5");
+insert into translations
+        values ('10', "Contact (fr)", "name", "French", "EntryType", "5");
+insert into entry_types
+        values ('2', '5');
+
+--initial contact types creation...
+insert into translation_maps
+        values ('6');
+insert into translations
+        values ('11', "Person", "name", "English", "ContactType", "6");
+insert into translations
+        values ('12', "Person (fr)", "name", "French", "ContactType", "6");
+insert into contact_types
+        values ('1', 1, '6');
+
+insert into translation_maps
+        values ('7');
+insert into translations
+        values ('13', "Organization", "name", "English", "ContactType", "7");
+insert into translations
+        values ('14', "Organization (fr)", "name", "French", "ContactType", "7");
+insert into contact_types
+        values ('2', 2, '7');
 --initial deficiency statuses creation...
 insert into translation_maps
         values ('2');
 insert into translations
-        values ('3', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Open", "name", "English", "EntryStatus", "2");
+        values ('3', "Open", "name", "English", "EntryStatus", "2");
 insert into translations
-        values ('4', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Open (fr)", "name", "French", "EntryStatus", "2");
+        values ('4', "Open (fr)", "name", "French", "EntryStatus", "2");
 insert into entry_statuses
         values ('1', '#ff0000', '', 'Deficiency', 1, '2');
 
 insert into translation_maps
         values ('3');
 insert into translations
-        values ('5', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "In Progress", "name", "English", "EntryStatus", "3");
+        values ('5', "In Progress", "name", "English", "EntryStatus", "3");
 insert into translations
-        values ('6', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "In Progress (fr)", "name", "French", "EntryStatus", "3");
+        values ('6', "In Progress (fr)", "name", "French", "EntryStatus", "3");
 insert into entry_statuses
         values ('2', '#ffff33', '', 'Deficiency', 2, '3');
 
 insert into translation_maps
         values ('4');
 insert into translations
-        values ('7', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Done", "name", "English", "EntryStatus", "4");
+        values ('7', "Done", "name", "English", "EntryStatus", "4");
 insert into translations
-        values ('8', '2015-01-01 00:00:01', "initialPopulation", '2015-01-01 00:00:01', "initialPopulation", 0, "Done (fr)", "name", "French", "EntryStatus", "4");
+        values ('8', "Done (fr)", "name", "French", "EntryStatus", "4");
 insert into entry_statuses
         values ('3', '#33ff33', '', 'Deficiency', 3, '4');

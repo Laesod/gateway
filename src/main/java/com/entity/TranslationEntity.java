@@ -34,7 +34,7 @@ import javax.persistence.*;
 @Table(name = "translations")
 @EntityListeners(AuditingEntityListener.class)
 @Audited
-public class TranslationEntity extends BaseEntity {
+public class TranslationEntity{
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name="system-uuid", strategy = "uuid")

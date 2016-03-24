@@ -3,19 +3,13 @@ package com.rest.entryManagement;
 import com.dto.entryManagement.*;
 import com.dto.userManagement.*;
 import com.entity.*;
-import com.entity.entryManagement.DeficiencyDetailsEntity;
-import com.entity.entryManagement.EntryEntity;
-import com.entity.entryManagement.EntryStatusEntity;
-import com.entity.entryManagement.EntryTypeEntity;
+import com.entity.entryManagement.*;
 import com.entity.userManagement.GroupEntity;
 import com.entity.userManagement.ProjectEntity;
 import com.entity.userManagement.RoleEntity;
 import com.entity.userManagement.UserEntity;
 import com.repository.*;
-import com.repository.entryManagement.IDeficiencyDetailsRepository;
-import com.repository.entryManagement.IEntryRepository;
-import com.repository.entryManagement.IEntryStatusRepository;
-import com.repository.entryManagement.IEntryTypeRepository;
+import com.repository.entryManagement.*;
 import com.repository.userManagement.*;
 import com.utils.BundleMessageReader;
 import com.utils.PermissionsValidator;
@@ -30,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +39,6 @@ import java.util.*;
 @RestController
 @RequestMapping("/entry")
 public class EntryRest {
-    private ModelMapper modelMapper = new ModelMapper(); //read more at http://modelmapper.org/user-manual/
-
     @Autowired
     public IEntryRepository entryRepository;
 
@@ -53,10 +46,16 @@ public class EntryRest {
     IDeficiencyDetailsRepository deficiencyDetailsRepository;
 
     @Autowired
+    IContactDetailsRepository contactDetailsRepository;
+
+    @Autowired
     public IEntryTypeRepository entryTypeRepository;
 
     @Autowired
     public IEntryStatusRepository entryStatusRepository;
+
+    @Autowired
+    public IContactTypeRepository contactTypeRepository;
 
     @Autowired
     public IUserRepository userRepository;
@@ -74,6 +73,25 @@ public class EntryRest {
     public BundleMessageReader bundleMessageReader = new BundleMessageReader();
 
     public TranslationManager translationManager = new TranslationManager();
+
+    private ModelMapper modelMapper = new ModelMapper(); //read more at http://modelmapper.org/user-manual/
+
+    @RequestMapping(value = "/getEntryTypes", method = RequestMethod.GET)
+    @Transactional
+    public List<EntryTypeResponseDto>  getEntryTypes() {
+        List<EntryTypeResponseDto> entryTypeResponseDtos = new ArrayList<EntryTypeResponseDto>();
+
+        ArrayList<Object[]>  entryTypesObj = entryTypeRepository.getEntryTypes(LocaleContextHolder.getLocale().getDisplayLanguage());
+
+        for (Object[] entryTypeObj : entryTypesObj) {
+            EntryTypeResponseDto entryTypeResponseDto = new EntryTypeResponseDto();
+            entryTypeResponseDto.setEntryTypeGuid((String) entryTypeObj[0]);
+            entryTypeResponseDto.setName((String) entryTypeObj[1]);
+            entryTypeResponseDtos.add(entryTypeResponseDto);
+        }
+
+        return entryTypeResponseDtos;
+    }
 
     @RequestMapping(value = "/getEntryTypesForProject", method = RequestMethod.GET)
     @Transactional
@@ -293,7 +311,7 @@ public class EntryRest {
             DeficiencyDetailsEntity deficiencyDetails = entry.getDeficiencyDetails();
 
             if(deficiencyDetails != null){
-                List<Object[]> deficiencyDetailsObjList = deficiencyDetailsRepository.getDeficiencyDetails(deficiencyDetails    .getDeficiencyDetailsGuid(),  LocaleContextHolder.getLocale().getDisplayLanguage());
+                List<Object[]> deficiencyDetailsObjList = deficiencyDetailsRepository.getDeficiencyDetails(deficiencyDetails.getDeficiencyDetailsGuid(),  LocaleContextHolder.getLocale().getDisplayLanguage());
                 Object[] deficiencyDetailsObj;
                 if(deficiencyDetailsObjList !=null && deficiencyDetailsObjList.size() > 0){
                     deficiencyDetailsObj = deficiencyDetailsObjList.get(0);
@@ -310,12 +328,42 @@ public class EntryRest {
             }
         }
 
+        if(entryTypeGuid.equals("2")){//in case of deficiency
+            ContactDetailsEntity contactDetails = entry.getContactDetails();
+
+            if(contactDetails != null){
+                List<Object[]> contactDetailsObjList = contactDetailsRepository.getContactDetails(contactDetails.getContactDetailsGuid(),  LocaleContextHolder.getLocale().getDisplayLanguage());
+                Object[] contactDetailsObj;
+                if(contactDetailsObjList !=null && contactDetailsObjList.size() > 0){
+                    contactDetailsObj = contactDetailsObjList.get(0);
+
+                    ContactDetailsResponseDto contactDetailsResponseDto = new ContactDetailsResponseDto();
+
+                    contactDetailsResponseDto.setContactDetailsGuid((String) contactDetailsObj[0]);
+                    contactDetailsResponseDto.setContactTypeGuid((String) contactDetailsObj[1]);
+                    contactDetailsResponseDto.setPersonFirstName((String) contactDetailsObj[2]);
+                    contactDetailsResponseDto.setPersonLastName((String) contactDetailsObj[3]);
+                    contactDetailsResponseDto.setPersonMobilePhone((String) contactDetailsObj[4]);
+                    contactDetailsResponseDto.setPersonEmail((String) contactDetailsObj[5]);
+                    contactDetailsResponseDto.setPersonAddress((String) contactDetailsObj[6]);
+
+                    contactDetailsResponseDto.setOrganizationName((String) contactDetailsObj[7]);
+                    contactDetailsResponseDto.setOrganizationWebSite((String) contactDetailsObj[8]);
+                    contactDetailsResponseDto.setOrganizationContactPhone((String) contactDetailsObj[9]);
+                    contactDetailsResponseDto.setOrganizationContactEmail((String) contactDetailsObj[10]);
+                    contactDetailsResponseDto.setOrganizationAddress((String) contactDetailsObj[11]);
+
+                    entryResponseDto.setContactDetails(contactDetailsResponseDto);
+                }
+            }
+        }
+
         return entryResponseDto;
     }
 
     @RequestMapping(value = "/getEntries", method = RequestMethod.GET)
     @Transactional
-    public Page<EntryResponseDto> getEntries(@RequestParam String projectGuid, Pageable pageable) {
+    public Page<EntryResponseDto> getEntries(@RequestParam String projectGuid, @RequestParam String entryTypeGuid, Pageable pageable) {
         //auth check if user has admin role for the project
         UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"manager", "user", "viewer"};
@@ -324,11 +372,17 @@ public class EntryRest {
         }
 
         List<EntryResponseDto> entries = new ArrayList<EntryResponseDto>();
-        Page<Object[]> entriesObj;
+        Page<Object[]> entriesObj = null;
 
         String[] managerRole = {"manager"};
         if(permissionsValidator.rolesForProjectCheck(user, projectGuid, managerRole)) {
-            entriesObj = entryRepository.getDeficienciesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+            if(entryTypeGuid.equals("1")){
+                entriesObj = entryRepository.getDeficienciesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+            }
+            if(entryTypeGuid.equals("2")){
+                entriesObj = entryRepository.getContactsForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+            }
+
         } else {
 
             List<String> groups = new ArrayList<String>();
@@ -339,7 +393,13 @@ public class EntryRest {
             }
 
             if(groups.size() > 0){
-                entriesObj = entryRepository.getDeficienciesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+                if(entryTypeGuid.equals("1")) {
+                    entriesObj = entryRepository.getDeficienciesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+                }
+
+                if(entryTypeGuid.equals("2")) {
+                    entriesObj = entryRepository.getContactsForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+                }
             }else{
                 return null;
             }
@@ -395,5 +455,110 @@ public class EntryRest {
         }
 
         return entryResponseDto;
+    }
+
+    @RequestMapping(value = "/getContactTypes", method = RequestMethod.GET)
+    @Transactional
+    public List<ContactTypeResponseDto> getContactTypes() {
+
+        List<ContactTypeResponseDto> contactTypeResponseDtos = new ArrayList<ContactTypeResponseDto>();
+
+        ArrayList<Object[]>  contactTypesObj = contactTypeRepository.getContactTypes(LocaleContextHolder.getLocale().getDisplayLanguage());
+
+        for (Object[] contactTypeObj : contactTypesObj) {
+            ContactTypeResponseDto contactTypeResponseDto = new ContactTypeResponseDto();
+            contactTypeResponseDto.setContactTypeGuid((String) contactTypeObj[0]);
+            contactTypeResponseDto.setRanking((Integer) contactTypeObj[1]);
+            contactTypeResponseDto.setName((String) contactTypeObj[2]);
+
+            contactTypeResponseDtos.add(contactTypeResponseDto);
+        }
+
+        return contactTypeResponseDtos;
+    }
+
+    @RequestMapping(value = "/createContactDetails", method = RequestMethod.POST)
+    @Transactional
+    public ContactDetailsResponseDto createContactDetails(@Valid @RequestBody ContactDetailsRequestDto contactDetailsRequestDto) {
+        EntryEntity entry = entryRepository.findByEntryGuid(contactDetailsRequestDto.getParentEntryGuid());
+        //auth check if user has manager role for the project
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
+        String[] requiredRoles = {"manager"};
+        if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), requiredRoles)){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
+
+        ContactDetailsEntity contactDetails = new ContactDetailsEntity();
+
+        ContactTypeEntity contactType = contactTypeRepository.findByContactTypeGuid(contactDetailsRequestDto.getContactTypeGuid());
+        contactDetails.setContactType(contactType);
+
+        contactDetails.setPersonFirstName(contactDetailsRequestDto.getPersonFirstName());
+        contactDetails.setPersonLastName(contactDetailsRequestDto.getPersonLastName());
+        contactDetails.setPersonMobilePhone(contactDetailsRequestDto.getPersonMobilePhone());
+        contactDetails.setPersonEmail(contactDetailsRequestDto.getPersonEmail());
+        contactDetails.setPersonAddress(contactDetailsRequestDto.getPersonAddress());
+
+        contactDetails.setOrganizationName(contactDetailsRequestDto.getOrganizationName());
+        contactDetails.setOrganizationWebSite(contactDetailsRequestDto.getOrganizationWebSite());
+        contactDetails.setOrganizationContactPhone(contactDetailsRequestDto.getOrganizationContactPhone());
+        contactDetails.setOrganizationContactEmail(contactDetailsRequestDto.getOrganizationContactEmail());
+        contactDetails.setOrganizationAddress(contactDetailsRequestDto.getOrganizationAddress());
+
+        // deficiencyDetailsRepository.save(deficiencyDetails);
+
+        entry.setContactDetails(contactDetails);
+        if(contactDetailsRequestDto.getContactTypeGuid().equals("1")){
+            entry.setDescription(contactDetails.getPersonLastName() + ' ' + contactDetails.getPersonFirstName());
+        }
+        if(contactDetailsRequestDto.getContactTypeGuid().equals("2")){
+            entry.setDescription(contactDetails.getOrganizationName());
+        }
+
+        entryRepository.save(entry);
+
+        ContactDetailsResponseDto contactDetailsResponseDto = new ContactDetailsResponseDto();
+        contactDetailsResponseDto.setContactDetailsGuid(contactDetails.getContactDetailsGuid());
+
+        return contactDetailsResponseDto;
+    }
+
+    @RequestMapping(value = "/updateContactDetails", method = RequestMethod.PUT)
+    @Transactional
+    public ResponseEntity updateContactDetails(@Valid @RequestBody ContactDetailsRequestDto contactDetailsRequestDto) {
+        EntryEntity entry = entryRepository.findByEntryGuid(contactDetailsRequestDto.getParentEntryGuid());
+        //auth check if user has manager role for the project
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
+        String[] requiredRoles = {"manager", "user"};
+        if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), requiredRoles)){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
+
+        ContactDetailsEntity contactDetails = contactDetailsRepository.findByContactDetailsGuid(contactDetailsRequestDto.getContactDetailsGuid());
+
+        contactDetails.setPersonFirstName(contactDetailsRequestDto.getPersonFirstName());
+        contactDetails.setPersonLastName(contactDetailsRequestDto.getPersonLastName());
+        contactDetails.setPersonMobilePhone(contactDetailsRequestDto.getPersonMobilePhone());
+        contactDetails.setPersonEmail(contactDetailsRequestDto.getPersonEmail());
+        contactDetails.setPersonAddress(contactDetailsRequestDto.getPersonAddress());
+
+        contactDetails.setOrganizationName(contactDetailsRequestDto.getOrganizationName());
+        contactDetails.setOrganizationWebSite(contactDetailsRequestDto.getOrganizationWebSite());
+        contactDetails.setOrganizationContactPhone(contactDetailsRequestDto.getOrganizationContactPhone());
+        contactDetails.setOrganizationContactEmail(contactDetailsRequestDto.getOrganizationContactEmail());
+        contactDetails.setOrganizationAddress(contactDetailsRequestDto.getOrganizationAddress());
+
+
+        contactDetailsRepository.save(contactDetails);
+
+        if(contactDetailsRequestDto.getContactTypeGuid().equals("1")){
+            entry.setDescription(contactDetails.getPersonLastName() + ' ' + contactDetails.getPersonFirstName());
+        }
+        if(contactDetailsRequestDto.getContactTypeGuid().equals("2")){
+            entry.setDescription(contactDetails.getOrganizationName());
+        }
+        entryRepository.save(entry);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

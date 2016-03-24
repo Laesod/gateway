@@ -41,6 +41,10 @@ public class EntryEntity extends BaseEntity {
         @JoinColumn(name = "deficiencyDetailsGuid")
     private DeficiencyDetailsEntity deficiencyDetails;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "contactDetailsGuid")
+    private ContactDetailsEntity contactDetails;
+
     @ManyToMany
     @JoinTable(name = "entries_groups", joinColumns = { @JoinColumn(name = "entry_guid") }, inverseJoinColumns = { @JoinColumn(name = "group_guid") })
     private Set<GroupEntity> groups;
@@ -83,6 +87,14 @@ public class EntryEntity extends BaseEntity {
 
     public void setDeficiencyDetails(DeficiencyDetailsEntity deficiencyDetails) {
         this.deficiencyDetails = deficiencyDetails;
+    }
+
+    public ContactDetailsEntity getContactDetails() {
+        return contactDetails;
+    }
+
+    public void setContactDetails(ContactDetailsEntity contactDetails) {
+        this.contactDetails = contactDetails;
     }
 
     public Set<GroupEntity> getGroups() {

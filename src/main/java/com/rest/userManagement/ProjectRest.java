@@ -92,9 +92,9 @@ public class ProjectRest {
         project.setTranslationMap(translationMap);
 
         Set<EntryTypeEntity> entryTypesSet = new HashSet<EntryTypeEntity>();
-        List<EntryTypeEntity> entryTypesList = entryTypeRepository.findAll();
 
-        for (EntryTypeEntity entryType : entryTypesList) {
+        for (String entryTypeGuid : projectRequestDto.getEntryTypesToAdd()) {
+            EntryTypeEntity entryType = entryTypeRepository.findByEntryTypeGuid(entryTypeGuid);
             entryTypesSet.add(entryType);
         }
 
@@ -191,6 +191,15 @@ public class ProjectRest {
         ProjectEntity project = projectRepository.findByProjectGuid(projectGuid);
 
         project.setMarkedAsDeleted(projectRequestDto.getMarkedAsDeleted());
+
+        Set<EntryTypeEntity> entryTypesSet = new HashSet<EntryTypeEntity>();
+
+        for (String entryTypeGuid : projectRequestDto.getEntryTypesToAdd()) {
+            EntryTypeEntity entryType = entryTypeRepository.findByEntryTypeGuid(entryTypeGuid);
+            entryTypesSet.add(entryType);
+        }
+
+        project.setEntryTypes(entryTypesSet);
 
         TranslationMapEntity translationMap = project.getTranslationMap();
         List<TranslationEntity> translations = translationRepository.getTranslation(translationMap.getTranslationMapGuid(), "description", LocaleContextHolder.getLocale().getDisplayLanguage());
