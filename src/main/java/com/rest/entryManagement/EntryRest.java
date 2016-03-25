@@ -248,6 +248,7 @@ public class EntryRest {
 
         EntryStatusEntity entryStatus = entryStatusRepository.findByEntryStatusGuid(deficiencyDetailsRequestDto.getEntryStatusGuid());
         deficiencyDetails.setEntryStatus(entryStatus);
+        deficiencyDetails.setDueDate(deficiencyDetailsRequestDto.getDueDate());
 
        // deficiencyDetailsRepository.save(deficiencyDetails);
 
@@ -275,6 +276,7 @@ public class EntryRest {
         DeficiencyDetailsEntity deficiencyDetail = deficiencyDetailsRepository.findByDeficiencyDetailsGuid(deficiencyDetailsRequestDto.getDeficiencyDetailsGuid());
         EntryStatusEntity entryStatus = entryStatusRepository.findByEntryStatusGuid(deficiencyDetailsRequestDto.getEntryStatusGuid());
         deficiencyDetail.setEntryStatus(entryStatus);
+        deficiencyDetail.setDueDate(deficiencyDetailsRequestDto.getDueDate()        );
 
         deficiencyDetailsRepository.save(deficiencyDetail);
 
@@ -319,9 +321,10 @@ public class EntryRest {
                     DeficiencyDetailsResponseDto deficiencyDetailsResponseDto = new DeficiencyDetailsResponseDto();
 
                     deficiencyDetailsResponseDto.setDeficiencyDetailsGuid((String) deficiencyDetailsObj[0]);
-                    deficiencyDetailsResponseDto.setEntryStatusGuid((String) deficiencyDetailsObj[1]);
-                    deficiencyDetailsResponseDto.setEntryStatusName((String) deficiencyDetailsObj[2]);
-                    deficiencyDetailsResponseDto.setEntryStatusBackgroundColor((String) deficiencyDetailsObj[3]);
+                    deficiencyDetailsResponseDto.setDueDate((Date) deficiencyDetailsObj[1]);
+                    deficiencyDetailsResponseDto.setEntryStatusGuid((String) deficiencyDetailsObj[2]);
+                    deficiencyDetailsResponseDto.setEntryStatusName((String) deficiencyDetailsObj[3]);
+                    deficiencyDetailsResponseDto.setEntryStatusBackgroundColor((String) deficiencyDetailsObj[4]);
 
                     entryResponseDto.setDeficiencyDetails(deficiencyDetailsResponseDto);
                 }
@@ -363,7 +366,7 @@ public class EntryRest {
 
     @RequestMapping(value = "/getEntries", method = RequestMethod.GET)
     @Transactional
-    public Page<EntryResponseDto> getEntries(@RequestParam String projectGuid, @RequestParam String entryTypeGuid, Pageable pageable) {
+    public Page<EntryResponseDto> getEntries(@RequestParam String projectGuid, @RequestParam String entryTypeGuid, @RequestParam String description, Pageable pageable) {
         //auth check if user has admin role for the project
         UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
         String[] requiredRoles = {"manager", "user", "viewer"};
@@ -377,10 +380,10 @@ public class EntryRest {
         String[] managerRole = {"manager"};
         if(permissionsValidator.rolesForProjectCheck(user, projectGuid, managerRole)) {
             if(entryTypeGuid.equals("1")){
-                entriesObj = entryRepository.getDeficienciesForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+               entriesObj = entryRepository.getDeficienciesForProject(projectGuid, '%' + description + '%', LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
             }
             if(entryTypeGuid.equals("2")){
-                entriesObj = entryRepository.getContactsForProject(projectGuid, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+                entriesObj = entryRepository.getContactsForProject(projectGuid, '%' + description + '%', LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
             }
 
         } else {
@@ -394,11 +397,11 @@ public class EntryRest {
 
             if(groups.size() > 0){
                 if(entryTypeGuid.equals("1")) {
-                    entriesObj = entryRepository.getDeficienciesForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+                    entriesObj = entryRepository.getDeficienciesForProjectAndGroups(projectGuid, '%' + description + '%', groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
                 }
 
                 if(entryTypeGuid.equals("2")) {
-                    entriesObj = entryRepository.getContactsForProjectAndGroups(projectGuid, groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
+                    entriesObj = entryRepository.getContactsForProjectAndGroups(projectGuid, '%' + description + '%', groups, LocaleContextHolder.getLocale().getDisplayLanguage(), pageable);
                 }
             }else{
                 return null;

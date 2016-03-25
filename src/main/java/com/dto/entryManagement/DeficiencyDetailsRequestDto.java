@@ -3,6 +3,7 @@ package com.dto.entryManagement;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Created by root on 01/03/16.
@@ -17,6 +18,8 @@ public class DeficiencyDetailsRequestDto {
     @NotNull(message = "{FieldIsMandatory}")
     @NotEmpty(message = "{FieldCanNotBeEmpty}")
     private String entryStatusGuid;
+
+    private Date dueDate;
 
     public String getDeficiencyDetailsGuid() {
         return deficiencyDetailsGuid;
@@ -40,5 +43,13 @@ public class DeficiencyDetailsRequestDto {
 
     public void setEntryStatusGuid(String entryStatusGuid) {
         this.entryStatusGuid = entryStatusGuid;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
     }
 }

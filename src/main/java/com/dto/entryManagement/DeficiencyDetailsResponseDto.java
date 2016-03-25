@@ -1,5 +1,7 @@
 package com.dto.entryManagement;
 
+import java.util.Date;
+
 /**
  * Created by root on 02/03/16.
  */
@@ -8,6 +10,7 @@ public class DeficiencyDetailsResponseDto {
     private String entryStatusGuid;
     private String entryStatusName;
     private String entryStatusBackgroundColor;
+    private Date dueDate;
 
     public String getDeficiencyDetailsGuid() {
         return deficiencyDetailsGuid;
@@ -39,5 +42,13 @@ public class DeficiencyDetailsResponseDto {
 
     public void setEntryStatusBackgroundColor(String entryStatusBackgroundColor) {
         this.entryStatusBackgroundColor = entryStatusBackgroundColor;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
     }
 }

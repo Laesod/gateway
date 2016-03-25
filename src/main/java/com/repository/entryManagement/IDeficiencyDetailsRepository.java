@@ -17,6 +17,6 @@ import java.util.List;
 public interface IDeficiencyDetailsRepository extends JpaRepository<DeficiencyDetailsEntity, Long> {
     DeficiencyDetailsEntity findByDeficiencyDetailsGuid(String deficiencyDetailsGuid);
 
-    @Query("select a.deficiencyDetailsGuid, b.entryStatusGuid, d.content, b.backgroundColor from DeficiencyDetailsEntity a join a.entryStatus b join b.translationMap c join c.translations d where a.deficiencyDetailsGuid=:deficiencyDetailsGuid and d.field='name' and d.language=:language")
+    @Query("select a.deficiencyDetailsGuid, a.dueDate, b.entryStatusGuid, d.content, b.backgroundColor from DeficiencyDetailsEntity a join a.entryStatus b join b.translationMap c join c.translations d where a.deficiencyDetailsGuid=:deficiencyDetailsGuid and d.field='name' and d.language=:language")
     List<Object[]> getDeficiencyDetails(@Param("deficiencyDetailsGuid") String deficiencyDetailsGuid, @Param("language") String language);
 }
