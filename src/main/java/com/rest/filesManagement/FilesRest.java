@@ -18,7 +18,7 @@ import java.io.IOException;
 @Component
 @RestController
 @RequestMapping("/filesManagement")
-public class FilesRest {
+public class        FilesRest {
     @Value("${fileManager.Host}")
     private String fileManagerHost;
 

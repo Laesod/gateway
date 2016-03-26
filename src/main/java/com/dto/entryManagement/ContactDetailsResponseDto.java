@@ -8,6 +8,8 @@ public class ContactDetailsResponseDto {
 
     private String contactTypeGuid;
 
+    private String photoS3ObjectKey;
+
     private String personFirstName;
 
     private String personLastName;
@@ -42,6 +44,14 @@ public class ContactDetailsResponseDto {
 
     public void setContactTypeGuid(String contactTypeGuid) {
         this.contactTypeGuid = contactTypeGuid;
+    }
+
+    public String getPhotoS3ObjectKey() {
+        return photoS3ObjectKey;
+    }
+
+    public void setPhotoS3ObjectKey(String photoS3ObjectKey) {
+        this.photoS3ObjectKey = photoS3ObjectKey;
     }
 
     public String getPersonFirstName() {

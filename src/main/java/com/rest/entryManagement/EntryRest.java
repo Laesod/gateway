@@ -276,7 +276,7 @@ public class EntryRest {
         DeficiencyDetailsEntity deficiencyDetail = deficiencyDetailsRepository.findByDeficiencyDetailsGuid(deficiencyDetailsRequestDto.getDeficiencyDetailsGuid());
         EntryStatusEntity entryStatus = entryStatusRepository.findByEntryStatusGuid(deficiencyDetailsRequestDto.getEntryStatusGuid());
         deficiencyDetail.setEntryStatus(entryStatus);
-        deficiencyDetail.setDueDate(deficiencyDetailsRequestDto.getDueDate()        );
+        deficiencyDetail.setDueDate(deficiencyDetailsRequestDto.getDueDate());
 
         deficiencyDetailsRepository.save(deficiencyDetail);
 
@@ -344,17 +344,18 @@ public class EntryRest {
 
                     contactDetailsResponseDto.setContactDetailsGuid((String) contactDetailsObj[0]);
                     contactDetailsResponseDto.setContactTypeGuid((String) contactDetailsObj[1]);
-                    contactDetailsResponseDto.setPersonFirstName((String) contactDetailsObj[2]);
-                    contactDetailsResponseDto.setPersonLastName((String) contactDetailsObj[3]);
-                    contactDetailsResponseDto.setPersonMobilePhone((String) contactDetailsObj[4]);
-                    contactDetailsResponseDto.setPersonEmail((String) contactDetailsObj[5]);
-                    contactDetailsResponseDto.setPersonAddress((String) contactDetailsObj[6]);
+                    contactDetailsResponseDto.setPhotoS3ObjectKey((String) contactDetailsObj[2]);
+                    contactDetailsResponseDto.setPersonFirstName((String) contactDetailsObj[3]);
+                    contactDetailsResponseDto.setPersonLastName((String) contactDetailsObj[4]);
+                    contactDetailsResponseDto.setPersonMobilePhone((String) contactDetailsObj[5]);
+                    contactDetailsResponseDto.setPersonEmail((String) contactDetailsObj[6]);
+                    contactDetailsResponseDto.setPersonAddress((String) contactDetailsObj[7]);
 
-                    contactDetailsResponseDto.setOrganizationName((String) contactDetailsObj[7]);
-                    contactDetailsResponseDto.setOrganizationWebSite((String) contactDetailsObj[8]);
-                    contactDetailsResponseDto.setOrganizationContactPhone((String) contactDetailsObj[9]);
-                    contactDetailsResponseDto.setOrganizationContactEmail((String) contactDetailsObj[10]);
-                    contactDetailsResponseDto.setOrganizationAddress((String) contactDetailsObj[11]);
+                    contactDetailsResponseDto.setOrganizationName((String) contactDetailsObj[8]);
+                    contactDetailsResponseDto.setOrganizationWebSite((String) contactDetailsObj[9]);
+                    contactDetailsResponseDto.setOrganizationContactPhone((String) contactDetailsObj[10]);
+                    contactDetailsResponseDto.setOrganizationContactEmail((String) contactDetailsObj[11]);
+                    contactDetailsResponseDto.setOrganizationAddress((String) contactDetailsObj[12]);
 
                     entryResponseDto.setContactDetails(contactDetailsResponseDto);
                 }
@@ -496,6 +497,7 @@ public class EntryRest {
         ContactTypeEntity contactType = contactTypeRepository.findByContactTypeGuid(contactDetailsRequestDto.getContactTypeGuid());
         contactDetails.setContactType(contactType);
 
+        contactDetails.setPhotoS3ObjectKey(contactDetailsRequestDto.getPhotoS3ObjectKey());
         contactDetails.setPersonFirstName(contactDetailsRequestDto.getPersonFirstName());
         contactDetails.setPersonLastName(contactDetailsRequestDto.getPersonLastName());
         contactDetails.setPersonMobilePhone(contactDetailsRequestDto.getPersonMobilePhone());
@@ -512,7 +514,15 @@ public class EntryRest {
 
         entry.setContactDetails(contactDetails);
         if(contactDetailsRequestDto.getContactTypeGuid().equals("1")){
-            entry.setDescription(contactDetails.getPersonLastName() + ' ' + contactDetails.getPersonFirstName());
+            String fullName = "";
+
+            if(contactDetails.getPersonLastName() != null){
+                fullName += contactDetails.getPersonLastName();
+            }
+            if(contactDetails.getPersonFirstName() != null){
+                fullName += ' ' + contactDetails.getPersonFirstName();
+            }
+            entry.setDescription(fullName);
         }
         if(contactDetailsRequestDto.getContactTypeGuid().equals("2")){
             entry.setDescription(contactDetails.getOrganizationName());
@@ -539,6 +549,7 @@ public class EntryRest {
 
         ContactDetailsEntity contactDetails = contactDetailsRepository.findByContactDetailsGuid(contactDetailsRequestDto.getContactDetailsGuid());
 
+        contactDetails.setPhotoS3ObjectKey(contactDetailsRequestDto.getPhotoS3ObjectKey());
         contactDetails.setPersonFirstName(contactDetailsRequestDto.getPersonFirstName());
         contactDetails.setPersonLastName(contactDetailsRequestDto.getPersonLastName());
         contactDetails.setPersonMobilePhone(contactDetailsRequestDto.getPersonMobilePhone());
@@ -555,7 +566,15 @@ public class EntryRest {
         contactDetailsRepository.save(contactDetails);
 
         if(contactDetailsRequestDto.getContactTypeGuid().equals("1")){
-            entry.setDescription(contactDetails.getPersonLastName() + ' ' + contactDetails.getPersonFirstName());
+            String fullName = "";
+
+            if(contactDetails.getPersonLastName() != null){
+                fullName += contactDetails.getPersonLastName();
+            }
+            if(contactDetails.getPersonFirstName() != null){
+                fullName += ' ' + contactDetails.getPersonFirstName();
+            }
+            entry.setDescription(fullName);
         }
         if(contactDetailsRequestDto.getContactTypeGuid().equals("2")){
             entry.setDescription(contactDetails.getOrganizationName());

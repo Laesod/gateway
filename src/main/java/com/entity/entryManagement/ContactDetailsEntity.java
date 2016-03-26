@@ -25,6 +25,9 @@ public class ContactDetailsEntity extends BaseEntity {
     @JoinColumn(name = "contactTypeGuid")
     private ContactTypeEntity contactType;
 
+    @Column(name = "photo_s3_object_key")
+    private String photoS3ObjectKey;
+
     @Column(name = "person_first_name")
     private String personFirstName;
 
@@ -69,6 +72,14 @@ public class ContactDetailsEntity extends BaseEntity {
 
     public void setContactType(ContactTypeEntity contactType) {
         this.contactType = contactType;
+    }
+
+    public String getPhotoS3ObjectKey() {
+        return photoS3ObjectKey;
+    }
+
+    public void setPhotoS3ObjectKey(String photoS3ObjectKey) {
+        this.photoS3ObjectKey = photoS3ObjectKey;
     }
 
     public String getPersonFirstName() {
