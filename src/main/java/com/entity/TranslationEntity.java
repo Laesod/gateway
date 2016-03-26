@@ -58,18 +58,6 @@ public class TranslationEntity{
 
     @ManyToOne
     @JoinColumn(name="translation_map_guid")
-//    private String translationMapGuid;
-//   // private String translation_map_guid;
-//
-//
-//    public String getTranslationMapGuid() {
-//        return translationMapGuid;
-//    }
-//
-//    public void setTranslationMapGuid(String translationMapGuid) {
-//        this.translationMapGuid = translationMapGuid;
-//    }
-
     private TranslationMapEntity translationMap;
 
     public String getTranslationGuid() {

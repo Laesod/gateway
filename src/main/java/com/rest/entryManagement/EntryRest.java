@@ -1,5 +1,7 @@
 package com.rest.entryManagement;
 
+import com.dto.CommentRequestDto;
+import com.dto.CommentResponseDto;
 import com.dto.entryManagement.*;
 import com.dto.userManagement.*;
 import com.entity.*;
@@ -66,6 +68,11 @@ public class EntryRest {
     @Autowired
     public IProjectRepository projectRepository;
 
+    @Autowired
+    public ICommentMapRepository commentMapRepository;
+
+    @Autowired
+    public ICommentRepository commentRepository;
  //   public SecurityContextReader securityContextReader = new SecurityContextReader();
 
     public PermissionsValidator permissionsValidator = new PermissionsValidator();
@@ -273,6 +280,14 @@ public class EntryRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
+        String[] managerRole = {"manager"};
+        if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), managerRole)){
+            //additional check on allowed groups needed here
+            if(!permissionsValidator.groupsForProjectCheck(user, entry.getGroups())){
+                throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+            }
+        }
+
         DeficiencyDetailsEntity deficiencyDetail = deficiencyDetailsRepository.findByDeficiencyDetailsGuid(deficiencyDetailsRequestDto.getDeficiencyDetailsGuid());
         EntryStatusEntity entryStatus = entryStatusRepository.findByEntryStatusGuid(deficiencyDetailsRequestDto.getEntryStatusGuid());
         deficiencyDetail.setEntryStatus(entryStatus);
@@ -307,6 +322,30 @@ public class EntryRest {
         }
 
         entryResponseDto.setGroups(groupsList);
+
+        if(entry.getCommentMap() != null){
+            Set<CommentEntity> comments = entry.getCommentMap().getComments();
+
+            List<CommentResponseDto> commentsList = new ArrayList<CommentResponseDto>();
+
+            for (CommentEntity comment : comments){
+                CommentResponseDto commentResponseDto = new CommentResponseDto();
+                commentResponseDto.setParentEntityGuid(entry.getEntryGuid());
+                commentResponseDto.setParentEntity("Entry");
+                commentResponseDto.setMessage(comment.getMessage());
+                commentResponseDto.setCreatedAt(comment.getCreatedAt());
+
+                UserEntity creator = userRepository.findByUsername(comment.getCreatedByUser());
+                commentResponseDto.setCreatedBy(creator.getFirstName() + " " + creator.getLastName());
+                commentResponseDto.setCreatorAvatar(creator.getAvatarS3ObjectKey());
+
+                commentsList.add(commentResponseDto);
+            }
+
+            entryResponseDto.setComments(commentsList);
+        }
+
+
         //entries.add(entryResponseDto);
 
         if(entryTypeGuid.equals("1")){//in case of deficiency
@@ -547,6 +586,14 @@ public class EntryRest {
             throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
         }
 
+        String[] managerRole = {"manager"};
+        if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), managerRole)){
+            //additional check on allowed groups needed here
+            if(!permissionsValidator.groupsForProjectCheck(user, entry.getGroups())){
+                throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+            }
+        }
+
         ContactDetailsEntity contactDetails = contactDetailsRepository.findByContactDetailsGuid(contactDetailsRequestDto.getContactDetailsGuid());
 
         contactDetails.setPhotoS3ObjectKey(contactDetailsRequestDto.getPhotoS3ObjectKey());
@@ -582,5 +629,60 @@ public class EntryRest {
         entryRepository.save(entry);
 
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/createComment", method = RequestMethod.POST)
+    @Transactional
+    public CommentResponseDto createComment(@Valid @RequestBody CommentRequestDto commentRequestDto) {
+        EntryEntity entry = entryRepository.findByEntryGuid(commentRequestDto.getParentEntityGuid());
+        //auth check if user has manager role for the project
+        UserEntity user = SecurityContextReader.getUserEntity(userRepository);//userRepository.findByUsername(securityContextReader.getUsername());
+        String[] requiredRoles = {"manager", "user"};
+        if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), requiredRoles)){
+            throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+        }
+
+        String[] managerRole = {"manager"};
+        if(!permissionsValidator.rolesForProjectCheck(user, entry.getProject().getProjectGuid(), managerRole)){
+            //additional check on allowed groups needed here
+           if(!permissionsValidator.groupsForProjectCheck(user, entry.getGroups())){
+               throw new RuntimeException(bundleMessageReader.getMessage("PermissionsRelatedIssue"));
+           }
+        }
+
+        CommentMapEntity commentMap = new CommentMapEntity();
+        if(entry.getCommentMap() != null){
+            commentMap = entry.getCommentMap();
+        }
+
+        Set<CommentEntity> comments = new HashSet<CommentEntity>();
+        if(commentMap.getComments() != null){
+            comments = commentMap.getComments();
+        }
+
+        CommentEntity comment = new CommentEntity();
+        comment.setParentEntity(commentRequestDto.getParentEntity());
+        comment.setMessage(commentRequestDto.getMessage());
+        comment.setCommentMap(commentMap);
+
+        commentRepository.save(comment);
+        comments.add(comment);
+
+        commentMap.setComments(comments);
+
+        //commentMapRepository.save(commentMap);
+        entry.setCommentMap(commentMap);
+        entryRepository.save(entry);
+
+        CommentResponseDto commentResponseDto = new CommentResponseDto();
+        commentResponseDto.setCommentGuid(comment.getCommentGuid());
+        commentResponseDto.setParentEntity(comment.getParentEntity());
+        commentResponseDto.setParentEntityGuid(commentRequestDto.getParentEntityGuid());
+        commentResponseDto.setMessage(comment.getMessage());
+        commentResponseDto.setCreatedAt(comment.getCreatedAt());
+        commentResponseDto.setCreatedBy(user.getFirstName() + ' ' + user.getLastName());
+        commentResponseDto.setCreatorAvatar(user.getAvatarS3ObjectKey());
+
+        return commentResponseDto;
     }
 }

@@ -1,6 +1,7 @@
 package com.entity.entryManagement;
 
 import com.entity.BaseEntity;
+import com.entity.CommentMapEntity;
 import com.entity.TranslationMapEntity;
 import com.entity.userManagement.GroupEntity;
 import com.entity.userManagement.ProjectEntity;
@@ -38,12 +39,16 @@ public class EntryEntity extends BaseEntity {
     private String description;
 
     @OneToOne(cascade = CascadeType.ALL)
-        @JoinColumn(name = "deficiencyDetailsGuid")
+    @JoinColumn(name = "deficiencyDetailsGuid")
     private DeficiencyDetailsEntity deficiencyDetails;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "contactDetailsGuid")
     private ContactDetailsEntity contactDetails;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "commentMapGuid")
+    private CommentMapEntity commentMap;
 
     @ManyToMany
     @JoinTable(name = "entries_groups", joinColumns = { @JoinColumn(name = "entry_guid") }, inverseJoinColumns = { @JoinColumn(name = "group_guid") })
@@ -95,6 +100,14 @@ public class EntryEntity extends BaseEntity {
 
     public void setContactDetails(ContactDetailsEntity contactDetails) {
         this.contactDetails = contactDetails;
+    }
+
+    public CommentMapEntity getCommentMap() {
+        return commentMap;
+    }
+
+    public void setCommentMap(CommentMapEntity commentMap) {
+        this.commentMap = commentMap;
     }
 
     public Set<GroupEntity> getGroups() {

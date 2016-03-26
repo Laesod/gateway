@@ -200,7 +200,7 @@ public class InvitationRest {
 
             UserEntity creator = userRepository.findByUsername((String) invitation[4]);
             invitationResponseDto.setCreatedBy(creator.getFirstName() + " " + creator.getLastName());
-                invitationResponseDto.setCreatorAvatar(creator.getAvatarS3ObjectKey());
+            invitationResponseDto.setCreatorAvatar(creator.getAvatarS3ObjectKey());
 
             for (RoleEntity role : invitationEntity.getRoles()) {
                 RoleResponseDto roleResponseDto = new RoleResponseDto();

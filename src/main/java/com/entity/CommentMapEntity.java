@@ -22,4 +22,22 @@ public class CommentMapEntity {
     @Column(name = "comment_map_guid"   )
     private String commentMapGuid;
 
+    @OneToMany(mappedBy="commentMap", cascade = CascadeType.ALL)
+    private Set<CommentEntity> comments;
+
+    public String getCommentMapGuid() {
+        return commentMapGuid;
+    }
+
+    public void setCommentMapGuid(String commentMapGuid) {
+        this.commentMapGuid = commentMapGuid;
+    }
+
+    public Set<CommentEntity> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<CommentEntity> comments) {
+        this.comments = comments;
+    }
 }

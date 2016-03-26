@@ -21,6 +21,7 @@ package com.utils;
  */
 
 
+import com.entity.userManagement.GroupEntity;
 import com.entity.userManagement.ProjectEntity;
 import com.entity.userManagement.RoleEntity;
 import com.entity.userManagement.UserEntity;
@@ -28,6 +29,8 @@ import com.repository.userManagement.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by aautushk on 9/12/2015.
@@ -62,5 +65,33 @@ public class PermissionsValidator {
         }
 
         return isProjectAssignementValid;
+    }
+
+    public Boolean groupsForProjectCheck(UserEntity user, Set<GroupEntity> groups){
+        Boolean isGroupAssignementValid = false;
+
+        GroupEntity group = new GroupEntity();
+        GroupEntity userGroup = new GroupEntity();
+        Iterator<GroupEntity> iteratorForGroups = groups.iterator();
+        Iterator<GroupEntity> iteratorForUserGroups = user.getGroups().iterator();
+
+        while (iteratorForGroups.hasNext()) {
+            group = iteratorForGroups.next();
+
+            while (iteratorForUserGroups.hasNext()) {
+                userGroup = iteratorForUserGroups.next();
+
+                if(group.getGroupGuid().equals(userGroup.getGroupGuid())){
+                    isGroupAssignementValid = true;
+                    break;
+                }
+            }
+
+            if(isGroupAssignementValid.equals(true)){
+                break;
+            }
+        }
+
+        return isGroupAssignementValid;
     }
 }

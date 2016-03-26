@@ -1,5 +1,6 @@
 package com.dto.entryManagement;
 
+import com.dto.CommentResponseDto;
 import com.dto.userManagement.GroupRequestDto;
 import com.dto.userManagement.GroupResponseDto;
 
@@ -17,6 +18,8 @@ public class EntryResponseDto {
     private String description;
 
     private List<GroupResponseDto> groups;
+
+    private List<CommentResponseDto> comments;
 
     private DeficiencyDetailsResponseDto deficiencyDetails;
 
@@ -60,6 +63,14 @@ public class EntryResponseDto {
 
     public void setGroups(List<GroupResponseDto> groups) {
         this.groups = groups;
+    }
+
+    public List<CommentResponseDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentResponseDto> comments) {
+        this.comments = comments;
     }
 
     public DeficiencyDetailsResponseDto getDeficiencyDetails() {
